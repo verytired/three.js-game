@@ -1,0 +1,22 @@
+{
+  "name": "game.js",
+  "version": "0.0.0",
+  "homepage": "https://github.com/verytired/three.js-game",
+  "authors": [
+    "verytired"
+  ],
+  "main": "app/app.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.3",
+    "threejs": "*",
+    "requirejs": "~2.1.17"
+  }
+}

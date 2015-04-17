@@ -26,7 +26,7 @@ gulp.task 'coffee', ->
 #typescript compile
 gulp.task 'typescript', () ->
 	gulp
-	.src 'src/typescript/*.ts'
+	.src ['src/*.ts','src/*/*.ts']
 	.pipe $.plumber()
 	.pipe $.tsc()
 	.pipe gulp.dest parentDir + 'js'
@@ -38,7 +38,7 @@ gulp.task 'serve', ['default'], ->
 		server:
 			baseDir: [parentDir]
 	gulp.watch ['src/coffee/*.coffee'], ['script']
-	gulp.watch ['src/typescript/*.ts'], ['script_type']
+	gulp.watch ['src/*.ts','src/*/*.ts'], ['script_type']
 	gulp.watch [parentDir + '*.html'], reload
 
 #coffee compile&reload

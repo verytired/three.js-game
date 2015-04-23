@@ -3,7 +3,7 @@
 
 /// <reference path="game/MyCharacter.ts"/>
 
-declare var MyCharacter:any;
+//declare var MyCharacter:any;
 
 declare module THREE {
 	export var OrbitControls;
@@ -22,7 +22,7 @@ class App {
 	constructor() {
 		this.scene = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-		this.camera.position.set(0, 300, 0);
+		this.camera.position.set(0, 0, 300);
 
 		if (WebGLRenderingContext) {//window参照しなくていい
 			this.renderer = new THREE.WebGLRenderer();
@@ -30,34 +30,34 @@ class App {
 			//this.renderer = new THREE.CanvasRenderer();
 		}
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		this.renderer.setClearColor(0x000000);
+		this.renderer.setClearColor(0xFFFFFF);
 		this.renderer.shadowMapEnabled = true;
 
 		var container = document.getElementById('container');
 		container.appendChild(this.renderer.domElement);
 
 		var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
-		directionalLight.position.set(0, 100, 30);
+		directionalLight.position.set(0, 0, 300);
 		directionalLight.castShadow = true;
 		this.scene.add(directionalLight);
 
 		var geometry = new THREE.CubeGeometry(40, 40, 40);
 		var material = new THREE.MeshPhongMaterial({color: 0xff0000});
 		var cube = new THREE.Mesh(geometry, material);
-		cube.position.set(0, 60, 0);
+		cube.position.set(0, 60, 50);
 		cube.castShadow = true;
 		this.scene.add(cube);
 
 		var geometry2 = new THREE.CubeGeometry(20, 20, 20);
 		var material2 = new THREE.MeshPhongMaterial({color: 0x0000ff});
 		var cube2 = new THREE.Mesh(geometry2, material2);
-		cube2.position.set(0, 50, -50);
+		cube2.position.set(50, 50, 50);
 		cube2.castShadow = true;
 		this.scene.add(cube2);
 
-		var pGeometry = new THREE.PlaneGeometry(640, 480);
+		var pGeometry = new THREE.PlaneGeometry(480, 640);
 		var pMaterial = new THREE.MeshLambertMaterial({
-			color: 0x666666,
+			color: 0x999999,
 			side: THREE.DoubleSide
 		});
 		var plane = new THREE.Mesh(pGeometry, pMaterial);
@@ -112,7 +112,6 @@ class App {
 				this.animate()
 		);
 		this.render();
-
 		this.update();
 	}
 

@@ -2,8 +2,7 @@
 /// <reference path="DefinitelyTyped/threejs/three.d.ts" />
 
 /// <reference path="game/MyCharacter.ts"/>
-
-//declare var MyCharacter:any;
+/// <reference path="game/GameManager.ts"/>
 
 declare module THREE {
 	export var OrbitControls;
@@ -90,6 +89,8 @@ class App {
 
 		//以下テスト実装
 		var c = new MyCharacter();
+		var manager = GameManager.getInstance()
+		manager.initialize();
 
 	}
 
@@ -114,7 +115,6 @@ class App {
 		this.render();
 		this.update();
 	}
-
 }
 
 window.addEventListener("load", (e) => {

@@ -28,7 +28,7 @@ gulp.task 'tsc', () ->
 	gulp
 	.src ['src/*.ts','src/*/*.ts']
 #	 --outオプションでひとまとめにコンパイル
-	.pipe typescript({ target: "ES5", removeComments: true, out: "main.js" })
+	.pipe $.typescript({ target: "ES5", removeComments: true, out: "main.js" })
 	.pipe $.plumber()
 	.pipe $.tsc()
 	.pipe gulp.dest parentDir + 'js'
@@ -38,7 +38,12 @@ gulp.task 'typescript', () ->
 	gulp
 		.src ['src/*.ts','src/*/*.ts']
 		.pipe $.plumber()
-		.pipe $.typescript {module:"amd"}
+		.pipe $.typescript {
+			module:"amd"
+			target: 'ES6'
+			removeComments: true
+			out: 'app.js'
+		}
 		.pipe gulp.dest parentDir + 'js'
 
 #run server / watch

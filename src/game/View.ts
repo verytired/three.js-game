@@ -1,4 +1,4 @@
-class Scene {
+class View {
 
 	constructor() {
 		console.log("new scene");

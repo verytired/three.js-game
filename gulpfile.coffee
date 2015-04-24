@@ -42,6 +42,8 @@ gulp.task 'typescript', () ->
 			module:"amd"
 			target: 'ES6'
 			removeComments: true
+			sortOutput: false
+			sourcemap: false
 			out: 'app.js'
 		}
 		.pipe gulp.dest parentDir + 'js'

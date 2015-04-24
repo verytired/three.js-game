@@ -1,4 +1,4 @@
-class Scene {
+class Stage {
 
 	constructor() {
 		console.log("new scene");

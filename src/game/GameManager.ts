@@ -1,3 +1,6 @@
+//ゲームマネージャークラス
+//theee.jsのカメラやレンダリングなどを管理する
+
 class GameManager {
 
 	private static _instance:GameManager = null;

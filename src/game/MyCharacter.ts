@@ -6,3 +6,5 @@ class MyCharacter extends Character {
 		super();
 	}
 }
+
+

@@ -27,6 +27,8 @@ class GameManager {
 	private stageWidth = 640;
 	private stageHidth = 640;
 
+	private objs: Character[] = new Array()
+
 	constructor() {
 		if(GameManager._instance){
 			throw new Error("must use the getInstance.");
@@ -75,7 +77,6 @@ class GameManager {
 		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 
 		//以下テスト実装
-
 		var plane = new THREE.Mesh(pGeometry, pMaterial);
 		plane.position.set(0, 0, 0);
 		//plane.rotation.x = 90 * Math.PI / 180;
@@ -83,13 +84,20 @@ class GameManager {
 		this.scene.add(plane);
 
 		var c = new MyCharacter();
+		this.scene.add(c.getObject());
 		//this.currentView = null;
+
+		this.objs.push(c);
 	}
 
 
 	public update(){
 		this.controls.update();
 		//this.currentView.update();
+		console.log("update")
+		for(var i=0;i<this.objs.length;i++){
+			this.objs[i].update();
+		}
 	}
 
 	public render(){

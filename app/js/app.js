@@ -1,33 +1,26 @@
-var Character = (function () {
-    function Character() {
+var MyCharacter = (function () {
+    function MyCharacter() {
         this.x = 0;
         this.y = 0;
         this.z = 0;
         this.vx = 0;
         this.vy = 0;
-        console.log("new character");
+        this.vy = -2;
+        var geometry = new THREE.CubeGeometry(40, 40, 40);
+        var material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+        this._obj = new THREE.Mesh(geometry, material);
+        this._obj.position.set(0, 60, 50);
+        this._obj.castShadow = true;
     }
-    Character.prototype.update = function () {
-        this.x = this.x + this.vx;
-        this.y = this.y + this.vy;
+    MyCharacter.prototype.getObject = function () {
+        return this._obj;
     };
-    Character.prototype.draw = function () {
+    MyCharacter.prototype.update = function () {
+        this.y += this.vy;
+        this._obj.position.set(this.x, this.y, 50);
     };
-    return Character;
-})();
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var MyCharacter = (function (_super) {
-    __extends(MyCharacter, _super);
-    function MyCharacter() {
-        _super.call(this);
-    }
     return MyCharacter;
-})(Character);
+})();
 var View = (function () {
     function View() {
         console.log("new scene");
@@ -42,6 +35,7 @@ var GameManager = (function () {
     function GameManager() {
         this.stageWidth = 640;
         this.stageHidth = 640;
+        this.objs = new Array();
         if (GameManager._instance) {
             throw new Error("must use the getInstance.");
         }
@@ -83,9 +77,15 @@ var GameManager = (function () {
         plane.receiveShadow = true;
         this.scene.add(plane);
         var c = new MyCharacter();
+        this.scene.add(c.getObject());
+        this.objs.push(c);
     };
     GameManager.prototype.update = function () {
         this.controls.update();
+        console.log("update");
+        for (var i = 0; i < this.objs.length; i++) {
+            this.objs[i].update();
+        }
     };
     GameManager.prototype.render = function () {
         this.renderer.render(this.scene, this.camera);
@@ -104,20 +104,30 @@ window.addEventListener("load", function (e) {
     var gm = GameManager.getInstance();
     gm.animate();
 });
-var Bullet = (function (_super) {
-    __extends(Bullet, _super);
+var Bullet = (function () {
     function Bullet() {
-        _super.call(this);
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.vx = 0;
+        this.vy = 0;
     }
+    Bullet.prototype.update = function () {
+    };
     return Bullet;
-})(Character);
-var EnemyCharacter = (function (_super) {
-    __extends(EnemyCharacter, _super);
+})();
+var EnemyCharacter = (function () {
     function EnemyCharacter() {
-        _super.call(this);
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.vx = 0;
+        this.vy = 0;
     }
+    EnemyCharacter.prototype.update = function () {
+    };
     return EnemyCharacter;
-})(Character);
+})();
 var Scene = (function () {
     function Scene() {
         console.log("new scene");

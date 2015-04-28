@@ -1,19 +1,20 @@
 //敵クラス
 
 
-class EnemyCharacter implements Character {
+class EnemyCharacter extends Character {
 
-     x = 0;
-     y = 0;
-     z = 0;
+	x = 0;
+	y = 0;
+	z = 0;
 
-     vx = 0;
-     vy = 0;
+	vx = 0;
+	vy = 0;
 
-    constructor() {
-    }
+	constructor() {
+		super()
+	}
 
-    public update(){
+	public update() {
 
-    }
+	}
 }

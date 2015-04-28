@@ -76,27 +76,22 @@ class GameManager {
 
 		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 
-		//以下テスト実装
 		var plane = new THREE.Mesh(pGeometry, pMaterial);
 		plane.position.set(0, 0, 0);
 		//plane.rotation.x = 90 * Math.PI / 180;
 		plane.receiveShadow = true;
 		this.scene.add(plane);
 
-		var c = new MyCharacter();
-		this.scene.add(c.getObject());
-		//this.currentView = null;
+		//オブジェクト指向実装テスト
+		this.setView(new TestGameView());
 
-		this.objs.push(c);
 	}
-
 
 	public update(){
 		this.controls.update();
 		//this.currentView.update();
-		console.log("update")
-		for(var i=0;i<this.objs.length;i++){
-			this.objs[i].update();
+		if(this.currentView){
+			this.currentView.update()
 		}
 	}
 
@@ -110,7 +105,14 @@ class GameManager {
 		);
 		this.update();
 		this.render();
+	}
 
+	public getScene(){
+		return this.scene;
+	}
+
+	public setView(v:View){
+		this.currentView = v;
 	}
 
 }

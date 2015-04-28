@@ -1,13 +1,23 @@
+/// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
 
-interface Character{
-	x : number;
-	y : number;
-	z : number;
-	vx : number;
-	vy : number;
+class Character implements ICharacter {
 
+	x = 0;
+	y = 0;
+	z = 0;
 
-	//内部情報更新
-	update():void
+	vx = 0;
+	vy = 0;
 
+	public _obj:THREE.Mesh;
+
+	constructor() {
+	}
+
+	public update(){
+	}
+
+	public getObject(){
+		return this._obj;
+	}
 }

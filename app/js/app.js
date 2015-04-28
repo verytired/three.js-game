@@ -1,5 +1,28 @@
-var MyCharacter = (function () {
+var Character = (function () {
+    function Character() {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.vx = 0;
+        this.vy = 0;
+    }
+    Character.prototype.update = function () {
+    };
+    Character.prototype.getObject = function () {
+        return this._obj;
+    };
+    return Character;
+})();
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var MyCharacter = (function (_super) {
+    __extends(MyCharacter, _super);
     function MyCharacter() {
+        _super.call(this);
         this.x = 0;
         this.y = 0;
         this.z = 0;
@@ -12,22 +35,35 @@ var MyCharacter = (function () {
         this._obj.position.set(0, 60, 50);
         this._obj.castShadow = true;
     }
-    MyCharacter.prototype.getObject = function () {
-        return this._obj;
-    };
     MyCharacter.prototype.update = function () {
         this.y += this.vy;
         this._obj.position.set(this.x, this.y, 50);
     };
     return MyCharacter;
-})();
+})(Character);
 var View = (function () {
     function View() {
+        this.objs = new Array();
         console.log("new scene");
+        this.getScene();
+        this.init();
     }
     View.prototype.init = function () {
     };
     View.prototype.destructor = function () {
+    };
+    View.prototype.update = function () {
+        for (var i = 0; i < this.objs.length; i++) {
+            this.objs[i].update();
+        }
+    };
+    View.prototype.addCharacter = function (chara) {
+        this.objs.push(chara);
+        this.scene.add(chara.getObject());
+    };
+    View.prototype.getScene = function () {
+        var gm = GameManager.getInstance();
+        this.scene = gm.getScene();
     };
     return View;
 })();
@@ -76,15 +112,12 @@ var GameManager = (function () {
         plane.position.set(0, 0, 0);
         plane.receiveShadow = true;
         this.scene.add(plane);
-        var c = new MyCharacter();
-        this.scene.add(c.getObject());
-        this.objs.push(c);
+        this.setView(new TestGameView());
     };
     GameManager.prototype.update = function () {
         this.controls.update();
-        console.log("update");
-        for (var i = 0; i < this.objs.length; i++) {
-            this.objs[i].update();
+        if (this.currentView) {
+            this.currentView.update();
         }
     };
     GameManager.prototype.render = function () {
@@ -96,16 +129,23 @@ var GameManager = (function () {
         this.update();
         this.render();
     };
+    GameManager.prototype.getScene = function () {
+        return this.scene;
+    };
+    GameManager.prototype.setView = function (v) {
+        this.currentView = v;
+    };
     GameManager._instance = null;
     return GameManager;
 })();
 window.addEventListener("load", function (e) {
-    console.log("loaded");
     var gm = GameManager.getInstance();
     gm.animate();
 });
-var Bullet = (function () {
+var Bullet = (function (_super) {
+    __extends(Bullet, _super);
     function Bullet() {
+        _super.call(this);
         this.x = 0;
         this.y = 0;
         this.z = 0;
@@ -115,9 +155,11 @@ var Bullet = (function () {
     Bullet.prototype.update = function () {
     };
     return Bullet;
-})();
-var EnemyCharacter = (function () {
+})(Character);
+var EnemyCharacter = (function (_super) {
+    __extends(EnemyCharacter, _super);
     function EnemyCharacter() {
+        _super.call(this);
         this.x = 0;
         this.y = 0;
         this.z = 0;
@@ -127,7 +169,7 @@ var EnemyCharacter = (function () {
     EnemyCharacter.prototype.update = function () {
     };
     return EnemyCharacter;
-})();
+})(Character);
 var Scene = (function () {
     function Scene() {
         console.log("new scene");
@@ -148,3 +190,14 @@ var Stage = (function () {
     };
     return Stage;
 })();
+var TestGameView = (function (_super) {
+    __extends(TestGameView, _super);
+    function TestGameView() {
+        _super.call(this);
+    }
+    TestGameView.prototype.init = function () {
+        var c = new MyCharacter();
+        this.addCharacter(c);
+    };
+    return TestGameView;
+})(View);

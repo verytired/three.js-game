@@ -25,6 +25,8 @@ class GameManager {
 	private stageWidth = 480;
 	private stageHeight = 640;
 
+	public isStop:boolean = false;
+
 	//現在のビュー
 	private currentView:View;
 
@@ -79,7 +81,7 @@ class GameManager {
 
 	public update(){
 		this.controls.update();
-		if(this.currentView){
+		if(this.currentView && this.isStop == false){
 			this.currentView.update();
 		}
 	}

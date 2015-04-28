@@ -140,10 +140,9 @@ var MyCharacter = (function (_super) {
         this.vx = 0;
         this.vy = 0;
         this.vy = -2;
-        var geometry = new THREE.BoxGeometry(40, 40, 40);
+        var geometry = new THREE.BoxGeometry(20, 20, 20);
         var material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
         this._obj = new THREE.Mesh(geometry, material);
-        this._obj.position.set(0, 60, 50);
         this._obj.castShadow = true;
     }
     MyCharacter.prototype.update = function () {
@@ -222,6 +221,7 @@ var GameManager = (function () {
     function GameManager() {
         this.stageWidth = 480;
         this.stageHeight = 640;
+        this.isStop = false;
         if (GameManager._instance) {
             throw new Error("must use the getInstance.");
         }
@@ -258,7 +258,7 @@ var GameManager = (function () {
     };
     GameManager.prototype.update = function () {
         this.controls.update();
-        if (this.currentView) {
+        if (this.currentView && this.isStop == false) {
             this.currentView.update();
         }
     };
@@ -301,7 +301,7 @@ var Bullet = (function (_super) {
         var s = GameManager.getInstance().getStageSize();
         this.stageWidth = s.width;
         this.stageHeight = s.height;
-        this.vy = 2;
+        this.vy = 6;
         this._obj = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshPhongMaterial({
             color: 0xffffff
         }));
@@ -377,6 +377,8 @@ var TestGameView = (function (_super) {
     __extends(TestGameView, _super);
     function TestGameView() {
         _super.call(this);
+        this.enemies = new Array();
+        this.bullets = new Array();
     }
     TestGameView.prototype.init = function () {
         var _this = this;
@@ -389,48 +391,94 @@ var TestGameView = (function (_super) {
         plane.position.set(0, 0, 0);
         plane.receiveShadow = true;
         this.add(plane);
-        var c = new MyCharacter();
-        c.y = -150;
-        this.addCharacter(c);
+        this.self = new MyCharacter();
+        this.self.y = -150;
+        this.addCharacter(this.self);
         var cm = ControlManager.getInstance();
+        var that = this;
         cm.addEventListener("onKeyPress", function (e) {
             switch (e.data.keyCode) {
                 case 32:
                     var b = new Bullet();
-                    b.x = c.x;
-                    b.y = c.y;
+                    b.x = _this.self.x;
+                    b.y = _this.self.y;
                     _this.addCharacter(b);
+                    _this.bullets.push(b);
                     break;
                 case 65:
                     console.log("left");
-                    c.x -= 10;
+                    _this.self.x -= 10;
                     break;
                 case 87:
                     console.log("up");
-                    c.y += 10;
+                    _this.self.y += 10;
                     break;
                 case 68:
                     console.log("right");
-                    c.x += 10;
+                    _this.self.x += 10;
                     break;
                 case 83:
                     console.log("down");
-                    c.y -= 10;
+                    _this.self.y -= 10;
                     break;
             }
         });
         var that = this;
         var func = function () {
             setTimeout(function () {
-                console.log("test");
                 var e = new EnemyCharacter();
                 e.y = 320;
                 e.x = -320 + Math.random() * 640;
                 that.addCharacter(e);
+                that.enemies.push(e);
                 func();
-            }, 1000);
+            }, 500);
         };
         func();
+    };
+    TestGameView.prototype.update = function () {
+        this.hitTest();
+        this.checkLiveTest();
+        _super.prototype.update.call(this);
+    };
+    TestGameView.prototype.hitTest = function () {
+        for (var i = 0; i < this.bullets.length; i++) {
+            for (var j = 0; j < this.enemies.length; j++) {
+                if (this.bullets[i].x > this.enemies[j].x - 15 && this.bullets[i].x < this.enemies[j].x + 15 && this.bullets[i].y > this.enemies[j].y - 15 && this.bullets[i].y < this.enemies[j].y + 15) {
+                    this.bullets[i].isDead = true;
+                    this.enemies[j].isDead = true;
+                }
+            }
+        }
+        for (var j = 0; j < this.enemies.length; j++) {
+            if (this.self.x > this.enemies[j].x - 15 && this.self.x < this.enemies[j].x + 15 && this.self.y > this.enemies[j].y - 15 && this.self.y < this.enemies[j].y + 15) {
+                this.self.isDead = true;
+            }
+        }
+    };
+    TestGameView.prototype.checkLiveTest = function () {
+        if (this.self.isDead) {
+            GameManager.getInstance().isStop = true;
+            return;
+        }
+        var n = 0;
+        for (var i = 0; i < this.bullets.length; i++) {
+            if (this.bullets[n].isDead == true) {
+                this.bullets.splice(n, 1);
+            }
+            else {
+                n++;
+            }
+        }
+        n = 0;
+        for (var i = 0; i < this.enemies.length; i++) {
+            if (this.enemies[n].isDead == true) {
+                this.enemies.splice(n, 1);
+            }
+            else {
+                n++;
+            }
+        }
     };
     return TestGameView;
 })(View);

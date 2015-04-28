@@ -12,11 +12,10 @@ class MyCharacter extends Character {
 	constructor() {
 		super();
 		this.vy = -2
-		var geometry = new THREE.BoxGeometry(40, 40, 40);
+		var geometry = new THREE.BoxGeometry(20, 20, 20);
 		var material = new THREE.MeshPhongMaterial({color: 0xff0000});
 
 		this._obj = new THREE.Mesh(geometry, material);
-		this._obj.position.set(0, 60, 50);
 		this._obj.castShadow = true;
 	}
 

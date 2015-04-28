@@ -8,6 +8,9 @@ class TestGameView extends View {
 		super()
 	}
 
+	private enemies:Character[] = new Array();
+	private bullets:Character[] = new Array();
+	private self:Character;
 	public init() {
 
 		var pGeometry = new THREE.PlaneBufferGeometry(480, 640);
@@ -22,34 +25,37 @@ class TestGameView extends View {
 		plane.receiveShadow = true;
 		this.add(plane);
 
-		var c = new MyCharacter()
-		c.y = -150;
-		this.addCharacter(c);
+		this.self = new MyCharacter()
+		this.self.y = -150;
+		this.addCharacter(this.self);
 		var cm = ControlManager.getInstance();
+
+		var that = this;
 		cm.addEventListener("onKeyPress", (e)=> {
 			switch (e.data.keyCode) {
 				case 32:
 					//todo ショットを打つ
 					var b = new Bullet();
-					b.x = c.x
-					b.y = c.y
+					b.x = this.self.x
+					b.y = this.self.y
 					this.addCharacter(b);
+					this.bullets.push(b);
 					break
 				case 65:
 					console.log("left");
-					c.x -= 10;
+					this.self.x -= 10;
 					break
 				case 87:
 					console.log("up");
-					c.y += 10;
+					this.self.y += 10;
 					break
 				case 68:
 					console.log("right");
-					c.x += 10;
+					this.self.x += 10;
 					break
 				case 83:
 					console.log("down");
-					c.y -= 10;
+					this.self.y -= 10;
 					break
 			}
 		})
@@ -57,15 +63,65 @@ class TestGameView extends View {
 		var that = this;
 		var func = ()=> {
 			setTimeout(()=> {
-				console.log("test")
 				var e = new EnemyCharacter();
 				e.y = 320;
 				e.x = -320 + Math.random() * 640;
 				that.addCharacter(e);
+				that.enemies.push(e);
 				func();
-			}, 1000)
+			}, 500)
 		}
 
 		func();
+	}
+
+	public update() {
+		this.hitTest()
+		this.checkLiveTest()
+		super.update();
+	}
+
+	public hitTest(){
+
+		for (var i = 0; i < this.bullets.length; i++) {
+			for (var j = 0; j < this.enemies.length; j++) {
+				if(this.bullets[i].x > this.enemies[j].x-15 && this.bullets[i].x < this.enemies[j].x+15 && this.bullets[i].y > this.enemies[j].y-15 && this.bullets[i].y < this.enemies[j].y+15){
+					this.bullets[i].isDead = true;
+					this.enemies[j].isDead = true;
+				}
+			}
+		}
+
+		for (var j = 0; j < this.enemies.length; j++) {
+			if(this.self.x > this.enemies[j].x-15 && this.self.x < this.enemies[j].x+15 && this.self.y > this.enemies[j].y-15 && this.self.y < this.enemies[j].y+15){
+				this.self.isDead = true;
+
+			}
+		}
+	}
+	public checkLiveTest() {
+		if(this.self.isDead){
+			//todo stop & allclear
+			GameManager.getInstance().isStop = true;
+			return
+		}
+		var n = 0
+		for (var i = 0; i < this.bullets.length; i++) {
+			if (this.bullets[n].isDead == true) {
+				this.bullets.splice(n, 1)
+			} else {
+				n++;
+			}
+		}
+		n = 0
+		for (var i = 0; i < this.enemies.length; i++) {
+			if (this.enemies[n].isDead == true) {
+				this.enemies.splice(n, 1)
+			} else {
+				n++;
+			}
+		}
+
+
 	}
 }

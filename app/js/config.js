@@ -12,6 +12,9 @@ require.config({
 			],
 			trackball_controls :[
 				'/bower_components/threejs/examples/js/controls/TrackballControls'
+			],
+			app_main :[
+				'/js/app'
 			]
 		},
 	shim: {
@@ -22,10 +25,13 @@ require.config({
 		'trackball_controls': {
 			deps: ['threejs'],
 			exports: 'THREE'
+		},
+		'app_main': {
+			deps: ['threejs','orbit_controls','trackball_controls'],
 		}
 	}
 });
 
 // モジュール定義
-define(['jquery','threejs','orbit_controls','trackball_controls'	], function (THREE) {
+define(['jquery','threejs','orbit_controls','trackball_controls','app_main'], function (THREE) {
 });

@@ -1,5 +1,6 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
 /// <reference path="View.ts"/>
+/// <reference path="EnemyCharacter.ts"/>
 
 class TestGameView extends View {
 
@@ -9,11 +10,12 @@ class TestGameView extends View {
 
 	public init(){
 
-		var pGeometry = new THREE.PlaneGeometry(480, 640);
+		var pGeometry = new THREE.PlaneBufferGeometry(480, 640);
 		var pMaterial = new THREE.MeshLambertMaterial({
 			color: 0x999999,
 			side: THREE.DoubleSide
 		});
+
 		var plane = new THREE.Mesh(pGeometry, pMaterial);
 		plane.position.set(0, 0, 0);
 		//plane.rotation.x = 90 * Math.PI / 180;
@@ -26,6 +28,11 @@ class TestGameView extends View {
 		cm.addEventListener("onKeyPress", (e)=>{
 			switch(e.data.keyCode){
 				case 32:
+					//todo ショットを打つ
+					var b = new Bullet();
+					b.x = c.x
+					b.y = c.y
+					this.addCharacter(b);
 					break
 				case 65:
 					console.log("left");
@@ -45,5 +52,19 @@ class TestGameView extends View {
 					break
 			}
 		})
+
+		var that = this;
+		var func = ()=>{
+			setTimeout(()=>{
+				console.log("test")
+				var e = new EnemyCharacter();
+				e.y = 320;
+				e.x = -320+Math.random()*640;
+				that.addCharacter(e);
+				func();
+			},1000)
+		}
+
+		func();
 	}
 }

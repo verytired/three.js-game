@@ -79,9 +79,8 @@ class GameManager {
 
 	public update(){
 		this.controls.update();
-		//this.currentView.update();
 		if(this.currentView){
-			this.currentView.update()
+			this.currentView.update();
 		}
 	}
 

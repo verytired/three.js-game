@@ -137,7 +137,7 @@ var MyCharacter = (function (_super) {
         this.vx = 0;
         this.vy = 0;
         this.vy = -2;
-        var geometry = new THREE.CubeGeometry(40, 40, 40);
+        var geometry = new THREE.BoxGeometry(40, 40, 40);
         var material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
         this._obj = new THREE.Mesh(geometry, material);
         this._obj.position.set(0, 60, 50);
@@ -279,8 +279,17 @@ var Bullet = (function (_super) {
         this.z = 0;
         this.vx = 0;
         this.vy = 0;
+        this.vy = 2;
+        this._obj = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshPhongMaterial({
+            color: 0xffffff
+        }));
+        this._obj.position.set(0, 60, 50);
+        this._obj.castShadow = true;
     }
     Bullet.prototype.update = function () {
+        this.x += this.vx;
+        this.y += this.vy;
+        this._obj.position.set(this.x, this.y, 50);
     };
     return Bullet;
 })(Character);
@@ -293,8 +302,15 @@ var EnemyCharacter = (function (_super) {
         this.z = 0;
         this.vx = 0;
         this.vy = 0;
+        this.vy = -2;
+        var material = new THREE.MeshLambertMaterial({ color: 0x008866, wireframe: false });
+        this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(20), material);
+        this._obj.castShadow = true;
     }
     EnemyCharacter.prototype.update = function () {
+        this.x += this.vx;
+        this.y += this.vy;
+        this._obj.position.set(this.x, this.y, 50);
     };
     return EnemyCharacter;
 })(Character);
@@ -324,7 +340,8 @@ var TestGameView = (function (_super) {
         _super.call(this);
     }
     TestGameView.prototype.init = function () {
-        var pGeometry = new THREE.PlaneGeometry(480, 640);
+        var _this = this;
+        var pGeometry = new THREE.PlaneBufferGeometry(480, 640);
         var pMaterial = new THREE.MeshLambertMaterial({
             color: 0x999999,
             side: THREE.DoubleSide
@@ -339,6 +356,10 @@ var TestGameView = (function (_super) {
         cm.addEventListener("onKeyPress", function (e) {
             switch (e.data.keyCode) {
                 case 32:
+                    var b = new Bullet();
+                    b.x = c.x;
+                    b.y = c.y;
+                    _this.addCharacter(b);
                     break;
                 case 65:
                     console.log("left");
@@ -358,6 +379,18 @@ var TestGameView = (function (_super) {
                     break;
             }
         });
+        var that = this;
+        var func = function () {
+            setTimeout(function () {
+                console.log("test");
+                var e = new EnemyCharacter();
+                e.y = 320;
+                e.x = -320 + Math.random() * 640;
+                that.addCharacter(e);
+                func();
+            }, 1000);
+        };
+        func();
     };
     return TestGameView;
 })(View);

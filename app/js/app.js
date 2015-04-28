@@ -119,11 +119,14 @@ var Character = (function (_super) {
         this.z = 0;
         this.vx = 0;
         this.vy = 0;
+        this.isDead = false;
     }
     Character.prototype.update = function () {
     };
     Character.prototype.getObject = function () {
         return this._obj;
+    };
+    Character.prototype.remove = function () {
     };
     return Character;
 })(events.EventDispatcher);
@@ -162,14 +165,25 @@ var View = (function () {
     View.prototype.update = function () {
         for (var i = 0; i < this.objs.length; i++) {
             this.objs[i].update();
+            if (this.objs[i].isDead == true) {
+                this.removeCharacter(this.objs[i], i);
+            }
         }
     };
     View.prototype.add = function (obj) {
         this.scene.add(obj);
     };
+    View.prototype.remove = function (obj) {
+        this.scene.remove(obj);
+    };
     View.prototype.addCharacter = function (chara) {
         this.objs.push(chara);
         this.scene.add(chara.getObject());
+    };
+    View.prototype.removeCharacter = function (chara, index) {
+        this.objs.splice(index, 1);
+        this.scene.remove(chara.getObject());
+        chara.remove();
     };
     View.prototype.getScene = function () {
         var gm = GameManager.getInstance();
@@ -206,8 +220,8 @@ var ControlManager = (function (_super) {
 })(events.EventDispatcher);
 var GameManager = (function () {
     function GameManager() {
-        this.stageWidth = 640;
-        this.stageHidth = 640;
+        this.stageWidth = 480;
+        this.stageHeight = 640;
         if (GameManager._instance) {
             throw new Error("must use the getInstance.");
         }
@@ -263,6 +277,9 @@ var GameManager = (function () {
     GameManager.prototype.setView = function (v) {
         this.currentView = v;
     };
+    GameManager.prototype.getStageSize = function () {
+        return { width: this.stageWidth, height: this.stageHeight };
+    };
     GameManager._instance = null;
     return GameManager;
 })();
@@ -279,6 +296,11 @@ var Bullet = (function (_super) {
         this.z = 0;
         this.vx = 0;
         this.vy = 0;
+        this.stageWidth = 0;
+        this.stageHeight = 0;
+        var s = GameManager.getInstance().getStageSize();
+        this.stageWidth = s.width;
+        this.stageHeight = s.height;
         this.vy = 2;
         this._obj = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshPhongMaterial({
             color: 0xffffff
@@ -289,7 +311,13 @@ var Bullet = (function (_super) {
     Bullet.prototype.update = function () {
         this.x += this.vx;
         this.y += this.vy;
+        this.checkAreaTest();
         this._obj.position.set(this.x, this.y, 50);
+    };
+    Bullet.prototype.checkAreaTest = function () {
+        if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
+            this.isDead = true;
+        }
     };
     return Bullet;
 })(Character);
@@ -302,15 +330,26 @@ var EnemyCharacter = (function (_super) {
         this.z = 0;
         this.vx = 0;
         this.vy = 0;
+        this.stageWidth = 0;
+        this.stageHeight = 0;
         this.vy = -2;
         var material = new THREE.MeshLambertMaterial({ color: 0x008866, wireframe: false });
         this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(20), material);
         this._obj.castShadow = true;
+        var s = GameManager.getInstance().getStageSize();
+        this.stageWidth = s.width;
+        this.stageHeight = s.height;
     }
     EnemyCharacter.prototype.update = function () {
         this.x += this.vx;
         this.y += this.vy;
+        this.checkAreaTest();
         this._obj.position.set(this.x, this.y, 50);
+    };
+    EnemyCharacter.prototype.checkAreaTest = function () {
+        if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
+            this.isDead = true;
+        }
     };
     return EnemyCharacter;
 })(Character);
@@ -351,6 +390,7 @@ var TestGameView = (function (_super) {
         plane.receiveShadow = true;
         this.add(plane);
         var c = new MyCharacter();
+        c.y = -150;
         this.addCharacter(c);
         var cm = ControlManager.getInstance();
         cm.addEventListener("onKeyPress", function (e) {

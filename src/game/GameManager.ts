@@ -22,8 +22,8 @@ class GameManager {
 	private renderer;
 	private controls;
 
-	private stageWidth = 640;
-	private stageHidth = 640;
+	private stageWidth = 480;
+	private stageHeight = 640;
 
 	//現在のビュー
 	private currentView:View;
@@ -102,6 +102,10 @@ class GameManager {
 
 	public setView(v:View){
 		this.currentView = v;
+	}
+
+	public getStageSize(){
+		return {width:this.stageWidth,height:this.stageHeight}
 	}
 
 }

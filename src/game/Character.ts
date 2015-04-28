@@ -11,6 +11,7 @@ class Character extends events.EventDispatcher implements ICharacter {
 	vy = 0;
 
 	public _obj:THREE.Mesh;
+	public isDead:boolean = false;
 
 	constructor() {
 		super()
@@ -22,4 +23,9 @@ class Character extends events.EventDispatcher implements ICharacter {
 	public getObject(){
 		return this._obj;
 	}
+
+	public remove(){
+
+	}
+
 }

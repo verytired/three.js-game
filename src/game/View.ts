@@ -27,6 +27,9 @@ class View {
 		}
 	}
 
+	public add(obj){
+		this.scene.add(obj);
+	}
 	public addCharacter(chara:Character){
 		this.objs.push(chara)
 		this.scene.add(chara.getObject());

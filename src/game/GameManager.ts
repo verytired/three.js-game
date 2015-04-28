@@ -6,6 +6,7 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
 /// <reference path="MyCharacter.ts"/>
 /// <reference path="View.ts"/>
+/// <reference path="ControlManager.ts"/>
 
 declare module THREE {
 	export var OrbitControls;
@@ -16,9 +17,6 @@ class GameManager {
 
 	private static _instance:GameManager = null;
 
-	//現在のビュー
-	private currentView:View;
-	//
 	private scene:THREE.Scene;
 	private camera:THREE.PerspectiveCamera;
 	private renderer;
@@ -27,7 +25,8 @@ class GameManager {
 	private stageWidth = 640;
 	private stageHidth = 640;
 
-	private objs: Character[] = new Array()
+	//現在のビュー
+	private currentView:View;
 
 	constructor() {
 		if(GameManager._instance){
@@ -63,12 +62,6 @@ class GameManager {
 		directionalLight.castShadow = true;
 		this.scene.add(directionalLight);
 
-		var pGeometry = new THREE.PlaneGeometry(480, 640);
-		var pMaterial = new THREE.MeshLambertMaterial({
-			color: 0x999999,
-			side: THREE.DoubleSide
-		});
-
 		//座標軸()
 		var axis = new THREE.AxisHelper(1000);
 		axis.position.set(0, 0, 0);
@@ -76,11 +69,8 @@ class GameManager {
 
 		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 
-		var plane = new THREE.Mesh(pGeometry, pMaterial);
-		plane.position.set(0, 0, 0);
-		//plane.rotation.x = 90 * Math.PI / 180;
-		plane.receiveShadow = true;
-		this.scene.add(plane);
+		//操作機能
+		var ctmanager = ControlManager.getInstance();
 
 		//オブジェクト指向実装テスト
 		this.setView(new TestGameView());

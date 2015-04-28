@@ -1,6 +1,7 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
+/// <reference path="EventDispatcher.ts"/>
 
-class Character implements ICharacter {
+class Character extends events.EventDispatcher implements ICharacter {
 
 	x = 0;
 	y = 0;
@@ -12,6 +13,7 @@ class Character implements ICharacter {
 	public _obj:THREE.Mesh;
 
 	constructor() {
+		super()
 	}
 
 	public update(){

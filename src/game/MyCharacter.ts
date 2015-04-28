@@ -3,11 +3,11 @@
 
 class MyCharacter extends Character {
 
-	 x = 0;
-	 y = 0;
+	public x = 0;
+	public y = 0;
 	 z = 0;
 	 vx = 0;
-	 vy = 0;
+	public vy = 0;
 
 	constructor() {
 		super();
@@ -20,7 +20,7 @@ class MyCharacter extends Character {
 	}
 
 	public update(){
-		this.y +=this.vy;
+		//this.y +=this.vy;
 		this._obj.position.set(this.x, this.y, 50);
 	}
 }

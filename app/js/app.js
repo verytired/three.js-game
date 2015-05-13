@@ -353,6 +353,66 @@ var EnemyCharacter = (function (_super) {
     };
     return EnemyCharacter;
 })(Character);
+var Explosion = (function (_super) {
+    __extends(Explosion, _super);
+    function Explosion(x, y) {
+        _super.call(this);
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.movementSpeed = 80;
+        this.totalObjects = 500;
+        this.objectSize = 10;
+        this.sizeRandomness = 4000;
+        this.colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
+        this.dirs = [];
+        this.parts = [];
+        this.status = false;
+        this.xDir = 0;
+        this.yDir = 0;
+        this.zDir = 0;
+        var particles = new THREE.Geometry();
+        for (var i = 0; i < this.totalObjects; i++) {
+            var vertex = new THREE.Vector3();
+            vertex.x = x;
+            vertex.y = y;
+            vertex.z = 0;
+            particles.vertices.push(vertex);
+            this.dirs.push({
+                x: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
+                y: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
+                z: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2)
+            });
+        }
+        var materialParticle = new THREE.PointCloudMaterial({
+            color: 0xFF0000,
+            size: 5,
+            transparent: true
+        });
+        this._obj = new THREE.PointCloud(particles, materialParticle);
+        this.status = true;
+        this.xDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
+        this.yDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
+        this.zDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
+    }
+    Explosion.prototype.init = function () {
+    };
+    Explosion.prototype.update = function () {
+        if (this.status == true) {
+            var pCount = this.totalObjects;
+            while (pCount--) {
+                var particle = this._obj.geometry.vertices[pCount];
+                particle.y += this.dirs[pCount].y;
+                particle.x += this.dirs[pCount].x;
+                particle.z += this.dirs[pCount].z;
+            }
+            this._obj.geometry.verticesNeedUpdate = true;
+        }
+    };
+    return Explosion;
+})(Character);
 var Scene = (function () {
     function Scene() {
         console.log("new scene");
@@ -379,6 +439,7 @@ var TestGameView = (function (_super) {
         _super.call(this);
         this.enemies = new Array();
         this.bullets = new Array();
+        this.explosions = new Array();
     }
     TestGameView.prototype.init = function () {
         var _this = this;
@@ -440,6 +501,9 @@ var TestGameView = (function (_super) {
         this.hitTest();
         this.checkLiveTest();
         _super.prototype.update.call(this);
+        for (var i = 0; i < this.explosions.length; i++) {
+            this.explosions[i].update();
+        }
     };
     TestGameView.prototype.hitTest = function () {
         for (var i = 0; i < this.bullets.length; i++) {
@@ -447,6 +511,9 @@ var TestGameView = (function (_super) {
                 if (this.bullets[i].x > this.enemies[j].x - 15 && this.bullets[i].x < this.enemies[j].x + 15 && this.bullets[i].y > this.enemies[j].y - 15 && this.bullets[i].y < this.enemies[j].y + 15) {
                     this.bullets[i].isDead = true;
                     this.enemies[j].isDead = true;
+                    var ex = new Explosion(this.enemies[j].x, this.enemies[j].y);
+                    this.add(ex.getObject());
+                    this.explosions.push(ex);
                 }
             }
         }

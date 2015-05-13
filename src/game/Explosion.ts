@@ -9,7 +9,7 @@ class Explosion extends Character {
 	public vy = 0;
 
 	movementSpeed = 80;
-	totalObjects = 1000;
+	totalObjects = 500;
 	objectSize = 10;
 	sizeRandomness = 4000;
 	colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
@@ -23,9 +23,9 @@ class Explosion extends Character {
 	yDir = 0;
 	zDir = 0;
 
-	private _pd:THREE.PointCloud;
-
+	private _obj:THREE.PointCloud;
 	private particle;
+
 	constructor(x, y) {
 		super();
 		var particles = new THREE.Geometry();
@@ -51,15 +51,11 @@ class Explosion extends Character {
 			transparent: true
 		});
 
-		this._pd = new THREE.PointCloud(particles, materialParticle);
-
+		this._obj = new THREE.PointCloud(particles, materialParticle);
 		this.status = true;
-
 		this.xDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
 		this.yDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
 		this.zDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
-
-
 	}
 
 	public init() {
@@ -67,16 +63,15 @@ class Explosion extends Character {
 	}
 
 	public update() {
-
 		if (this.status == true) {
 			var pCount = this.totalObjects;
 			while (pCount--) {
-				var particle = this._pd.geometry.vertices[pCount]
+				var particle = this._obj.geometry.vertices[pCount]
 				particle.y += this.dirs[pCount].y;
 				particle.x += this.dirs[pCount].x;
 				particle.z += this.dirs[pCount].z;
 			}
-			this._pd.geometry.verticesNeedUpdate = true;
+			this._obj.geometry.verticesNeedUpdate = true;
 		}
 	}
 

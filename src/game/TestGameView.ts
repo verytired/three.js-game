@@ -10,6 +10,8 @@ class TestGameView extends View {
 
 	private enemies:Character[] = new Array();
 	private bullets:Character[] = new Array();
+	private explosions:Character[] = new Array();
+
 	private self:Character;
 	public init() {
 
@@ -79,6 +81,10 @@ class TestGameView extends View {
 		this.hitTest()
 		this.checkLiveTest()
 		super.update();
+		//todo 爆風更新が別になっているのをなんとかしたい
+		for(var i=0;i<this.explosions.length;i++){
+			this.explosions[i].update();
+		}
 	}
 
 	public hitTest(){
@@ -88,6 +94,9 @@ class TestGameView extends View {
 				if(this.bullets[i].x > this.enemies[j].x-15 && this.bullets[i].x < this.enemies[j].x+15 && this.bullets[i].y > this.enemies[j].y-15 && this.bullets[i].y < this.enemies[j].y+15){
 					this.bullets[i].isDead = true;
 					this.enemies[j].isDead = true;
+					var ex = new Explosion(this.enemies[j].x,this.enemies[j].y);
+					this.add(ex.getObject());
+					this.explosions.push(ex)
 				}
 			}
 		}
@@ -121,7 +130,5 @@ class TestGameView extends View {
 				n++;
 			}
 		}
-
-
 	}
 }

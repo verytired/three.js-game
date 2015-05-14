@@ -64,7 +64,7 @@ class GameManager {
 		directionalLight.castShadow = true;
 		this.scene.add(directionalLight);
 
-		//座標軸()
+		//座標軸
 		var axis = new THREE.AxisHelper(1000);
 		axis.position.set(0, 0, 0);
 		this.scene.add(axis);

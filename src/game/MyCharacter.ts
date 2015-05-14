@@ -11,7 +11,7 @@ class MyCharacter extends Character {
 
 	constructor() {
 		super();
-		this.vy = -2
+		this.vy = -2;
 		var geometry = new THREE.BoxGeometry(20, 20, 20);
 		var material = new THREE.MeshPhongMaterial({color: 0xff0000});
 

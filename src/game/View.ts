@@ -7,7 +7,6 @@ class View {
 	private objs: Character[] = new Array()
 	private scene:THREE.Scene;
 
-
 	constructor() {
 		console.log("new scene");
 		this.getScene();

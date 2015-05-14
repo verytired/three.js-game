@@ -391,7 +391,7 @@ var Explosion = (function (_super) {
             size: 5,
             transparent: true
         });
-        this._obj = new THREE.PointCloud(particles, materialParticle);
+        this._pc = new THREE.PointCloud(particles, materialParticle);
         this.status = true;
         this.xDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
         this.yDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
@@ -399,20 +399,30 @@ var Explosion = (function (_super) {
     }
     Explosion.prototype.init = function () {
     };
+    Explosion.prototype.getParticles = function () {
+        return this._pc;
+    };
     Explosion.prototype.update = function () {
         if (this.status == true) {
             var pCount = this.totalObjects;
             while (pCount--) {
-                var particle = this._obj.geometry.vertices[pCount];
+                var particle = this._pc.geometry.vertices[pCount];
                 particle.y += this.dirs[pCount].y;
                 particle.x += this.dirs[pCount].x;
                 particle.z += this.dirs[pCount].z;
             }
-            this._obj.geometry.verticesNeedUpdate = true;
+            this._pc.geometry.verticesNeedUpdate = true;
         }
     };
     return Explosion;
 })(Character);
+var MenuView = (function (_super) {
+    __extends(MenuView, _super);
+    function MenuView() {
+        _super.call(this);
+    }
+    return MenuView;
+})(View);
 var Scene = (function () {
     function Scene() {
         console.log("new scene");
@@ -456,7 +466,6 @@ var TestGameView = (function (_super) {
         this.self.y = -150;
         this.addCharacter(this.self);
         var cm = ControlManager.getInstance();
-        var that = this;
         cm.addEventListener("onKeyPress", function (e) {
             switch (e.data.keyCode) {
                 case 32:
@@ -484,14 +493,13 @@ var TestGameView = (function (_super) {
                     break;
             }
         });
-        var that = this;
         var func = function () {
             setTimeout(function () {
                 var e = new EnemyCharacter();
                 e.y = 320;
                 e.x = -320 + Math.random() * 640;
-                that.addCharacter(e);
-                that.enemies.push(e);
+                _this.addCharacter(e);
+                _this.enemies.push(e);
                 func();
             }, 500);
         };
@@ -512,20 +520,24 @@ var TestGameView = (function (_super) {
                     this.bullets[i].isDead = true;
                     this.enemies[j].isDead = true;
                     var ex = new Explosion(this.enemies[j].x, this.enemies[j].y);
-                    this.add(ex.getObject());
+                    this.add(ex.getParticles());
                     this.explosions.push(ex);
                 }
             }
         }
         for (var j = 0; j < this.enemies.length; j++) {
             if (this.self.x > this.enemies[j].x - 15 && this.self.x < this.enemies[j].x + 15 && this.self.y > this.enemies[j].y - 15 && this.self.y < this.enemies[j].y + 15) {
-                this.self.isDead = true;
+                if (!this.self.isDead) {
+                    this.self.isDead = true;
+                    var ex = new Explosion(this.self.x, this.self.y);
+                    this.add(ex.getParticles());
+                    this.explosions.push(ex);
+                }
             }
         }
     };
     TestGameView.prototype.checkLiveTest = function () {
         if (this.self.isDead) {
-            GameManager.getInstance().isStop = true;
             return;
         }
         var n = 0;
@@ -546,6 +558,10 @@ var TestGameView = (function (_super) {
                 n++;
             }
         }
+    };
+    TestGameView.prototype.setGameOver = function () {
+    };
+    TestGameView.prototype.restart = function () {
     };
     return TestGameView;
 })(View);

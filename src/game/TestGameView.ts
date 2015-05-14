@@ -10,7 +10,7 @@ class TestGameView extends View {
 
 	private enemies:Character[] = new Array();
 	private bullets:Character[] = new Array();
-	private explosions:Character[] = new Array();
+	private explosions:Explosion[] = new Array();
 
 	private self:Character;
 	public init() {
@@ -32,7 +32,6 @@ class TestGameView extends View {
 		this.addCharacter(this.self);
 		var cm = ControlManager.getInstance();
 
-		var that = this;
 		cm.addEventListener("onKeyPress", (e)=> {
 			switch (e.data.keyCode) {
 				case 32:
@@ -62,14 +61,13 @@ class TestGameView extends View {
 			}
 		})
 
-		var that = this;
 		var func = ()=> {
 			setTimeout(()=> {
 				var e = new EnemyCharacter();
 				e.y = 320;
 				e.x = -320 + Math.random() * 640;
-				that.addCharacter(e);
-				that.enemies.push(e);
+				this.addCharacter(e);
+				this.enemies.push(e);
 				func();
 			}, 500)
 		}
@@ -95,7 +93,7 @@ class TestGameView extends View {
 					this.bullets[i].isDead = true;
 					this.enemies[j].isDead = true;
 					var ex = new Explosion(this.enemies[j].x,this.enemies[j].y);
-					this.add(ex.getObject());
+					this.add(ex.getParticles());
 					this.explosions.push(ex)
 				}
 			}
@@ -103,15 +101,20 @@ class TestGameView extends View {
 
 		for (var j = 0; j < this.enemies.length; j++) {
 			if(this.self.x > this.enemies[j].x-15 && this.self.x < this.enemies[j].x+15 && this.self.y > this.enemies[j].y-15 && this.self.y < this.enemies[j].y+15){
-				this.self.isDead = true;
+				if(!this.self.isDead){
+					this.self.isDead = true;
+					var ex = new Explosion(this.self.x,this.self.y);
+					this.add(ex.getParticles());
+					this.explosions.push(ex)
+				}
 
 			}
 		}
 	}
 	public checkLiveTest() {
 		if(this.self.isDead){
-			//todo stop & allclear
-			GameManager.getInstance().isStop = true;
+			//GameManager.getInstance().isStop = true;
+			//todo 3秒後くらいにゲームオーバー表示させる→スペース押したらreplay
 			return
 		}
 		var n = 0
@@ -130,5 +133,14 @@ class TestGameView extends View {
 				n++;
 			}
 		}
+	}
+
+	public setGameOver(){
+
+	}
+
+	public restart(){
+
+
 	}
 }

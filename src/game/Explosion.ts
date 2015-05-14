@@ -23,7 +23,7 @@ class Explosion extends Character {
 	yDir = 0;
 	zDir = 0;
 
-	private _obj:THREE.PointCloud;
+	private _pc:THREE.PointCloud;
 	private particle;
 
 	constructor(x, y) {
@@ -51,7 +51,7 @@ class Explosion extends Character {
 			transparent: true
 		});
 
-		this._obj = new THREE.PointCloud(particles, materialParticle);
+		this._pc = new THREE.PointCloud(particles, materialParticle);
 		this.status = true;
 		this.xDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
 		this.yDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
@@ -62,16 +62,20 @@ class Explosion extends Character {
 
 	}
 
+	public getParticles(){
+		return this._pc;
+	}
+
 	public update() {
 		if (this.status == true) {
 			var pCount = this.totalObjects;
 			while (pCount--) {
-				var particle = this._obj.geometry.vertices[pCount]
+				var particle = this._pc.geometry.vertices[pCount]
 				particle.y += this.dirs[pCount].y;
 				particle.x += this.dirs[pCount].x;
 				particle.z += this.dirs[pCount].z;
 			}
-			this._obj.geometry.verticesNeedUpdate = true;
+			this._pc.geometry.verticesNeedUpdate = true;
 		}
 	}
 

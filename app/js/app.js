@@ -222,6 +222,9 @@ var GameManager = (function () {
         this.stageWidth = 480;
         this.stageHeight = 640;
         this.isStop = false;
+        this.$viewScore = null;
+        this.$viewDebug = null;
+        this.score = 0;
         if (GameManager._instance) {
             throw new Error("must use the getInstance.");
         }
@@ -254,6 +257,11 @@ var GameManager = (function () {
         this.scene.add(axis);
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         var ctmanager = ControlManager.getInstance();
+        this.$viewScore = $("#score");
+        this.setScore(0);
+        this.$viewScore.show();
+        this.$viewDebug = $("#debug");
+        this.$viewDebug.hide();
         this.setView(new TestGameView());
     };
     GameManager.prototype.update = function () {
@@ -279,6 +287,14 @@ var GameManager = (function () {
     };
     GameManager.prototype.getStageSize = function () {
         return { width: this.stageWidth, height: this.stageHeight };
+    };
+    GameManager.prototype.addScore = function (p) {
+        this.score += p;
+        this.$viewScore.html("Score:" + this.score);
+    };
+    GameManager.prototype.setScore = function (p) {
+        this.score = p;
+        this.$viewScore.html("Score:" + this.score);
     };
     GameManager._instance = null;
     return GameManager;
@@ -332,6 +348,7 @@ var EnemyCharacter = (function (_super) {
         this.vy = 0;
         this.stageWidth = 0;
         this.stageHeight = 0;
+        this.point = 150;
         this.vy = -2;
         var material = new THREE.MeshLambertMaterial({ color: 0x008866, wireframe: false });
         this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(20), material);
@@ -453,6 +470,7 @@ var TestGameView = (function (_super) {
     }
     TestGameView.prototype.init = function () {
         var _this = this;
+        this.gm = GameManager.getInstance();
         var pGeometry = new THREE.PlaneBufferGeometry(480, 640);
         var pMaterial = new THREE.MeshLambertMaterial({
             color: 0x999999,
@@ -519,6 +537,7 @@ var TestGameView = (function (_super) {
                 if (this.bullets[i].x > this.enemies[j].x - 15 && this.bullets[i].x < this.enemies[j].x + 15 && this.bullets[i].y > this.enemies[j].y - 15 && this.bullets[i].y < this.enemies[j].y + 15) {
                     this.bullets[i].isDead = true;
                     this.enemies[j].isDead = true;
+                    this.gm.addScore(this.enemies[j].point);
                     var ex = new Explosion(this.enemies[j].x, this.enemies[j].y);
                     this.add(ex.getParticles());
                     this.explosions.push(ex);
@@ -562,6 +581,7 @@ var TestGameView = (function (_super) {
     TestGameView.prototype.setGameOver = function () {
     };
     TestGameView.prototype.restart = function () {
+        this.gm.setScore(0);
     };
     return TestGameView;
 })(View);

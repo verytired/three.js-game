@@ -8,13 +8,16 @@ class TestGameView extends View {
 		super()
 	}
 
-	private enemies:Character[] = new Array();
+	private enemies:EnemyCharacter[] = new Array();
 	private bullets:Character[] = new Array();
 	private explosions:Explosion[] = new Array();
 
 	private self:Character;
-	public init() {
 
+	private gm:GameManager;
+
+	public init() {
+		this.gm = GameManager.getInstance();
 		var pGeometry = new THREE.PlaneBufferGeometry(480, 640);
 		var pMaterial = new THREE.MeshLambertMaterial({
 			color: 0x999999,
@@ -92,6 +95,7 @@ class TestGameView extends View {
 				if(this.bullets[i].x > this.enemies[j].x-15 && this.bullets[i].x < this.enemies[j].x+15 && this.bullets[i].y > this.enemies[j].y-15 && this.bullets[i].y < this.enemies[j].y+15){
 					this.bullets[i].isDead = true;
 					this.enemies[j].isDead = true;
+					this.gm.addScore(this.enemies[j].point)
 					var ex = new Explosion(this.enemies[j].x,this.enemies[j].y);
 					this.add(ex.getParticles());
 					this.explosions.push(ex)
@@ -136,11 +140,9 @@ class TestGameView extends View {
 	}
 
 	public setGameOver(){
-
 	}
 
 	public restart(){
-
-
+		this.gm.setScore(0);
 	}
 }

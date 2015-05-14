@@ -14,6 +14,8 @@ class EnemyCharacter extends Character {
 	private stageWidth = 0;
 	private stageHeight = 0;
 
+	public point = 150;
+
 	constructor() {
 		super()
 		this.vy = -2

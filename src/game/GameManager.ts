@@ -4,6 +4,7 @@
 
 //定義ファイル
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
+/// <reference path="../DefinitelyTyped/jquery/jquery.d.ts" />
 /// <reference path="MyCharacter.ts"/>
 /// <reference path="View.ts"/>
 /// <reference path="ControlManager.ts"/>
@@ -30,8 +31,11 @@ class GameManager {
 	//現在のビュー
 	private currentView:View;
 
+	private $viewScore = null;
+	private $viewDebug = null;
+
 	constructor() {
-		if(GameManager._instance){
+		if (GameManager._instance) {
 			throw new Error("must use the getInstance.");
 		}
 		GameManager._instance = this;
@@ -39,7 +43,7 @@ class GameManager {
 	}
 
 	public static getInstance():GameManager {
-		if(GameManager._instance === null) {
+		if (GameManager._instance === null) {
 			GameManager._instance = new GameManager();
 		}
 		return GameManager._instance;
@@ -74,19 +78,27 @@ class GameManager {
 		//操作機能
 		var ctmanager = ControlManager.getInstance();
 
+		//canvas以外のdom
+		this.$viewScore = $("#score");
+		this.setScore(0);
+		this.$viewScore.show();
+
+		this.$viewDebug = $("#debug");
+		this.$viewDebug.hide();
+
 		//オブジェクト指向実装テスト
 		this.setView(new TestGameView());
 
 	}
 
-	public update(){
+	public update() {
 		this.controls.update();
-		if(this.currentView && this.isStop == false){
+		if (this.currentView && this.isStop == false) {
 			this.currentView.update();
 		}
 	}
 
-	public render(){
+	public render() {
 		this.renderer.render(this.scene, this.camera);
 	}
 
@@ -98,16 +110,27 @@ class GameManager {
 		this.render();
 	}
 
-	public getScene(){
+	public getScene() {
 		return this.scene;
 	}
 
-	public setView(v:View){
+	public setView(v:View) {
 		this.currentView = v;
 	}
 
-	public getStageSize(){
-		return {width:this.stageWidth,height:this.stageHeight}
+	public getStageSize() {
+		return {width: this.stageWidth, height: this.stageHeight}
 	}
 
+	private score = 0;
+
+	public addScore(p) {
+		this.score += p;
+		this.$viewScore.html("Score:"+this.score);
+	}
+
+	public setScore(p){
+		this.score = p;
+		this.$viewScore.html("Score:"+this.score);
+	}
 }

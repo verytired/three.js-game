@@ -53,4 +53,11 @@ class View {
 		var gm = GameManager.getInstance();
 		this.scene = gm.getScene();
 	}
+
+	public removeAll(){
+		for(var i=0;i<this.objs.length;i++){
+			this.scene.remove(this.objs[i].getObject());
+			this.objs[i].remove();
+		}
+	}
 }

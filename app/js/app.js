@@ -188,6 +188,12 @@ var View = (function () {
         var gm = GameManager.getInstance();
         this.scene = gm.getScene();
     };
+    View.prototype.removeAll = function () {
+        for (var i = 0; i < this.objs.length; i++) {
+            this.scene.remove(this.objs[i].getObject());
+            this.objs[i].remove();
+        }
+    };
     return View;
 })();
 var ControlManager = (function (_super) {
@@ -467,6 +473,7 @@ var TestGameView = (function (_super) {
         this.enemies = new Array();
         this.bullets = new Array();
         this.explosions = new Array();
+        this.timerId = 0;
     }
     TestGameView.prototype.init = function () {
         var _this = this;
@@ -480,9 +487,6 @@ var TestGameView = (function (_super) {
         plane.position.set(0, 0, 0);
         plane.receiveShadow = true;
         this.add(plane);
-        this.self = new MyCharacter();
-        this.self.y = -150;
-        this.addCharacter(this.self);
         var cm = ControlManager.getInstance();
         cm.addEventListener("onKeyPress", function (e) {
             switch (e.data.keyCode) {
@@ -511,17 +515,7 @@ var TestGameView = (function (_super) {
                     break;
             }
         });
-        var func = function () {
-            setTimeout(function () {
-                var e = new EnemyCharacter();
-                e.y = 320;
-                e.x = -320 + Math.random() * 640;
-                _this.addCharacter(e);
-                _this.enemies.push(e);
-                func();
-            }, 500);
-        };
-        func();
+        this.startGame();
     };
     TestGameView.prototype.update = function () {
         this.hitTest();
@@ -556,7 +550,11 @@ var TestGameView = (function (_super) {
         }
     };
     TestGameView.prototype.checkLiveTest = function () {
+        var _this = this;
         if (this.self.isDead) {
+            setTimeout(function () {
+                _this.restart();
+            }, 3000);
             return;
         }
         var n = 0;
@@ -580,8 +578,30 @@ var TestGameView = (function (_super) {
     };
     TestGameView.prototype.setGameOver = function () {
     };
+    TestGameView.prototype.startGame = function () {
+        var _this = this;
+        this.self = new MyCharacter();
+        this.self.y = -150;
+        this.addCharacter(this.self);
+        var func = function () {
+            _this.timerId = setTimeout(function () {
+                var e = new EnemyCharacter();
+                e.y = 320;
+                e.x = -320 + Math.random() * 640;
+                _this.addCharacter(e);
+                _this.enemies.push(e);
+                func();
+            }, 500);
+        };
+        func();
+    };
     TestGameView.prototype.restart = function () {
+        clearTimeout(this.timerId);
+        this.removeAll();
+        this.bullets.length = 0;
+        this.enemies.length = 0;
         this.gm.setScore(0);
+        this.startGame();
     };
     return TestGameView;
 })(View);

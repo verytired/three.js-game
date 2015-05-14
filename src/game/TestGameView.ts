@@ -30,11 +30,8 @@ class TestGameView extends View {
 		plane.receiveShadow = true;
 		this.add(plane);
 
-		this.self = new MyCharacter()
-		this.self.y = -150;
-		this.addCharacter(this.self);
-		var cm = ControlManager.getInstance();
 
+		var cm = ControlManager.getInstance();
 		cm.addEventListener("onKeyPress", (e)=> {
 			switch (e.data.keyCode) {
 				case 32:
@@ -63,19 +60,7 @@ class TestGameView extends View {
 					break
 			}
 		})
-
-		var func = ()=> {
-			setTimeout(()=> {
-				var e = new EnemyCharacter();
-				e.y = 320;
-				e.x = -320 + Math.random() * 640;
-				this.addCharacter(e);
-				this.enemies.push(e);
-				func();
-			}, 500)
-		}
-
-		func();
+		this.startGame();
 	}
 
 	public update() {
@@ -83,20 +68,24 @@ class TestGameView extends View {
 		this.checkLiveTest()
 		super.update();
 		//todo 爆風更新が別になっているのをなんとかしたい
-		for(var i=0;i<this.explosions.length;i++){
+		for (var i = 0; i < this.explosions.length; i++) {
 			this.explosions[i].update();
 		}
 	}
 
-	public hitTest(){
+
+	/**
+	 * 当たり判定
+	 */
+	public hitTest() {
 
 		for (var i = 0; i < this.bullets.length; i++) {
 			for (var j = 0; j < this.enemies.length; j++) {
-				if(this.bullets[i].x > this.enemies[j].x-15 && this.bullets[i].x < this.enemies[j].x+15 && this.bullets[i].y > this.enemies[j].y-15 && this.bullets[i].y < this.enemies[j].y+15){
+				if (this.bullets[i].x > this.enemies[j].x - 15 && this.bullets[i].x < this.enemies[j].x + 15 && this.bullets[i].y > this.enemies[j].y - 15 && this.bullets[i].y < this.enemies[j].y + 15) {
 					this.bullets[i].isDead = true;
 					this.enemies[j].isDead = true;
 					this.gm.addScore(this.enemies[j].point)
-					var ex = new Explosion(this.enemies[j].x,this.enemies[j].y);
+					var ex = new Explosion(this.enemies[j].x, this.enemies[j].y);
 					this.add(ex.getParticles());
 					this.explosions.push(ex)
 				}
@@ -104,10 +93,10 @@ class TestGameView extends View {
 		}
 
 		for (var j = 0; j < this.enemies.length; j++) {
-			if(this.self.x > this.enemies[j].x-15 && this.self.x < this.enemies[j].x+15 && this.self.y > this.enemies[j].y-15 && this.self.y < this.enemies[j].y+15){
-				if(!this.self.isDead){
+			if (this.self.x > this.enemies[j].x - 15 && this.self.x < this.enemies[j].x + 15 && this.self.y > this.enemies[j].y - 15 && this.self.y < this.enemies[j].y + 15) {
+				if (!this.self.isDead) {
 					this.self.isDead = true;
-					var ex = new Explosion(this.self.x,this.self.y);
+					var ex = new Explosion(this.self.x, this.self.y);
 					this.add(ex.getParticles());
 					this.explosions.push(ex)
 				}
@@ -115,10 +104,17 @@ class TestGameView extends View {
 			}
 		}
 	}
+
+	/**
+	 * キャラクタの表示確認
+	 */
 	public checkLiveTest() {
-		if(this.self.isDead){
+		if (this.self.isDead) {
 			//GameManager.getInstance().isStop = true;
 			//todo 3秒後くらいにゲームオーバー表示させる→スペース押したらreplay
+			setTimeout(()=> {
+				this.restart();
+			}, 3000)
 			return
 		}
 		var n = 0
@@ -139,10 +135,40 @@ class TestGameView extends View {
 		}
 	}
 
-	public setGameOver(){
+	/**
+	 * ゲームオーバー処理
+	 */
+	public setGameOver() {
 	}
 
-	public restart(){
+	private timerId =0
+	public startGame() {
+		this.self = new MyCharacter()
+		this.self.y = -150;
+		this.addCharacter(this.self);
+
+		var func = ()=> {
+			this.timerId = setTimeout(()=> {
+				var e = new EnemyCharacter();
+				e.y = 320;
+				e.x = -320 + Math.random() * 640;
+				this.addCharacter(e);
+				this.enemies.push(e);
+				func();
+			}, 500)
+		}
+		func();
+	}
+
+	/**
+	 * リスタート処理
+	 */
+	public restart() {
+		clearTimeout(this.timerId);
+		this.removeAll();
+		this.bullets.length = 0;
+		this.enemies.length = 0;
 		this.gm.setScore(0);
+		this.startGame();
 	}
 }

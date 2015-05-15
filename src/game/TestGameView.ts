@@ -25,14 +25,15 @@ class TestGameView extends View {
 
 		//create background
 		var pGeometry = new THREE.PlaneBufferGeometry(480, 640);
-		var pMaterial = new THREE.MeshLambertMaterial({
+		var pMaterial = new THREE.MeshBasicMaterial({
 			color: 0x999999,
-			side: THREE.DoubleSide
+			side: THREE.DoubleSide,
+			wireframe:true
 		});
 		var plane = new THREE.Mesh(pGeometry, pMaterial);
 		plane.position.set(0, 0, 0);
 		//plane.rotation.x = 90 * Math.PI / 180;
-		plane.receiveShadow = true;
+		//plane.receiveShadow = true;
 		this.add(plane);
 
 		//set control manager

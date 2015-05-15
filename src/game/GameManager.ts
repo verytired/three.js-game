@@ -57,16 +57,17 @@ class GameManager {
 		this.renderer = new THREE.WebGLRenderer();
 
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		this.renderer.setClearColor(0xFFFFFF);
-		this.renderer.shadowMapEnabled = true;
+		this.renderer.setClearColor(0x000000);
+		//this.renderer.shadowMapEnabled = true;
 
 		var container = document.getElementById('container');
 		container.appendChild(this.renderer.domElement);
 
-		var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
-		directionalLight.position.set(0, 0, 300);
-		directionalLight.castShadow = true;
-		this.scene.add(directionalLight);
+		//
+		//var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+		//directionalLight.position.set(0, 0, 300);
+		//directionalLight.castShadow = true;
+		//this.scene.add(directionalLight);
 
 		//座標軸
 		var axis = new THREE.AxisHelper(1000);

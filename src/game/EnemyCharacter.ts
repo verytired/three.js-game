@@ -20,7 +20,10 @@ class EnemyCharacter extends Character {
 		super()
 		this.vy = -2
 
-		var material = new THREE.MeshLambertMaterial({color: 0x008866, wireframe: false});
+		var material = new THREE.MeshBasicMaterial({
+			color: 0xffffff,
+			wireframe: true
+		});
 		this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(20), material);
 		this._obj.castShadow = true;
 

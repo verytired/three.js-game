@@ -24,9 +24,10 @@ class Bullet extends Character {
 			//球のジオメトリ　（半径：２００）
 			new THREE.SphereGeometry(5),
 			//マテリアル （材質）
-			new THREE.MeshPhongMaterial({
+			new THREE.MeshBasicMaterial({
 				//色（１６進数）
-				color: 0xffffff
+				color: 0xffffff,
+				wireframe:true
 			}));
 		this._obj.position.set(0, 60, 50);
 		this._obj.castShadow = true;

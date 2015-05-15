@@ -141,7 +141,10 @@ var MyCharacter = (function (_super) {
         this.vy = 0;
         this.vy = -2;
         var geometry = new THREE.BoxGeometry(20, 20, 20);
-        var material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+        var material = new THREE.MeshBasicMaterial({
+            color: 0xff0000,
+            wireframe: true
+        });
         this._obj = new THREE.Mesh(geometry, material);
         this._obj.castShadow = true;
     }
@@ -250,14 +253,9 @@ var GameManager = (function () {
         this.camera.position.set(0, 0, 300);
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setClearColor(0xFFFFFF);
-        this.renderer.shadowMapEnabled = true;
+        this.renderer.setClearColor(0x000000);
         var container = document.getElementById('container');
         container.appendChild(this.renderer.domElement);
-        var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
-        directionalLight.position.set(0, 0, 300);
-        directionalLight.castShadow = true;
-        this.scene.add(directionalLight);
         var axis = new THREE.AxisHelper(1000);
         axis.position.set(0, 0, 0);
         this.scene.add(axis);
@@ -324,8 +322,9 @@ var Bullet = (function (_super) {
         this.stageWidth = s.width;
         this.stageHeight = s.height;
         this.vy = 6;
-        this._obj = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshPhongMaterial({
-            color: 0xffffff
+        this._obj = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            wireframe: true
         }));
         this._obj.position.set(0, 60, 50);
         this._obj.castShadow = true;
@@ -356,7 +355,10 @@ var EnemyCharacter = (function (_super) {
         this.stageHeight = 0;
         this.point = 150;
         this.vy = -2;
-        var material = new THREE.MeshLambertMaterial({ color: 0x008866, wireframe: false });
+        var material = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            wireframe: true
+        });
         this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(20), material);
         this._obj.castShadow = true;
         var s = GameManager.getInstance().getStageSize();
@@ -481,13 +483,13 @@ var TestGameView = (function (_super) {
         var _this = this;
         this.gm = GameManager.getInstance();
         var pGeometry = new THREE.PlaneBufferGeometry(480, 640);
-        var pMaterial = new THREE.MeshLambertMaterial({
+        var pMaterial = new THREE.MeshBasicMaterial({
             color: 0x999999,
-            side: THREE.DoubleSide
+            side: THREE.DoubleSide,
+            wireframe: true
         });
         var plane = new THREE.Mesh(pGeometry, pMaterial);
         plane.position.set(0, 0, 0);
-        plane.receiveShadow = true;
         this.add(plane);
         var cm = ControlManager.getInstance();
         cm.addEventListener("onKeyPress", function (e) {

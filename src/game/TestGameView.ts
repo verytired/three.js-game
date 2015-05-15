@@ -16,21 +16,26 @@ class TestGameView extends View {
 
 	private gm:GameManager;
 
+	private waitingRestart = false;
+	private timerId = 0 ;
+
 	public init() {
+
 		this.gm = GameManager.getInstance();
+
+		//create background
 		var pGeometry = new THREE.PlaneBufferGeometry(480, 640);
 		var pMaterial = new THREE.MeshLambertMaterial({
 			color: 0x999999,
 			side: THREE.DoubleSide
 		});
-
 		var plane = new THREE.Mesh(pGeometry, pMaterial);
 		plane.position.set(0, 0, 0);
 		//plane.rotation.x = 90 * Math.PI / 180;
 		plane.receiveShadow = true;
 		this.add(plane);
 
-
+		//set control manager
 		var cm = ControlManager.getInstance();
 		cm.addEventListener("onKeyPress", (e)=> {
 			switch (e.data.keyCode) {
@@ -60,6 +65,7 @@ class TestGameView extends View {
 					break
 			}
 		})
+
 		this.startGame();
 	}
 
@@ -80,6 +86,7 @@ class TestGameView extends View {
 	 */
 	public hitTest() {
 
+		//弾と敵の当たり判定
 		for (var i = 0; i < this.bullets.length; i++) {
 			for (var j = 0; j < this.enemies.length; j++) {
 				if (this.bullets[i].x > this.enemies[j].x - 15 && this.bullets[i].x < this.enemies[j].x + 15 && this.bullets[i].y > this.enemies[j].y - 15 && this.bullets[i].y < this.enemies[j].y + 15) {
@@ -93,6 +100,7 @@ class TestGameView extends View {
 			}
 		}
 
+		//敵と自分の当たり判定
 		for (var j = 0; j < this.enemies.length; j++) {
 			if (this.self.x > this.enemies[j].x - 15 && this.self.x < this.enemies[j].x + 15 && this.self.y > this.enemies[j].y - 15 && this.self.y < this.enemies[j].y + 15) {
 				if (!this.self.isDead) {
@@ -101,19 +109,14 @@ class TestGameView extends View {
 					this.add(ex.getParticles());
 					this.explosions.push(ex)
 				}
-
 			}
 		}
 	}
 
-	waitingRestart = false;
 	/**
 	 * キャラクタの表示確認
 	 */
-
 	public checkLiveTest() {
-
-
 		if (this.self.isDead == true && this.waitingRestart == false) {
 			//GameManager.getInstance().isStop = true;
 			//todo 3秒後くらいにゲームオーバー表示させる→スペース押したらreplay
@@ -147,7 +150,9 @@ class TestGameView extends View {
 	public setGameOver() {
 	}
 
-	private timerId =0
+	/**
+	 * ゲーム開始
+	 */
 	public startGame() {
 		this.self = new MyCharacter()
 		this.self.y = -150;
@@ -170,8 +175,6 @@ class TestGameView extends View {
 	 * リスタート処理
 	 */
 	public restart() {
-
-		console.log("restart");
 		this.waitingRestart = false;
 		clearTimeout(this.timerId);
 		this.removeAll();

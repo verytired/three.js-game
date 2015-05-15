@@ -64,15 +64,16 @@ class TestGameView extends View {
 	}
 
 	public update() {
+
 		this.hitTest()
 		this.checkLiveTest()
 		super.update();
+
 		//todo 爆風更新が別になっているのをなんとかしたい
 		for (var i = 0; i < this.explosions.length; i++) {
 			this.explosions[i].update();
 		}
 	}
-
 
 	/**
 	 * 当たり判定
@@ -105,13 +106,18 @@ class TestGameView extends View {
 		}
 	}
 
+	waitingRestart = false;
 	/**
 	 * キャラクタの表示確認
 	 */
+
 	public checkLiveTest() {
-		if (this.self.isDead) {
+
+
+		if (this.self.isDead == true && this.waitingRestart == false) {
 			//GameManager.getInstance().isStop = true;
 			//todo 3秒後くらいにゲームオーバー表示させる→スペース押したらreplay
+			this.waitingRestart = true;
 			setTimeout(()=> {
 				this.restart();
 			}, 3000)
@@ -164,6 +170,9 @@ class TestGameView extends View {
 	 * リスタート処理
 	 */
 	public restart() {
+
+		console.log("restart");
+		this.waitingRestart = false;
 		clearTimeout(this.timerId);
 		this.removeAll();
 		this.bullets.length = 0;

@@ -473,6 +473,7 @@ var TestGameView = (function (_super) {
         this.enemies = new Array();
         this.bullets = new Array();
         this.explosions = new Array();
+        this.waitingRestart = false;
         this.timerId = 0;
     }
     TestGameView.prototype.init = function () {
@@ -551,7 +552,8 @@ var TestGameView = (function (_super) {
     };
     TestGameView.prototype.checkLiveTest = function () {
         var _this = this;
-        if (this.self.isDead) {
+        if (this.self.isDead == true && this.waitingRestart == false) {
+            this.waitingRestart = true;
             setTimeout(function () {
                 _this.restart();
             }, 3000);
@@ -596,6 +598,8 @@ var TestGameView = (function (_super) {
         func();
     };
     TestGameView.prototype.restart = function () {
+        console.log("restart");
+        this.waitingRestart = false;
         clearTimeout(this.timerId);
         this.removeAll();
         this.bullets.length = 0;

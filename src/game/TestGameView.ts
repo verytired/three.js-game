@@ -38,8 +38,16 @@ class TestGameView extends View {
 		//set control manager
 		var cm = ControlManager.getInstance();
 		cm.addEventListener("onKeyPress", (e)=> {
+			if(this.isKeyLock == true){
+				return
+			}
 			switch (e.data.keyCode) {
 				case 32:
+
+					if(this.waitingRestart == true){
+						this.restart();
+						return
+					}
 					//todo ショットを打つ
 					var b = new Bullet();
 					b.x = this.self.x
@@ -116,13 +124,18 @@ class TestGameView extends View {
 	/**
 	 * キャラクタの表示確認
 	 */
+
+	private isKeyLock = false;
 	public checkLiveTest() {
 		if (this.self.isDead == true && this.waitingRestart == false) {
 			//GameManager.getInstance().isStop = true;
 			//todo 3秒後くらいにゲームオーバー表示させる→スペース押したらreplay
 			this.waitingRestart = true;
+			this.isKeyLock = true;
 			setTimeout(()=> {
-				this.restart();
+				//this.restart();
+				//gameover表示
+				this.isKeyLock = false;
 			}, 3000)
 			return
 		}

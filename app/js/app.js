@@ -475,6 +475,7 @@ var TestGameView = (function (_super) {
         this.explosions = new Array();
         this.waitingRestart = false;
         this.timerId = 0;
+        this.isKeyLock = false;
     }
     TestGameView.prototype.init = function () {
         var _this = this;
@@ -490,8 +491,15 @@ var TestGameView = (function (_super) {
         this.add(plane);
         var cm = ControlManager.getInstance();
         cm.addEventListener("onKeyPress", function (e) {
+            if (_this.isKeyLock == true) {
+                return;
+            }
             switch (e.data.keyCode) {
                 case 32:
+                    if (_this.waitingRestart == true) {
+                        _this.restart();
+                        return;
+                    }
                     var b = new Bullet();
                     b.x = _this.self.x;
                     b.y = _this.self.y;
@@ -554,8 +562,9 @@ var TestGameView = (function (_super) {
         var _this = this;
         if (this.self.isDead == true && this.waitingRestart == false) {
             this.waitingRestart = true;
+            this.isKeyLock = true;
             setTimeout(function () {
-                _this.restart();
+                _this.isKeyLock = false;
             }, 3000);
             return;
         }
@@ -598,7 +607,6 @@ var TestGameView = (function (_super) {
         func();
     };
     TestGameView.prototype.restart = function () {
-        console.log("restart");
         this.waitingRestart = false;
         clearTimeout(this.timerId);
         this.removeAll();

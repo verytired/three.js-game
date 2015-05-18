@@ -264,6 +264,12 @@ var GameManager = (function () {
         var axis = new THREE.AxisHelper(1000);
         axis.position.set(0, 0, 0);
         this.scene.add(axis);
+        this.stats = new Stats();
+        this.stats.setMode(0);
+        this.stats.domElement.style.position = 'absolute';
+        this.stats.domElement.style.right = '0px';
+        this.stats.domElement.style.top = '0px';
+        document.body.appendChild(this.stats.domElement);
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         var ctmanager = ControlManager.getInstance();
         this.$viewScore = $("#score");
@@ -284,9 +290,11 @@ var GameManager = (function () {
     };
     GameManager.prototype.animate = function () {
         var _this = this;
-        requestAnimationFrame(function (e) { return _this.animate(); });
+        this.stats.begin();
         this.update();
         this.render();
+        this.stats.end();
+        requestAnimationFrame(function (e) { return _this.animate(); });
     };
     GameManager.prototype.getScene = function () {
         return this.scene;

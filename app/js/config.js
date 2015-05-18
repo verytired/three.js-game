@@ -16,6 +16,9 @@ require.config({
 			improved_noise :[
 				'/bower_components/threejs/examples/js/ImprovedNoise'
 			],
+			stats :[
+				'/bower_components/threejs/examples/js/libs/stats.min'
+			],
 			app_main :[
 				'/js/app'
 			]
@@ -40,5 +43,5 @@ require.config({
 });
 
 // モジュール定義
-define(['jquery','threejs','orbit_controls','trackball_controls','improved_noise','app_main'], function (THREE) {
+define(['jquery','threejs','orbit_controls','trackball_controls','stats','improved_noise','app_main'], function (THREE) {
 });

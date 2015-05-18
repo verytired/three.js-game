@@ -8,6 +8,7 @@
 /// <reference path="MyCharacter.ts"/>
 /// <reference path="View.ts"/>
 /// <reference path="ControlManager.ts"/>
+/// <reference path="../DefinitelyTyped/stats/stats.d.ts" />
 
 declare module THREE {
 	export var OrbitControls;
@@ -49,6 +50,8 @@ class GameManager {
 		return GameManager._instance;
 	}
 
+	public stats:Stats;
+
 	public initialize() {
 		console.log("manager initialize");
 		this.scene = new THREE.Scene();
@@ -74,6 +77,15 @@ class GameManager {
 		axis.position.set(0, 0, 0);
 		this.scene.add(axis);
 
+		//stats
+		this.stats = new Stats();
+		this.stats.setMode(0); // 0: fps, 1: ms
+		this.stats.domElement.style.position = 'absolute';
+		this.stats.domElement.style.right = '0px';
+		this.stats.domElement.style.top = '0px';
+		document.body.appendChild(this.stats.domElement );
+
+		//orbitcontrol
 		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 
 		//操作機能
@@ -104,11 +116,15 @@ class GameManager {
 	}
 
 	public animate() {
+		this.stats.begin();
+		this.update();
+		this.render();
+		this.stats.end();
+
 		requestAnimationFrame((e)=>
 				this.animate()
 		);
-		this.update();
-		this.render();
+
 	}
 
 	public getScene() {

@@ -28,4 +28,11 @@ class Character extends events.EventDispatcher implements ICharacter {
 
 	}
 
+	public setPosition(x,y,z){
+		this.x = x;
+		this.y = y;
+		this.z = z;
+
+	}
+
 }

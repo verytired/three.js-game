@@ -128,6 +128,11 @@ var Character = (function (_super) {
     };
     Character.prototype.remove = function () {
     };
+    Character.prototype.setPosition = function (x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    };
     return Character;
 })(events.EventDispatcher);
 var MyCharacter = (function (_super) {
@@ -720,7 +725,6 @@ var MenuView = (function (_super) {
 })(View);
 var Scene = (function () {
     function Scene() {
-        console.log("new scene");
     }
     Scene.prototype.init = function () {
     };
@@ -728,16 +732,29 @@ var Scene = (function () {
     };
     return Scene;
 })();
-var Stage = (function () {
+var Stage = (function (_super) {
+    __extends(Stage, _super);
     function Stage() {
-        console.log("new scene");
+        _super.call(this);
     }
     Stage.prototype.init = function () {
+        var geometry2 = new THREE.PlaneGeometry(480, 1280, 48, 128);
+        var material2 = new THREE.MeshBasicMaterial({ color: 0x00FFFF, wireframe: true });
+        this._obj = new THREE.Mesh(geometry2, material2);
+        this._obj.position.set(0, 0, 0);
+        this.vy = -1;
     };
     Stage.prototype.destructor = function () {
     };
+    Stage.prototype.update = function () {
+        this.y += this.vy;
+        if (this.y <= -320) {
+            this.y = 0;
+        }
+        this._obj.position.set(this.x, this.y, 0);
+    };
     return Stage;
-})();
+})(Character);
 var TestGameView = (function (_super) {
     __extends(TestGameView, _super);
     function TestGameView() {
@@ -752,25 +769,9 @@ var TestGameView = (function (_super) {
     TestGameView.prototype.init = function () {
         var _this = this;
         this.gm = GameManager.getInstance();
-        var pGeometry = new THREE.PlaneBufferGeometry(480, 640);
-        var pMaterial = new THREE.MeshBasicMaterial({
-            color: 0x999999,
-            side: THREE.DoubleSide,
-            wireframe: true
-        });
-        var plane = new THREE.Mesh(pGeometry, pMaterial);
-        plane.position.set(0, 0, 0);
-        var geometry2 = new THREE.PlaneGeometry(480, 640, 128, 128);
-        var material2 = new THREE.MeshBasicMaterial({ color: 0x00FFFF, wireframe: true });
-        var ground = new THREE.Mesh(geometry2, material2);
-        this.add(ground);
-        var pn = new SimplexNoise();
-        for (var i = 0; i < geometry2.vertices.length; i++) {
-            var vertex = geometry2.vertices[i];
-            vertex.z = pn.noise(vertex.x / 5, vertex.y / 5);
-        }
-        geometry2.computeFaceNormals();
-        geometry2.computeVertexNormals();
+        this.bg = new Stage();
+        this.bg.init();
+        this.addCharacter(this.bg);
         var cm = ControlManager.getInstance();
         cm.addEventListener("onKeyPress", function (e) {
             if (_this.isKeyLock == true) {
@@ -873,6 +874,9 @@ var TestGameView = (function (_super) {
     };
     TestGameView.prototype.startGame = function () {
         var _this = this;
+        this.bg = new Stage();
+        this.bg.init();
+        this.addCharacter(this.bg);
         this.self = new MyCharacter();
         this.self.y = -150;
         this.addCharacter(this.self);

@@ -1,6 +1,7 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
 /// <reference path="View.ts"/>
 /// <reference path="EnemyCharacter.ts"/>
+/// <reference path="../utils/SimplexNoise.ts"/>
 
 class TestGameView extends View {
 
@@ -34,7 +35,24 @@ class TestGameView extends View {
 		plane.position.set(0, 0, 0);
 		//plane.rotation.x = 90 * Math.PI / 180;
 		//plane.receiveShadow = true;
-		this.add(plane);
+		//this.add(plane);
+
+
+		var geometry2 = new THREE.PlaneGeometry(480, 640, 128, 128);
+
+		var material2 = new THREE.MeshBasicMaterial({ color: 0x00FFFF, wireframe: true });
+		var ground = new THREE.Mesh(geometry2, material2);
+		//ground.rotation.x = Math.PI / -2;
+		this.add(ground);
+
+		var pn = new SimplexNoise();
+		for (var i = 0; i < geometry2.vertices.length; i++) {
+			var vertex = geometry2.vertices[ i ];
+			vertex.z = pn.noise(vertex.x /5 , vertex.y / 5);
+		}
+		geometry2.computeFaceNormals();
+		geometry2.computeVertexNormals();
+
 
 		//set control manager
 		var cm = ControlManager.getInstance();

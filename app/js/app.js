@@ -252,6 +252,7 @@ var GameManager = (function () {
         return GameManager._instance;
     };
     GameManager.prototype.initialize = function () {
+        var _this = this;
         console.log("manager initialize");
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
@@ -264,6 +265,20 @@ var GameManager = (function () {
         var axis = new THREE.AxisHelper(1000);
         axis.position.set(0, 0, 0);
         this.scene.add(axis);
+        window.addEventListener("keyup", function (e) {
+            var imgData, imgNode;
+            if (e.which !== 80)
+                return;
+            try {
+                imgData = _this.renderer.domElement.toDataURL();
+                console.log(imgData);
+            }
+            catch (e) {
+                console.log(e);
+                console.log("Browser does not support taking screenshot of 3d context");
+                return;
+            }
+        });
         this.stats = new Stats();
         this.stats.setMode(0);
         this.stats.domElement.style.position = 'absolute';

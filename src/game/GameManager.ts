@@ -77,6 +77,22 @@ class GameManager {
 		axis.position.set(0, 0, 0);
 		this.scene.add(axis);
 
+		/*** ADDING SCREEN SHOT ABILITY ***/
+		window.addEventListener("keyup", (e)=>{
+			var imgData, imgNode;
+			//Listen to 'P' key
+			if(e.which !== 80) return;
+			try {
+				imgData = this.renderer.domElement.toDataURL();
+				console.log(imgData);
+			}
+			catch(e) {
+				console.log(e)
+				console.log("Browser does not support taking screenshot of 3d context");
+				return;
+			}
+		});
+
 		//stats
 		this.stats = new Stats();
 		this.stats.setMode(0); // 0: fps, 1: ms

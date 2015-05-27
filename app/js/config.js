@@ -2,25 +2,25 @@
 require.config({
 		paths : {
 			jquery : [
-				'/bower_components/jquery/dist/jquery.min'
+				'../bower_components/jquery/dist/jquery.min'
 			],
 			threejs : [
-				'/bower_components/threejs/build/three.min'
+				'../bower_components/threejs/build/three.min'
 			],
 			orbit_controls :[
-				'/bower_components/threejs/examples/js/controls/OrbitControls'
+				'../bower_components/threejs/examples/js/controls/OrbitControls'
 			],
 			trackball_controls :[
-				'/bower_components/threejs/examples/js/controls/TrackballControls'
+				'../bower_components/threejs/examples/js/controls/TrackballControls'
 			],
 			improved_noise :[
-				'/bower_components/threejs/examples/js/ImprovedNoise'
+				'../bower_components/threejs/examples/js/ImprovedNoise'
 			],
 			stats :[
-				'/bower_components/threejs/examples/js/libs/stats.min'
+				'../bower_components/threejs/examples/js/libs/stats.min'
 			],
 			app_main :[
-				'/js/app'
+				'app'
 			]
 		},
 	shim: {

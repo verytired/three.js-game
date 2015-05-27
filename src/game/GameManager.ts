@@ -161,13 +161,12 @@ class GameManager {
 		this.$viewDebug = $("#debug");
 		this.$viewDebug.hide();
 
-		$.getJSON("../data/scenedata.json" , (data)=> {
-
+		$.getJSON("data/scenedata.json" , (data)=> {
 			//start point
 			//オブジェクト指向実装テスト
 			this.setView(new TestGameView(data));
 		});
-
+		//this.setView(new TestGameView(data));
 	}
 
 	public update() {

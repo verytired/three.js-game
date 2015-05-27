@@ -4,7 +4,7 @@
 
 class View {
 
-	private objs: Character[] = new Array()
+	private objs:Character[] = new Array()
 	private scene:THREE.Scene;
 
 	constructor() {
@@ -13,49 +13,49 @@ class View {
 		this.init();
 	}
 
-	public init(){
+	public init() {
 
 	}
 
-	public destructor(){
+	public destructor() {
 
 	}
 
-	public update(nowFrame){
-		for(var i=0;i<this.objs.length;i++){
+	public update(nowFrame) {
+		for (var i = 0; i < this.objs.length; i++) {
 			this.objs[i].update(nowFrame)
-			if(this.objs[i].isDead == true){
-				this.removeCharacter(this.objs[i],i)
+			if (this.objs[i].isDead == true) {
+				this.removeCharacter(this.objs[i], i)
 			}
 		}
 	}
 
-	public add(obj){
+	public add(obj) {
 		this.scene.add(obj);
 	}
 
-	public remove(obj){
+	public remove(obj) {
 		this.scene.remove(obj);
 	}
 
-	public addCharacter(chara:Character){
+	public addCharacter(chara:Character) {
 		this.objs.push(chara)
 		this.scene.add(chara.getObject());
 	}
 
-	public removeCharacter(chara:Character,index){
-		this.objs.splice(index,1);
+	public removeCharacter(chara:Character, index) {
+		this.objs.splice(index, 1);
 		this.scene.remove(chara.getObject());
 		chara.remove();
 	}
 
-	private getScene(){
+	private getScene() {
 		var gm = GameManager.getInstance();
 		this.scene = gm.getScene();
 	}
 
-	public removeAll(){
-		for(var i=0;i<this.objs.length;i++){
+	public removeAll() {
+		for (var i = 0; i < this.objs.length; i++) {
 			this.scene.remove(this.objs[i].getObject());
 			this.objs[i].remove();
 		}

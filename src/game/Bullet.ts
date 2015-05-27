@@ -19,6 +19,7 @@ class Bullet extends Character {
 		this.stageWidth = s.width;
 		this.stageHeight = s.height;
 
+		this.vx = vx
 		this.vy = vy
 		this._obj = new THREE.Mesh(
 			//球のジオメトリ　（半径：２００）
@@ -35,7 +36,7 @@ class Bullet extends Character {
 
 	public update() {
 		this.x += this.vx;
-		this.y += this.vy
+		this.y += this.vy;
 		this.checkAreaTest()
 		this._obj.position.set(this.x, this.y, 50);
 	}

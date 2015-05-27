@@ -77,15 +77,17 @@ class EnemyCharacter extends Character {
 
 	public shot() {
 		console.log("enemyShot");
-		var v = GameManager.getInstance().getCurrentView();
-		var b = new Bullet(0,-6);
+		var s = GameManager.getInstance().getSelfCharacter();
+		var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
+		var b = new Bullet((s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
 		b.x = this.x
 		b.y = this.y
+		var v = GameManager.getInstance().getCurrentView();
 		v.addCharacter(b);
 		this.bullets.push(b);
 	}
 
-	public getBullets(){
+	public getBullets() {
 		return this.bullets;
 	}
 }

@@ -211,10 +211,12 @@ class GameManager {
 		this.currentView = v;
 	}
 
+	//stageサイズ返却
 	public getStageSize() {
 		return {width: this.stageWidth, height: this.stageHeight}
 	}
 
+	//スコア計算
 	public addScore(p) {
 		this.score += p;
 		this.$viewScore.html("Score:" + this.score);
@@ -225,11 +227,21 @@ class GameManager {
 		this.$viewScore.html("Score:" + this.score);
 	}
 
+	//viewへの参照
 	public getCurrentFrame(){
 		return this.currentFrame;
 	}
 
 	public getCurrentView(){
 		return this.currentView
+	}
+
+	//自機への参照
+	private myChara;
+	public setSelfCharacter(chara){
+		this.myChara = chara;
+	}
+	public getSelfCharacter(){
+		return this.myChara
 	}
 }

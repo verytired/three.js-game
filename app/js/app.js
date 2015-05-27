@@ -357,6 +357,12 @@ var GameManager = (function () {
     GameManager.prototype.getCurrentView = function () {
         return this.currentView;
     };
+    GameManager.prototype.setSelfCharacter = function (chara) {
+        this.myChara = chara;
+    };
+    GameManager.prototype.getSelfCharacter = function () {
+        return this.myChara;
+    };
     GameManager._instance = null;
     return GameManager;
 })();
@@ -648,6 +654,7 @@ var Bullet = (function (_super) {
         var s = GameManager.getInstance().getStageSize();
         this.stageWidth = s.width;
         this.stageHeight = s.height;
+        this.vx = vx;
         this.vy = vy;
         this._obj = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshBasicMaterial({
             color: 0xffffff,
@@ -730,10 +737,12 @@ var EnemyCharacter = (function (_super) {
     };
     EnemyCharacter.prototype.shot = function () {
         console.log("enemyShot");
-        var v = GameManager.getInstance().getCurrentView();
-        var b = new Bullet(0, -6);
+        var s = GameManager.getInstance().getSelfCharacter();
+        var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
+        var b = new Bullet((s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
         b.x = this.x;
         b.y = this.y;
+        var v = GameManager.getInstance().getCurrentView();
         v.addCharacter(b);
         this.bullets.push(b);
     };
@@ -987,6 +996,7 @@ var TestGameView = (function (_super) {
         this.self = new MyCharacter();
         this.self.y = -150;
         this.addCharacter(this.self);
+        this.gm.setSelfCharacter(this.self);
         this.gm.setStartTime();
         var func = function () {
             _this.timerId = setTimeout(function () {

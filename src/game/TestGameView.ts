@@ -194,6 +194,7 @@ class TestGameView extends View {
 		this.self = new MyCharacter()
 		this.self.y = -150;
 		this.addCharacter(this.self);
+		this.gm.setSelfCharacter(this.self);
 
 		this.gm.setStartTime();
 

@@ -7,6 +7,7 @@
 class TestGameView extends View {
 
 	private enemies:EnemyCharacter[] = new Array();
+	private enemyBullets:Character[] = new Array();
 	private bullets:Character[] = new Array();
 	private explosions:Explosion[] = new Array();
 
@@ -15,19 +16,18 @@ class TestGameView extends View {
 	private gm:GameManager;
 
 	private waitingRestart = false;
-	private timerId = 0 ;
+	private timerId = 0;
 
 	private bg:Stage;
 
 	private sceneData
+
 	constructor(data) {
 		super()
 		this.sceneData = data;
 		console.log("view init")
 		console.log(this.sceneData)
 	}
-
-
 
 	public init() {
 
@@ -41,13 +41,13 @@ class TestGameView extends View {
 		//set control manager
 		var cm = ControlManager.getInstance();
 		cm.addEventListener("onKeyPress", (e)=> {
-			if(this.isKeyLock == true){
+			if (this.isKeyLock == true) {
 				return
 			}
 			switch (e.data.keyCode) {
 				case 32:
 
-					if(this.waitingRestart == true){
+					if (this.waitingRestart == true) {
 						this.restart();
 						return
 					}
@@ -129,6 +129,7 @@ class TestGameView extends View {
 	 */
 
 	private isKeyLock = false;
+
 	public checkLiveTest() {
 		if (this.self.isDead == true && this.waitingRestart == false) {
 			//GameManager.getInstance().isStop = true;
@@ -204,6 +205,5 @@ class TestGameView extends View {
 		this.enemies.length = 0;
 		this.gm.setScore(0);
 		this.startGame();
-
 	}
 }

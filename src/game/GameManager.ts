@@ -1,5 +1,4 @@
 //GameManager
-
 //theee.jsのカメラやレンダリングなどを管理する
 
 //定義ファイル
@@ -13,6 +12,20 @@
 declare module THREE {
 	export var OrbitControls;
 	export var TrackballControls;
+}
+
+interface Window {
+	webkitRequestAnimationFrame: any;
+	mozRequestAnimationFrame: any;
+	oRequestAnimationFrame: any;
+
+}
+
+interface Performance {
+	mozNow: any;
+	msNow: any;
+	oNow: any;
+	webkitNow: any;
 }
 
 class GameManager {
@@ -29,11 +42,25 @@ class GameManager {
 
 	public isStop:boolean = false;
 
+	private score = 0;
+
 	//現在のビュー
 	private currentView:View;
 
+	//dom
 	private $viewScore = null;
 	private $viewDebug = null;
+
+	//stats用
+	public stats:Stats;
+
+	//タイマー管理
+	private startTime = 0;
+	private currentFrame = 0;
+	private requestAnimationFrame;
+	private getTime;
+	private fps = 60.0;
+	private frameLength = 60.0;
 
 	constructor() {
 		if (GameManager._instance) {
@@ -50,8 +77,6 @@ class GameManager {
 		return GameManager._instance;
 	}
 
-	public stats:Stats;
-
 	public initialize() {
 		console.log("manager initialize");
 		this.scene = new THREE.Scene();
@@ -66,11 +91,32 @@ class GameManager {
 		var container = document.getElementById('container');
 		container.appendChild(this.renderer.domElement);
 
-		//
 		//var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
 		//directionalLight.position.set(0, 0, 300);
 		//directionalLight.castShadow = true;
 		//this.scene.add(directionalLight);
+
+		//タイマ管理設定
+		this.requestAnimationFrame = (function () {
+			return window.requestAnimationFrame ||
+				window.webkitRequestAnimationFrame ||
+				window.mozRequestAnimationFrame ||
+				window.oRequestAnimationFrame ||
+				window.msRequestAnimationFrame ||
+				function (callback) {
+					window.setTimeout(callback, 1000.0 / 60.0);
+				};
+		})();
+		var now = window.performance && (
+			performance.now ||
+			performance.mozNow ||
+			performance.msNow ||
+			performance.oNow ||
+			performance.webkitNow );
+		this.getTime = function () {
+			return ( now && now.call(performance) ) || ( new Date().getTime() );
+		}
+		this.startTime = this.getTime();
 
 		//座標軸
 		var axis = new THREE.AxisHelper(1000);
@@ -78,15 +124,15 @@ class GameManager {
 		this.scene.add(axis);
 
 		/*** ADDING SCREEN SHOT ABILITY ***/
-		window.addEventListener("keyup", (e)=>{
+		window.addEventListener("keyup", (e)=> {
 			var imgData, imgNode;
 			//Listen to 'P' key
-			if(e.which !== 80) return;
+			if (e.which !== 80) return;
 			try {
 				imgData = this.renderer.domElement.toDataURL();
 				console.log(imgData);
 			}
-			catch(e) {
+			catch (e) {
 				console.log(e)
 				console.log("Browser does not support taking screenshot of 3d context");
 				return;
@@ -99,7 +145,7 @@ class GameManager {
 		this.stats.domElement.style.position = 'absolute';
 		this.stats.domElement.style.right = '0px';
 		this.stats.domElement.style.top = '0px';
-		document.body.appendChild(this.stats.domElement );
+		document.body.appendChild(this.stats.domElement);
 
 		//orbitcontrol
 		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
@@ -137,10 +183,19 @@ class GameManager {
 		this.render();
 		this.stats.end();
 
-		requestAnimationFrame((e)=>
-				this.animate()
+		requestAnimationFrame((e)=> {
+				this.animate();
+
+				this.currentFrame = Math.floor(( this.getTime() - this.startTime ) / ( 1000.0 / this.fps ));
+				console.log(this.currentFrame)
+			}
 		);
 
+	}
+
+	public setStartTime(){
+		this.startTime = this.getTime();
+		this.currentFrame = 0;
 	}
 
 	public getScene() {
@@ -155,15 +210,13 @@ class GameManager {
 		return {width: this.stageWidth, height: this.stageHeight}
 	}
 
-	private score = 0;
-
 	public addScore(p) {
 		this.score += p;
-		this.$viewScore.html("Score:"+this.score);
+		this.$viewScore.html("Score:" + this.score);
 	}
 
-	public setScore(p){
+	public setScore(p) {
 		this.score = p;
-		this.$viewScore.html("Score:"+this.score);
+		this.$viewScore.html("Score:" + this.score);
 	}
 }

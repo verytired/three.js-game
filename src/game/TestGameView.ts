@@ -196,5 +196,6 @@ class TestGameView extends View {
 		this.enemies.length = 0;
 		this.gm.setScore(0);
 		this.startGame();
+		this.gm.setStartTime();
 	}
 }

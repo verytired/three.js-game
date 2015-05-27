@@ -8,6 +8,6 @@ interface ICharacter{
 
 
 	//内部情報更新
-	update():void
+	update(nowFrame):void
 
 }

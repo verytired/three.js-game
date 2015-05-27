@@ -12,14 +12,14 @@ class Bullet extends Character {
 	private stageWidth = 0;
 	private stageHeight = 0;
 
-	constructor() {
+	constructor(vx,vy) {
 		super()
 
 		var s = GameManager.getInstance().getStageSize();
 		this.stageWidth = s.width;
 		this.stageHeight = s.height;
 
-		this.vy = 6
+		this.vy = vy
 		this._obj = new THREE.Mesh(
 			//球のジオメトリ　（半径：２００）
 			new THREE.SphereGeometry(5),

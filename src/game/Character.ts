@@ -17,7 +17,7 @@ class Character extends events.EventDispatcher implements ICharacter {
 		super()
 	}
 
-	public update(){
+	public update(nowFrame){
 	}
 
 	public getObject(){

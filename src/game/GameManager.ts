@@ -173,7 +173,7 @@ class GameManager {
 	public update() {
 		this.controls.update();
 		if (this.currentView && this.isStop == false) {
-			this.currentView.update();
+			this.currentView.update(this.currentFrame);
 		}
 	}
 
@@ -223,5 +223,13 @@ class GameManager {
 	public setScore(p) {
 		this.score = p;
 		this.$viewScore.html("Score:" + this.score);
+	}
+
+	public getCurrentFrame(){
+		return this.currentFrame;
+	}
+
+	public getCurrentView(){
+		return this.currentView
 	}
 }

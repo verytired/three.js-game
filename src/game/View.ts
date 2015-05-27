@@ -21,9 +21,9 @@ class View {
 
 	}
 
-	public update(){
+	public update(nowFrame){
 		for(var i=0;i<this.objs.length;i++){
-			this.objs[i].update()
+			this.objs[i].update(nowFrame)
 			if(this.objs[i].isDead == true){
 				this.removeCharacter(this.objs[i],i)
 			}

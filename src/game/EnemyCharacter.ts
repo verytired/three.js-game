@@ -18,10 +18,15 @@ class EnemyCharacter extends Character {
 
 	public point = 150;
 
+	private startFrame = 0;
 	private currentFrame = 0;
 
-	constructor() {
+	private bullets:Character[] = new Array();
+
+	constructor(startframe) {
 		super()
+
+		this.startFrame = startframe
 		this.vy = -6
 
 		var material = new THREE.MeshBasicMaterial({
@@ -36,13 +41,17 @@ class EnemyCharacter extends Character {
 		this.stageHeight = s.height;
 	}
 
-	public update() {
-		this.currentFrame++;
+	public update(nowFrame) {
+		this.currentFrame = nowFrame - this.startFrame;
 		this.frameTest();
 		this.x += this.vx;
 		this.y += this.vy
 		this.checkAreaTest()
 		this._obj.position.set(this.x, this.y, 50);
+
+		for (var i = 0; this.bullets.length < i; i++) {
+			this.bullets[i].update(nowFrame);
+		}
 	}
 
 	public checkAreaTest() {
@@ -51,18 +60,32 @@ class EnemyCharacter extends Character {
 		}
 	}
 
-	public frameTest(){
-		if(this.currentFrame == 50){
+	private isShoted = false;
+
+	public frameTest() {
+		if (this.currentFrame >= 50 && this.currentFrame < 70) {
 			this.vy = 0
-		} else if(this.currentFrame == 70){
+		} else if (this.currentFrame >= 70 && this.currentFrame < 100) {
+			//フレームが進まない場合の行動制限
+			if (this.isShoted == true)return
+			this.isShoted = true;
 			this.shot()
-		} else if(this.currentFrame == 100){
+		} else if (this.currentFrame >= 100) {
 			this.vy = 6
 		}
-
 	}
 
-	public shot(){
+	public shot() {
 		console.log("enemyShot");
+		var v = GameManager.getInstance().getCurrentView();
+		var b = new Bullet(0,-6);
+		b.x = this.x
+		b.y = this.y
+		v.addCharacter(b);
+		this.bullets.push(b);
+	}
+
+	public getBullets(){
+		return this.bullets;
 	}
 }

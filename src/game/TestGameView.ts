@@ -20,7 +20,7 @@ class TestGameView extends View {
 
 	private bg:Stage;
 
-	private sceneData
+	private sceneData;
 
 	constructor(data) {
 		super()
@@ -52,7 +52,7 @@ class TestGameView extends View {
 						return
 					}
 					//todo ショットを打つ
-					var b = new Bullet();
+					var b = new Bullet(0, 6);
 					b.x = this.self.x
 					b.y = this.self.y
 					this.addCharacter(b);
@@ -84,7 +84,7 @@ class TestGameView extends View {
 
 		this.hitTest()
 		this.checkLiveTest()
-		super.update();
+		super.update(this.gm.getCurrentFrame());
 
 		//todo 爆風更新が別になっているのをなんとかしたい
 		for (var i = 0; i < this.explosions.length; i++) {
@@ -107,6 +107,22 @@ class TestGameView extends View {
 					var ex = new Explosion(this.enemies[j].x, this.enemies[j].y);
 					this.add(ex.getParticles());
 					this.explosions.push(ex)
+				}
+			}
+		}
+
+		//敵の弾と自分の当たり判定
+		for (var j = 0; j < this.enemies.length; j++) {
+			var bulletArray = this.enemies[j].getBullets();
+			for (var k = 0; k < bulletArray.length; k++) {
+				var b = bulletArray[k]
+				if (this.self.x > b.x - 15 && this.self.x < b.x + 15 && this.self.y > b.y - 15 && this.self.y < b.y + 15) {
+					if (!this.self.isDead) {
+						this.self.isDead = true;
+						var ex = new Explosion(this.self.x, this.self.y);
+						this.add(ex.getParticles());
+						this.explosions.push(ex)
+					}
 				}
 			}
 		}
@@ -183,7 +199,7 @@ class TestGameView extends View {
 
 		var func = ()=> {
 			this.timerId = setTimeout(()=> {
-				var e = new EnemyCharacter();
+				var e = new EnemyCharacter(this.gm.getCurrentFrame());
 				e.y = 320;
 				e.x = -320 + Math.random() * 640;
 				this.addCharacter(e);

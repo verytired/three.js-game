@@ -306,7 +306,9 @@ var GameManager = (function () {
         this.$viewScore.show();
         this.$viewDebug = $("#debug");
         this.$viewDebug.hide();
-        this.setView(new TestGameView());
+        $.getJSON("../data/scenedata.json", function (data) {
+            _this.setView(new TestGameView(data));
+        });
     };
     GameManager.prototype.update = function () {
         this.controls.update();
@@ -319,14 +321,13 @@ var GameManager = (function () {
     };
     GameManager.prototype.animate = function () {
         var _this = this;
+        this.currentFrame = Math.floor((this.getTime() - this.startTime) / (1000.0 / this.fps));
         this.stats.begin();
         this.update();
         this.render();
         this.stats.end();
         requestAnimationFrame(function (e) {
             _this.animate();
-            _this.currentFrame = Math.floor((_this.getTime() - _this.startTime) / (1000.0 / _this.fps));
-            console.log(_this.currentFrame);
         });
     };
     GameManager.prototype.setStartTime = function () {
@@ -802,7 +803,7 @@ var Stage = (function (_super) {
 })(Character);
 var TestGameView = (function (_super) {
     __extends(TestGameView, _super);
-    function TestGameView() {
+    function TestGameView(data) {
         _super.call(this);
         this.enemies = new Array();
         this.bullets = new Array();
@@ -810,6 +811,9 @@ var TestGameView = (function (_super) {
         this.waitingRestart = false;
         this.timerId = 0;
         this.isKeyLock = false;
+        this.sceneData = data;
+        console.log("view init");
+        console.log(this.sceneData);
     }
     TestGameView.prototype.init = function () {
         var _this = this;
@@ -925,6 +929,7 @@ var TestGameView = (function (_super) {
         this.self = new MyCharacter();
         this.self.y = -150;
         this.addCharacter(this.self);
+        this.gm.setStartTime();
         var func = function () {
             _this.timerId = setTimeout(function () {
                 var e = new EnemyCharacter();
@@ -945,7 +950,6 @@ var TestGameView = (function (_super) {
         this.enemies.length = 0;
         this.gm.setScore(0);
         this.startGame();
-        this.gm.setStartTime();
     };
     return TestGameView;
 })(View);

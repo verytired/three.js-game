@@ -6,10 +6,6 @@
 
 class TestGameView extends View {
 
-	constructor() {
-		super()
-	}
-
 	private enemies:EnemyCharacter[] = new Array();
 	private bullets:Character[] = new Array();
 	private explosions:Explosion[] = new Array();
@@ -22,6 +18,16 @@ class TestGameView extends View {
 	private timerId = 0 ;
 
 	private bg:Stage;
+
+	private sceneData
+	constructor(data) {
+		super()
+		this.sceneData = data;
+		console.log("view init")
+		console.log(this.sceneData)
+	}
+
+
 
 	public init() {
 
@@ -172,6 +178,8 @@ class TestGameView extends View {
 		this.self.y = -150;
 		this.addCharacter(this.self);
 
+		this.gm.setStartTime();
+
 		var func = ()=> {
 			this.timerId = setTimeout(()=> {
 				var e = new EnemyCharacter();
@@ -196,6 +204,6 @@ class TestGameView extends View {
 		this.enemies.length = 0;
 		this.gm.setScore(0);
 		this.startGame();
-		this.gm.setStartTime();
+
 	}
 }

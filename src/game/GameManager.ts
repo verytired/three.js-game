@@ -161,8 +161,12 @@ class GameManager {
 		this.$viewDebug = $("#debug");
 		this.$viewDebug.hide();
 
-		//オブジェクト指向実装テスト
-		this.setView(new TestGameView());
+		$.getJSON("../data/scenedata.json" , (data)=> {
+
+			//start point
+			//オブジェクト指向実装テスト
+			this.setView(new TestGameView(data));
+		});
 
 	}
 
@@ -178,6 +182,10 @@ class GameManager {
 	}
 
 	public animate() {
+
+		this.currentFrame = Math.floor(( this.getTime() - this.startTime ) / ( 1000.0 / this.fps ));
+		//console.log(this.currentFrame);
+
 		this.stats.begin();
 		this.update();
 		this.render();
@@ -185,9 +193,6 @@ class GameManager {
 
 		requestAnimationFrame((e)=> {
 				this.animate();
-
-				this.currentFrame = Math.floor(( this.getTime() - this.startTime ) / ( 1000.0 / this.fps ));
-				console.log(this.currentFrame)
 			}
 		);
 

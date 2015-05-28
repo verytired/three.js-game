@@ -175,7 +175,7 @@ class GameView extends CView {
 		this.addMover(this.bg);
 
 		this.self = new MyCharacter()
-		this.self.y = -150;
+		this.self.y = -250;
 		this.addMover(this.self);
 		this.gm.setSelfCharacter(this.self);
 

@@ -81,7 +81,7 @@ class GameManager {
 		console.log("manager initialize");
 		this.scene = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-		this.camera.position.set(0, -240, 180);
+		this.camera.position.set(0, -300, 240);
 		this.renderer = new THREE.WebGLRenderer();
 
 		this.renderer.setSize(window.innerWidth, window.innerHeight);

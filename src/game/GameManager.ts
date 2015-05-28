@@ -163,22 +163,24 @@ class GameManager {
 		this.$viewScore.show();
 
 		this.$viewDebug = $("#debug");
-		this.$viewDebug.hide();
+		//this.$viewDebug.hide();
 
 		this.resize();
 		$(window).resize(()=> {
 			this.resize();
 		});
 
+
 		$.getJSON("data/scenedata.json", (data)=> {
 			//start point
+			this.sceneData = new SceneData(data);
 			//オブジェクト指向実装テスト
 			$("#view-top").show();
 			this.setView(new TopView());
 		});
 		//this.setView(new TestGameView(data));
 	}
-
+	private sceneData:SceneData;
 	private overlay:String[] = ["#view-top","#view-gameover"];
 
 	public resize(){
@@ -254,6 +256,10 @@ class GameManager {
 		this.$viewScore.html("Score:" + this.score);
 	}
 
+    public debug(str){
+        this.$viewDebug.html(str);
+    }
+
 	//viewへの参照
 	public getCurrentFrame() {
 		return this.currentFrame;
@@ -272,5 +278,10 @@ class GameManager {
 
 	public getSelfCharacter() {
 		return this.myChara
+	}
+
+	//シーン情報取得
+	public getSceneData(index){
+		return this.sceneData.getData(index);
 	}
 }

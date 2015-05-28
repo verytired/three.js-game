@@ -338,12 +338,12 @@ var GameManager = (function () {
         this.setScore(0);
         this.$viewScore.show();
         this.$viewDebug = $("#debug");
-        this.$viewDebug.hide();
         this.resize();
         $(window).resize(function () {
             _this.resize();
         });
         $.getJSON("data/scenedata.json", function (data) {
+            _this.sceneData = new SceneData(data);
             $("#view-top").show();
             _this.setView(new TopView());
         });
@@ -402,6 +402,9 @@ var GameManager = (function () {
         this.score = p;
         this.$viewScore.html("Score:" + this.score);
     };
+    GameManager.prototype.debug = function (str) {
+        this.$viewDebug.html(str);
+    };
     GameManager.prototype.getCurrentFrame = function () {
         return this.currentFrame;
     };
@@ -413,6 +416,9 @@ var GameManager = (function () {
     };
     GameManager.prototype.getSelfCharacter = function () {
         return this.myChara;
+    };
+    GameManager.prototype.getSceneData = function (index) {
+        return this.sceneData.getData(index);
     };
     GameManager._instance = null;
     return GameManager;
@@ -916,6 +922,8 @@ var GameView = (function (_super) {
         this.bullets = new Array();
         this.waitingRestart = false;
         this.timerId = 0;
+        this.nextActionFrame = 0;
+        this.nextActionNum = 0;
         this.isKeyLock = false;
     }
     GameView.prototype.init = function () {
@@ -924,6 +932,9 @@ var GameView = (function (_super) {
         this.bg = new Stage();
         this.bg.init();
         this.addMover(this.bg);
+        this.sceneData = this.gm.getSceneData(0);
+        console.log(this.sceneData);
+        this.nextActionNum = 0;
         this.startGame();
     };
     GameView.prototype.keyEvent = function (e) {
@@ -957,6 +968,19 @@ var GameView = (function (_super) {
         }
     };
     GameView.prototype.update = function () {
+        var currentFrame = this.gm.getCurrentFrame();
+        this.gm.debug(currentFrame);
+        if (this.nextActionNum < this.sceneData.length && currentFrame == this.sceneData[this.nextActionNum].frame) {
+            var enemies = this.sceneData[this.nextActionNum].enemies;
+            for (var i = 0; i < enemies.length; i++) {
+                var e = new EnemyCharacter(this.gm.getCurrentFrame());
+                e.x = enemies[i].x;
+                e.y = enemies[i].y;
+                this.addMover(e);
+                this.enemies.push(e);
+            }
+            this.nextActionNum++;
+        }
         this.hitTest();
         this.checkLiveTest();
         _super.prototype.update.call(this, this.gm.getCurrentFrame());
@@ -1029,7 +1053,6 @@ var GameView = (function (_super) {
     GameView.prototype.setGameOver = function () {
     };
     GameView.prototype.startGame = function () {
-        var _this = this;
         $("#overlay").hide();
         this.bg = new Stage();
         this.bg.init();
@@ -1039,17 +1062,6 @@ var GameView = (function (_super) {
         this.addMover(this.self);
         this.gm.setSelfCharacter(this.self);
         this.gm.setStartTime();
-        var func = function () {
-            _this.timerId = setTimeout(function () {
-                var e = new EnemyCharacter(_this.gm.getCurrentFrame());
-                e.y = 320;
-                e.x = -320 + Math.random() * 640;
-                _this.addMover(e);
-                _this.enemies.push(e);
-                func();
-            }, 500);
-        };
-        func();
     };
     GameView.prototype.restart = function () {
         this.waitingRestart = false;
@@ -1059,6 +1071,7 @@ var GameView = (function (_super) {
         this.enemies.length = 0;
         this.gm.setScore(0);
         this.startGame();
+        this.nextActionNum = 0;
     };
     return GameView;
 })(CView);
@@ -1086,3 +1099,12 @@ var TopView = (function (_super) {
     };
     return TopView;
 })(CView);
+var SceneData = (function () {
+    function SceneData(data) {
+        this._data = data;
+    }
+    SceneData.prototype.getData = function (index) {
+        return this._data[index];
+    };
+    return SceneData;
+})();

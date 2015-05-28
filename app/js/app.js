@@ -290,7 +290,7 @@ var GameManager = (function () {
         console.log("manager initialize");
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-        this.camera.position.set(0, 0, 300);
+        this.camera.position.set(0, -240, 180);
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setClearColor(0x000000);
@@ -330,6 +330,9 @@ var GameManager = (function () {
         this.stats.domElement.style.top = '0px';
         document.body.appendChild(this.stats.domElement);
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.addEventListener('change', function () {
+            console.log(_this.camera);
+        });
         var ctmanager = ControlManager.getInstance();
         this.$viewScore = $("#score");
         this.setScore(0);

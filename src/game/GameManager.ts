@@ -81,7 +81,7 @@ class GameManager {
 		console.log("manager initialize");
 		this.scene = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-		this.camera.position.set(0, 0, 300);
+		this.camera.position.set(0, -240, 180);
 		this.renderer = new THREE.WebGLRenderer();
 
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -149,6 +149,10 @@ class GameManager {
 
 		//orbitcontrol
 		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+
+		this.controls.addEventListener( 'change', ()=>{
+			console.log(this.camera)
+		} );
 
 		//操作機能
 		var ctmanager = ControlManager.getInstance();

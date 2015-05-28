@@ -1,5 +1,5 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
-/// <reference path="Character.ts"/>
+/// <reference path="../framework/Character.ts"/>
 
 class Explosion extends Character {
 	public x = 0;

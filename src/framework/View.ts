@@ -1,5 +1,5 @@
 /// <reference path="Character.ts"/>
-/// <reference path="GameManager.ts"/>
+/// <reference path="../game/GameManager.ts"/>
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
 
 class View {

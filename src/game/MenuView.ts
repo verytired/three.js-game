@@ -1,5 +1,5 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
-/// <reference path="View.ts"/>
+/// <reference path="../framework/View.ts"/>
 
 class MenuView extends View {
 

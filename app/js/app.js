@@ -667,6 +667,38 @@ var SimplexNoise = (function () {
     };
     return SimplexNoise;
 })();
+var Scene = (function () {
+    function Scene() {
+    }
+    Scene.prototype.init = function () {
+    };
+    Scene.prototype.destructor = function () {
+    };
+    return Scene;
+})();
+var Stage = (function (_super) {
+    __extends(Stage, _super);
+    function Stage() {
+        _super.call(this);
+    }
+    Stage.prototype.init = function () {
+        var geometry2 = new THREE.PlaneGeometry(480, 1280, 48, 128);
+        var material2 = new THREE.MeshBasicMaterial({ color: 0x00FFFF, wireframe: true });
+        this._obj = new THREE.Mesh(geometry2, material2);
+        this._obj.position.set(0, 0, 0);
+        this.vy = -1;
+    };
+    Stage.prototype.destructor = function () {
+    };
+    Stage.prototype.update = function () {
+        this.y += this.vy;
+        if (this.y <= -320) {
+            this.y = 0;
+        }
+        this._obj.position.set(this.x, this.y, 0);
+    };
+    return Stage;
+})(Character);
 var Bullet = (function (_super) {
     __extends(Bullet, _super);
     function Bullet(vx, vy) {
@@ -847,38 +879,6 @@ var MenuView = (function (_super) {
     }
     return MenuView;
 })(View);
-var Scene = (function () {
-    function Scene() {
-    }
-    Scene.prototype.init = function () {
-    };
-    Scene.prototype.destructor = function () {
-    };
-    return Scene;
-})();
-var Stage = (function (_super) {
-    __extends(Stage, _super);
-    function Stage() {
-        _super.call(this);
-    }
-    Stage.prototype.init = function () {
-        var geometry2 = new THREE.PlaneGeometry(480, 1280, 48, 128);
-        var material2 = new THREE.MeshBasicMaterial({ color: 0x00FFFF, wireframe: true });
-        this._obj = new THREE.Mesh(geometry2, material2);
-        this._obj.position.set(0, 0, 0);
-        this.vy = -1;
-    };
-    Stage.prototype.destructor = function () {
-    };
-    Stage.prototype.update = function () {
-        this.y += this.vy;
-        if (this.y <= -320) {
-            this.y = 0;
-        }
-        this._obj.position.set(this.x, this.y, 0);
-    };
-    return Stage;
-})(Character);
 var TestGameView = (function (_super) {
     __extends(TestGameView, _super);
     function TestGameView(data) {

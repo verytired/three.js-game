@@ -1,6 +1,6 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
-/// <reference path="View.ts"/>
-/// <reference path="Stage.ts"/>
+/// <reference path="../framework/View.ts"/>
+/// <reference path="../framework/Stage.ts"/>
 /// <reference path="EnemyCharacter.ts"/>
 
 

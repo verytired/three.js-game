@@ -5,7 +5,7 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
 /// <reference path="../DefinitelyTyped/jquery/jquery.d.ts" />
 /// <reference path="MyCharacter.ts"/>
-/// <reference path="View.ts"/>
+/// <reference path="../framework/View.ts"/>
 /// <reference path="ControlManager.ts"/>
 /// <reference path="../DefinitelyTyped/stats/stats.d.ts" />
 

@@ -32,7 +32,7 @@ class CView {
 	public update(nowFrame) {
 		for (var i = 0; i < this.objs.length; i++) {
 			this.objs[i].update(nowFrame);
-			if (this.objs[i].isDead == true) {
+			if (this.objs[i].waitRemove == true) {
 				this.removeMover(this.objs[i], i)
 			}
 		}

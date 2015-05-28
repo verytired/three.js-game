@@ -62,9 +62,12 @@ class Explosion extends CMover {
 
 	}
 
-	public getParticles(){
+	public getParticles() {
 		return this._pc;
 	}
+
+	private frameCount = 0;
+	private isFinished = false;
 
 	public update() {
 		if (this.status == true) {
@@ -74,6 +77,11 @@ class Explosion extends CMover {
 				particle.y += this.dirs[pCount].y;
 				particle.x += this.dirs[pCount].x;
 				particle.z += this.dirs[pCount].z;
+			}
+			this.frameCount++;
+			if (this.frameCount > 300) {
+				this.status = false;
+				this.isFinished = true;
 			}
 			this._pc.geometry.verticesNeedUpdate = true;
 		}

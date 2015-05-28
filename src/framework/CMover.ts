@@ -11,7 +11,9 @@ class CMover extends events.EventDispatcher implements IMover {
 	vy = 0;
 
 	public _obj:THREE.Mesh;
+
 	public isDead:boolean = false;
+	public waitRemove:boolean = false;
 
 	constructor() {
 		super()
@@ -34,5 +36,7 @@ class CMover extends events.EventDispatcher implements IMover {
 		this.z = z;
 
 	}
+
+	public explode(){}
 
 }

@@ -23,6 +23,8 @@ class EnemyCharacter extends CMover {
 
 	private bullets:CMover[] = new Array();
 
+	private explosionObj;
+
 	constructor(startframe) {
 		super()
 
@@ -51,6 +53,14 @@ class EnemyCharacter extends CMover {
 
 		for (var i = 0; this.bullets.length < i; i++) {
 			this.bullets[i].update(nowFrame);
+		}
+		if (this.explosionObj != null) {
+			this.explosionObj.update(nowFrame);
+			if (this.explosionObj.isFinished == true) {
+				var v = GameManager.getInstance().getCurrentView();
+				v.remove(this.explosionObj);
+				this.waitRemove = true;
+			}
 		}
 	}
 
@@ -88,5 +98,13 @@ class EnemyCharacter extends CMover {
 
 	public getBullets() {
 		return this.bullets;
+	}
+
+	public explode() {
+		var v = GameManager.getInstance().getCurrentView();
+		v.remove(this._obj)
+		var ex = new Explosion(this.x, this.y);
+		v.add(ex.getParticles());
+		this.explosionObj = ex;
 	}
 }

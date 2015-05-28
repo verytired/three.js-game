@@ -120,6 +120,7 @@ var CMover = (function (_super) {
         this.vx = 0;
         this.vy = 0;
         this.isDead = false;
+        this.waitRemove = false;
     }
     CMover.prototype.update = function (nowFrame) {
     };
@@ -133,6 +134,8 @@ var CMover = (function (_super) {
         this.y = y;
         this.z = z;
     };
+    CMover.prototype.explode = function () {
+    };
     return CMover;
 })(events.EventDispatcher);
 var MyCharacter = (function (_super) {
@@ -144,6 +147,7 @@ var MyCharacter = (function (_super) {
         this.z = 0;
         this.vx = 0;
         this.vy = 0;
+        this.explosionObj = null;
         this.vy = -2;
         var geometry = new THREE.BoxGeometry(20, 20, 20);
         var material = new THREE.MeshBasicMaterial({
@@ -153,8 +157,23 @@ var MyCharacter = (function (_super) {
         this._obj = new THREE.Mesh(geometry, material);
         this._obj.castShadow = true;
     }
-    MyCharacter.prototype.update = function () {
+    MyCharacter.prototype.update = function (nowFrame) {
         this._obj.position.set(this.x, this.y, 50);
+        if (this.explosionObj != null) {
+            this.explosionObj.update(nowFrame);
+            if (this.explosionObj.isFinished == true) {
+                var v = GameManager.getInstance().getCurrentView();
+                v.remove(this.explosionObj);
+                this.waitRemove = true;
+            }
+        }
+    };
+    MyCharacter.prototype.explode = function () {
+        var v = GameManager.getInstance().getCurrentView();
+        v.remove(this._obj);
+        var ex = new Explosion(this.x, this.y);
+        v.add(ex.getParticles());
+        this.explosionObj = ex;
     };
     return MyCharacter;
 })(CMover);
@@ -180,7 +199,7 @@ var CView = (function () {
     CView.prototype.update = function (nowFrame) {
         for (var i = 0; i < this.objs.length; i++) {
             this.objs[i].update(nowFrame);
-            if (this.objs[i].isDead == true) {
+            if (this.objs[i].waitRemove == true) {
                 this.removeMover(this.objs[i], i);
             }
         }
@@ -397,179 +416,6 @@ var GameManager = (function () {
 })();
 var gm = GameManager.getInstance();
 gm.animate();
-var Bullet = (function (_super) {
-    __extends(Bullet, _super);
-    function Bullet(vx, vy) {
-        _super.call(this);
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-        this.vx = 0;
-        this.vy = 0;
-        this.stageWidth = 0;
-        this.stageHeight = 0;
-        var s = GameManager.getInstance().getStageSize();
-        this.stageWidth = s.width;
-        this.stageHeight = s.height;
-        this.vx = vx;
-        this.vy = vy;
-        this._obj = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            wireframe: true
-        }));
-        this._obj.position.set(0, 60, 50);
-        this._obj.castShadow = true;
-    }
-    Bullet.prototype.update = function () {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.checkAreaTest();
-        this._obj.position.set(this.x, this.y, 50);
-    };
-    Bullet.prototype.checkAreaTest = function () {
-        if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
-            this.isDead = true;
-        }
-    };
-    return Bullet;
-})(CMover);
-var EnemyCharacter = (function (_super) {
-    __extends(EnemyCharacter, _super);
-    function EnemyCharacter(startframe) {
-        _super.call(this);
-        this.id = 0;
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-        this.vx = 0;
-        this.vy = 0;
-        this.stageWidth = 0;
-        this.stageHeight = 0;
-        this.point = 150;
-        this.startFrame = 0;
-        this.currentFrame = 0;
-        this.bullets = new Array();
-        this.isShoted = false;
-        this.startFrame = startframe;
-        this.vy = -6;
-        var material = new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            wireframe: true
-        });
-        this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(20), material);
-        this._obj.castShadow = true;
-        var s = GameManager.getInstance().getStageSize();
-        this.stageWidth = s.width;
-        this.stageHeight = s.height;
-    }
-    EnemyCharacter.prototype.update = function (nowFrame) {
-        this.currentFrame = nowFrame - this.startFrame;
-        this.frameTest();
-        this.x += this.vx;
-        this.y += this.vy;
-        this.checkAreaTest();
-        this._obj.position.set(this.x, this.y, 50);
-        for (var i = 0; this.bullets.length < i; i++) {
-            this.bullets[i].update(nowFrame);
-        }
-    };
-    EnemyCharacter.prototype.checkAreaTest = function () {
-        if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
-            this.isDead = true;
-        }
-    };
-    EnemyCharacter.prototype.frameTest = function () {
-        if (this.currentFrame >= 50 && this.currentFrame < 70) {
-            this.vy = 0;
-        }
-        else if (this.currentFrame >= 70 && this.currentFrame < 100) {
-            if (this.isShoted == true)
-                return;
-            this.isShoted = true;
-            this.shot();
-        }
-        else if (this.currentFrame >= 100) {
-            this.vy = 6;
-        }
-    };
-    EnemyCharacter.prototype.shot = function () {
-        var s = GameManager.getInstance().getSelfCharacter();
-        var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
-        var b = new Bullet((s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
-        b.x = this.x;
-        b.y = this.y;
-        var v = GameManager.getInstance().getCurrentView();
-        v.addMover(b);
-        this.bullets.push(b);
-    };
-    EnemyCharacter.prototype.getBullets = function () {
-        return this.bullets;
-    };
-    return EnemyCharacter;
-})(CMover);
-var Explosion = (function (_super) {
-    __extends(Explosion, _super);
-    function Explosion(x, y) {
-        _super.call(this);
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-        this.vx = 0;
-        this.vy = 0;
-        this.movementSpeed = 80;
-        this.totalObjects = 500;
-        this.objectSize = 10;
-        this.sizeRandomness = 4000;
-        this.colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
-        this.dirs = [];
-        this.parts = [];
-        this.status = false;
-        this.xDir = 0;
-        this.yDir = 0;
-        this.zDir = 0;
-        var particles = new THREE.Geometry();
-        for (var i = 0; i < this.totalObjects; i++) {
-            var vertex = new THREE.Vector3();
-            vertex.x = x;
-            vertex.y = y;
-            vertex.z = 0;
-            particles.vertices.push(vertex);
-            this.dirs.push({
-                x: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
-                y: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
-                z: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2)
-            });
-        }
-        var materialParticle = new THREE.PointCloudMaterial({
-            color: 0xFF0000,
-            size: 5,
-            transparent: true
-        });
-        this._pc = new THREE.PointCloud(particles, materialParticle);
-        this.status = true;
-        this.xDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
-        this.yDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
-        this.zDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
-    }
-    Explosion.prototype.init = function () {
-    };
-    Explosion.prototype.getParticles = function () {
-        return this._pc;
-    };
-    Explosion.prototype.update = function () {
-        if (this.status == true) {
-            var pCount = this.totalObjects;
-            while (pCount--) {
-                var particle = this._pc.geometry.vertices[pCount];
-                particle.y += this.dirs[pCount].y;
-                particle.x += this.dirs[pCount].x;
-                particle.z += this.dirs[pCount].z;
-            }
-            this._pc.geometry.verticesNeedUpdate = true;
-        }
-    };
-    return Explosion;
-})(CMover);
 var SimplexNoise = (function () {
     function SimplexNoise(r) {
         if (r === void 0) { r = undefined; }
@@ -840,6 +686,201 @@ var SimplexNoise = (function () {
     };
     return SimplexNoise;
 })();
+var Bullet = (function (_super) {
+    __extends(Bullet, _super);
+    function Bullet(vx, vy) {
+        _super.call(this);
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.stageWidth = 0;
+        this.stageHeight = 0;
+        var s = GameManager.getInstance().getStageSize();
+        this.stageWidth = s.width;
+        this.stageHeight = s.height;
+        this.vx = vx;
+        this.vy = vy;
+        this._obj = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            wireframe: true
+        }));
+        this._obj.position.set(0, 60, 50);
+        this._obj.castShadow = true;
+    }
+    Bullet.prototype.update = function () {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.checkAreaTest();
+        this._obj.position.set(this.x, this.y, 50);
+    };
+    Bullet.prototype.checkAreaTest = function () {
+        if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
+            this.isDead = true;
+        }
+    };
+    return Bullet;
+})(CMover);
+var EnemyCharacter = (function (_super) {
+    __extends(EnemyCharacter, _super);
+    function EnemyCharacter(startframe) {
+        _super.call(this);
+        this.id = 0;
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.stageWidth = 0;
+        this.stageHeight = 0;
+        this.point = 150;
+        this.startFrame = 0;
+        this.currentFrame = 0;
+        this.bullets = new Array();
+        this.isShoted = false;
+        this.startFrame = startframe;
+        this.vy = -6;
+        var material = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            wireframe: true
+        });
+        this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(20), material);
+        this._obj.castShadow = true;
+        var s = GameManager.getInstance().getStageSize();
+        this.stageWidth = s.width;
+        this.stageHeight = s.height;
+    }
+    EnemyCharacter.prototype.update = function (nowFrame) {
+        this.currentFrame = nowFrame - this.startFrame;
+        this.frameTest();
+        this.x += this.vx;
+        this.y += this.vy;
+        this.checkAreaTest();
+        this._obj.position.set(this.x, this.y, 50);
+        for (var i = 0; this.bullets.length < i; i++) {
+            this.bullets[i].update(nowFrame);
+        }
+        if (this.explosionObj != null) {
+            this.explosionObj.update(nowFrame);
+            if (this.explosionObj.isFinished == true) {
+                var v = GameManager.getInstance().getCurrentView();
+                v.remove(this.explosionObj);
+                this.waitRemove = true;
+            }
+        }
+    };
+    EnemyCharacter.prototype.checkAreaTest = function () {
+        if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
+            this.isDead = true;
+        }
+    };
+    EnemyCharacter.prototype.frameTest = function () {
+        if (this.currentFrame >= 50 && this.currentFrame < 70) {
+            this.vy = 0;
+        }
+        else if (this.currentFrame >= 70 && this.currentFrame < 100) {
+            if (this.isShoted == true)
+                return;
+            this.isShoted = true;
+            this.shot();
+        }
+        else if (this.currentFrame >= 100) {
+            this.vy = 6;
+        }
+    };
+    EnemyCharacter.prototype.shot = function () {
+        var s = GameManager.getInstance().getSelfCharacter();
+        var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
+        var b = new Bullet((s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
+        b.x = this.x;
+        b.y = this.y;
+        var v = GameManager.getInstance().getCurrentView();
+        v.addMover(b);
+        this.bullets.push(b);
+    };
+    EnemyCharacter.prototype.getBullets = function () {
+        return this.bullets;
+    };
+    EnemyCharacter.prototype.explode = function () {
+        var v = GameManager.getInstance().getCurrentView();
+        v.remove(this._obj);
+        var ex = new Explosion(this.x, this.y);
+        v.add(ex.getParticles());
+        this.explosionObj = ex;
+    };
+    return EnemyCharacter;
+})(CMover);
+var Explosion = (function (_super) {
+    __extends(Explosion, _super);
+    function Explosion(x, y) {
+        _super.call(this);
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.movementSpeed = 80;
+        this.totalObjects = 500;
+        this.objectSize = 10;
+        this.sizeRandomness = 4000;
+        this.colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
+        this.dirs = [];
+        this.parts = [];
+        this.status = false;
+        this.xDir = 0;
+        this.yDir = 0;
+        this.zDir = 0;
+        this.frameCount = 0;
+        this.isFinished = false;
+        var particles = new THREE.Geometry();
+        for (var i = 0; i < this.totalObjects; i++) {
+            var vertex = new THREE.Vector3();
+            vertex.x = x;
+            vertex.y = y;
+            vertex.z = 0;
+            particles.vertices.push(vertex);
+            this.dirs.push({
+                x: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
+                y: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
+                z: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2)
+            });
+        }
+        var materialParticle = new THREE.PointCloudMaterial({
+            color: 0xFF0000,
+            size: 5,
+            transparent: true
+        });
+        this._pc = new THREE.PointCloud(particles, materialParticle);
+        this.status = true;
+        this.xDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
+        this.yDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
+        this.zDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
+    }
+    Explosion.prototype.init = function () {
+    };
+    Explosion.prototype.getParticles = function () {
+        return this._pc;
+    };
+    Explosion.prototype.update = function () {
+        if (this.status == true) {
+            var pCount = this.totalObjects;
+            while (pCount--) {
+                var particle = this._pc.geometry.vertices[pCount];
+                particle.y += this.dirs[pCount].y;
+                particle.x += this.dirs[pCount].x;
+                particle.z += this.dirs[pCount].z;
+            }
+            this.frameCount++;
+            if (this.frameCount > 300) {
+                this.status = false;
+                this.isFinished = true;
+            }
+            this._pc.geometry.verticesNeedUpdate = true;
+        }
+    };
+    return Explosion;
+})(CMover);
 var Stage = (function (_super) {
     __extends(Stage, _super);
     function Stage() {
@@ -870,7 +911,6 @@ var GameView = (function (_super) {
         this.enemies = new Array();
         this.enemyBullets = new Array();
         this.bullets = new Array();
-        this.explosions = new Array();
         this.waitingRestart = false;
         this.timerId = 0;
         this.isKeyLock = false;
@@ -900,19 +940,15 @@ var GameView = (function (_super) {
                 this.bullets.push(b);
                 break;
             case 65:
-                console.log("left");
                 this.self.x -= 10;
                 break;
             case 87:
-                console.log("up");
                 this.self.y += 10;
                 break;
             case 68:
-                console.log("right");
                 this.self.x += 10;
                 break;
             case 83:
-                console.log("down");
                 this.self.y -= 10;
                 break;
         }
@@ -921,20 +957,17 @@ var GameView = (function (_super) {
         this.hitTest();
         this.checkLiveTest();
         _super.prototype.update.call(this, this.gm.getCurrentFrame());
-        for (var i = 0; i < this.explosions.length; i++) {
-            this.explosions[i].update();
-        }
     };
     GameView.prototype.hitTest = function () {
         for (var i = 0; i < this.bullets.length; i++) {
             for (var j = 0; j < this.enemies.length; j++) {
                 if (this.bullets[i].x > this.enemies[j].x - 15 && this.bullets[i].x < this.enemies[j].x + 15 && this.bullets[i].y > this.enemies[j].y - 15 && this.bullets[i].y < this.enemies[j].y + 15) {
-                    this.bullets[i].isDead = true;
-                    this.enemies[j].isDead = true;
-                    this.gm.addScore(this.enemies[j].point);
-                    var ex = new Explosion(this.enemies[j].x, this.enemies[j].y);
-                    this.add(ex.getParticles());
-                    this.explosions.push(ex);
+                    if (!this.enemies[j].isDead) {
+                        this.bullets[i].waitRemove = true;
+                        this.enemies[j].isDead = true;
+                        this.enemies[j].explode();
+                        this.gm.addScore(this.enemies[j].point);
+                    }
                 }
             }
         }
@@ -945,9 +978,7 @@ var GameView = (function (_super) {
                 if (this.self.x > b.x - 15 && this.self.x < b.x + 15 && this.self.y > b.y - 15 && this.self.y < b.y + 15) {
                     if (!this.self.isDead) {
                         this.self.isDead = true;
-                        var ex = new Explosion(this.self.x, this.self.y);
-                        this.add(ex.getParticles());
-                        this.explosions.push(ex);
+                        this.self.explode();
                     }
                 }
             }
@@ -956,9 +987,7 @@ var GameView = (function (_super) {
             if (this.self.x > this.enemies[j].x - 15 && this.self.x < this.enemies[j].x + 15 && this.self.y > this.enemies[j].y - 15 && this.self.y < this.enemies[j].y + 15) {
                 if (!this.self.isDead) {
                     this.self.isDead = true;
-                    var ex = new Explosion(this.self.x, this.self.y);
-                    this.add(ex.getParticles());
-                    this.explosions.push(ex);
+                    this.self.explode();
                 }
             }
         }
@@ -986,7 +1015,7 @@ var GameView = (function (_super) {
         }
         n = 0;
         for (var i = 0; i < this.enemies.length; i++) {
-            if (this.enemies[n].isDead == true) {
+            if (this.enemies[n].waitRemove == true) {
                 this.enemies.splice(n, 1);
             }
             else {

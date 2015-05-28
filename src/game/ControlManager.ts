@@ -20,9 +20,9 @@ class ControlManager extends events.EventDispatcher {
 	public initialize(){
 
 		document.addEventListener("keydown" , (e)=>{
-			var et = new events.Event("onKeyPress")
-			et.data = e
-			this.dispatchEvent(et)
+			var et = new events.Event("onKeyPress");
+			et.data = e;
+			this.dispatchEvent(et);
 			//switch(e.keyCode){
 			//	case 32:
 			//		break

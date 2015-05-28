@@ -161,12 +161,33 @@ class GameManager {
 		this.$viewDebug = $("#debug");
 		this.$viewDebug.hide();
 
-		$.getJSON("data/scenedata.json" , (data)=> {
+		this.resize();
+		$(window).resize(()=> {
+			this.resize();
+		});
+
+		$.getJSON("data/scenedata.json", (data)=> {
 			//start point
 			//オブジェクト指向実装テスト
-			this.setView(new TestGameView(data));
+			$("#view-top").show();
+			this.setView(new TopView());
 		});
 		//this.setView(new TestGameView(data));
+	}
+
+	private overlay:String[] = ["#view-top","#view-gameover"];
+
+	public resize(){
+		var w = window.innerWidth;
+		var h = window.innerHeight;
+		this.renderer.setSize(w, h);
+		this.camera.aspect = w / h;
+
+		for(var i=0;i<this.overlay.length;i++){
+			$(this.overlay[i]).css({top:h/2-$(this.overlay[i]).height()/2})
+			$(this.overlay[i]).hide()
+		}
+
 	}
 
 	public update() {
@@ -197,7 +218,7 @@ class GameManager {
 
 	}
 
-	public setStartTime(){
+	public setStartTime() {
 		this.startTime = this.getTime();
 		this.currentFrame = 0;
 	}
@@ -207,6 +228,9 @@ class GameManager {
 	}
 
 	public setView(v:View) {
+		if(this.currentView){
+			this.currentView.destructor();
+		}
 		this.currentView = v;
 	}
 
@@ -227,20 +251,22 @@ class GameManager {
 	}
 
 	//viewへの参照
-	public getCurrentFrame(){
+	public getCurrentFrame() {
 		return this.currentFrame;
 	}
 
-	public getCurrentView(){
+	public getCurrentView() {
 		return this.currentView
 	}
 
 	//自機への参照
 	private myChara;
-	public setSelfCharacter(chara){
+
+	public setSelfCharacter(chara) {
 		this.myChara = chara;
 	}
-	public getSelfCharacter(){
+
+	public getSelfCharacter() {
 		return this.myChara
 	}
 }

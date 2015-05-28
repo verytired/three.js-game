@@ -7,23 +7,31 @@ class View {
 	private objs:Character[] = new Array()
 	private scene:THREE.Scene;
 
+	private cm:ControlManager;
+
 	constructor() {
 		console.log("new scene");
 		this.getScene();
 		this.init();
 	}
 
+	private _func:Function;
 	public init() {
-
+		this.cm = ControlManager.getInstance();
+		this._func = (e)=>{
+			this.keyEvent(e);
+		}
+		this.cm.addEventListener("onKeyPress",this._func);
 	}
 
 	public destructor() {
-
+		this.removeAll();
+		this.cm.removeEventListener("onKeyPress",this._func);
 	}
 
 	public update(nowFrame) {
 		for (var i = 0; i < this.objs.length; i++) {
-			this.objs[i].update(nowFrame)
+			this.objs[i].update(nowFrame);
 			if (this.objs[i].isDead == true) {
 				this.removeCharacter(this.objs[i], i)
 			}
@@ -60,4 +68,6 @@ class View {
 			this.objs[i].remove();
 		}
 	}
+
+	public keyEvent(e:any){}
 }

@@ -3,3 +3,4 @@
 	var gm = GameManager.getInstance();
 	gm.animate();
 //});
+

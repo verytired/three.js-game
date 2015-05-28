@@ -166,8 +166,16 @@ var View = (function () {
         this.init();
     }
     View.prototype.init = function () {
+        var _this = this;
+        this.cm = ControlManager.getInstance();
+        this._func = function (e) {
+            _this.keyEvent(e);
+        };
+        this.cm.addEventListener("onKeyPress", this._func);
     };
     View.prototype.destructor = function () {
+        this.removeAll();
+        this.cm.removeEventListener("onKeyPress", this._func);
     };
     View.prototype.update = function (nowFrame) {
         for (var i = 0; i < this.objs.length; i++) {
@@ -201,6 +209,8 @@ var View = (function () {
             this.scene.remove(this.objs[i].getObject());
             this.objs[i].remove();
         }
+    };
+    View.prototype.keyEvent = function (e) {
     };
     return View;
 })();
@@ -243,6 +253,7 @@ var GameManager = (function () {
         this.currentFrame = 0;
         this.fps = 60.0;
         this.frameLength = 60.0;
+        this.overlay = ["#view-top", "#view-gameover"];
         if (GameManager._instance) {
             throw new Error("must use the getInstance.");
         }
@@ -306,9 +317,24 @@ var GameManager = (function () {
         this.$viewScore.show();
         this.$viewDebug = $("#debug");
         this.$viewDebug.hide();
-        $.getJSON("data/scenedata.json", function (data) {
-            _this.setView(new TestGameView(data));
+        this.resize();
+        $(window).resize(function () {
+            _this.resize();
         });
+        $.getJSON("data/scenedata.json", function (data) {
+            $("#view-top").show();
+            _this.setView(new TopView());
+        });
+    };
+    GameManager.prototype.resize = function () {
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        this.renderer.setSize(w, h);
+        this.camera.aspect = w / h;
+        for (var i = 0; i < this.overlay.length; i++) {
+            $(this.overlay[i]).css({ top: h / 2 - $(this.overlay[i]).height() / 2 });
+            $(this.overlay[i]).hide();
+        }
     };
     GameManager.prototype.update = function () {
         this.controls.update();
@@ -338,6 +364,9 @@ var GameManager = (function () {
         return this.scene;
     };
     GameManager.prototype.setView = function (v) {
+        if (this.currentView) {
+            this.currentView.destructor();
+        }
         this.currentView = v;
     };
     GameManager.prototype.getStageSize = function () {
@@ -368,196 +397,6 @@ var GameManager = (function () {
 })();
 var gm = GameManager.getInstance();
 gm.animate();
-var Bullet = (function (_super) {
-    __extends(Bullet, _super);
-    function Bullet(vx, vy) {
-        _super.call(this);
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-        this.vx = 0;
-        this.vy = 0;
-        this.stageWidth = 0;
-        this.stageHeight = 0;
-        var s = GameManager.getInstance().getStageSize();
-        this.stageWidth = s.width;
-        this.stageHeight = s.height;
-        this.vx = vx;
-        this.vy = vy;
-        this._obj = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            wireframe: true
-        }));
-        this._obj.position.set(0, 60, 50);
-        this._obj.castShadow = true;
-    }
-    Bullet.prototype.update = function () {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.checkAreaTest();
-        this._obj.position.set(this.x, this.y, 50);
-    };
-    Bullet.prototype.checkAreaTest = function () {
-        if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
-            this.isDead = true;
-        }
-    };
-    return Bullet;
-})(Character);
-var EnemyCharacter = (function (_super) {
-    __extends(EnemyCharacter, _super);
-    function EnemyCharacter(startframe) {
-        _super.call(this);
-        this.id = 0;
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-        this.vx = 0;
-        this.vy = 0;
-        this.stageWidth = 0;
-        this.stageHeight = 0;
-        this.point = 150;
-        this.startFrame = 0;
-        this.currentFrame = 0;
-        this.bullets = new Array();
-        this.isShoted = false;
-        this.startFrame = startframe;
-        this.vy = -6;
-        var material = new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            wireframe: true
-        });
-        this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(20), material);
-        this._obj.castShadow = true;
-        var s = GameManager.getInstance().getStageSize();
-        this.stageWidth = s.width;
-        this.stageHeight = s.height;
-    }
-    EnemyCharacter.prototype.update = function (nowFrame) {
-        this.currentFrame = nowFrame - this.startFrame;
-        this.frameTest();
-        this.x += this.vx;
-        this.y += this.vy;
-        this.checkAreaTest();
-        this._obj.position.set(this.x, this.y, 50);
-        for (var i = 0; this.bullets.length < i; i++) {
-            this.bullets[i].update(nowFrame);
-        }
-    };
-    EnemyCharacter.prototype.checkAreaTest = function () {
-        if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
-            this.isDead = true;
-        }
-    };
-    EnemyCharacter.prototype.frameTest = function () {
-        if (this.currentFrame >= 50 && this.currentFrame < 70) {
-            this.vy = 0;
-        }
-        else if (this.currentFrame >= 70 && this.currentFrame < 100) {
-            if (this.isShoted == true)
-                return;
-            this.isShoted = true;
-            this.shot();
-        }
-        else if (this.currentFrame >= 100) {
-            this.vy = 6;
-        }
-    };
-    EnemyCharacter.prototype.shot = function () {
-        console.log("enemyShot");
-        var s = GameManager.getInstance().getSelfCharacter();
-        var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
-        var b = new Bullet((s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
-        b.x = this.x;
-        b.y = this.y;
-        var v = GameManager.getInstance().getCurrentView();
-        v.addCharacter(b);
-        this.bullets.push(b);
-    };
-    EnemyCharacter.prototype.getBullets = function () {
-        return this.bullets;
-    };
-    return EnemyCharacter;
-})(Character);
-var Explosion = (function (_super) {
-    __extends(Explosion, _super);
-    function Explosion(x, y) {
-        _super.call(this);
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-        this.vx = 0;
-        this.vy = 0;
-        this.movementSpeed = 80;
-        this.totalObjects = 500;
-        this.objectSize = 10;
-        this.sizeRandomness = 4000;
-        this.colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
-        this.dirs = [];
-        this.parts = [];
-        this.status = false;
-        this.xDir = 0;
-        this.yDir = 0;
-        this.zDir = 0;
-        var particles = new THREE.Geometry();
-        for (var i = 0; i < this.totalObjects; i++) {
-            var vertex = new THREE.Vector3();
-            vertex.x = x;
-            vertex.y = y;
-            vertex.z = 0;
-            particles.vertices.push(vertex);
-            this.dirs.push({
-                x: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
-                y: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
-                z: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2)
-            });
-        }
-        var materialParticle = new THREE.PointCloudMaterial({
-            color: 0xFF0000,
-            size: 5,
-            transparent: true
-        });
-        this._pc = new THREE.PointCloud(particles, materialParticle);
-        this.status = true;
-        this.xDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
-        this.yDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
-        this.zDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
-    }
-    Explosion.prototype.init = function () {
-    };
-    Explosion.prototype.getParticles = function () {
-        return this._pc;
-    };
-    Explosion.prototype.update = function () {
-        if (this.status == true) {
-            var pCount = this.totalObjects;
-            while (pCount--) {
-                var particle = this._pc.geometry.vertices[pCount];
-                particle.y += this.dirs[pCount].y;
-                particle.x += this.dirs[pCount].x;
-                particle.z += this.dirs[pCount].z;
-            }
-            this._pc.geometry.verticesNeedUpdate = true;
-        }
-    };
-    return Explosion;
-})(Character);
-var MenuView = (function (_super) {
-    __extends(MenuView, _super);
-    function MenuView() {
-        _super.call(this);
-    }
-    return MenuView;
-})(View);
-var Scene = (function () {
-    function Scene() {
-    }
-    Scene.prototype.init = function () {
-    };
-    Scene.prototype.destructor = function () {
-    };
-    return Scene;
-})();
 var SimplexNoise = (function () {
     function SimplexNoise(r) {
         if (r === void 0) { r = undefined; }
@@ -828,6 +667,195 @@ var SimplexNoise = (function () {
     };
     return SimplexNoise;
 })();
+var Bullet = (function (_super) {
+    __extends(Bullet, _super);
+    function Bullet(vx, vy) {
+        _super.call(this);
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.stageWidth = 0;
+        this.stageHeight = 0;
+        var s = GameManager.getInstance().getStageSize();
+        this.stageWidth = s.width;
+        this.stageHeight = s.height;
+        this.vx = vx;
+        this.vy = vy;
+        this._obj = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            wireframe: true
+        }));
+        this._obj.position.set(0, 60, 50);
+        this._obj.castShadow = true;
+    }
+    Bullet.prototype.update = function () {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.checkAreaTest();
+        this._obj.position.set(this.x, this.y, 50);
+    };
+    Bullet.prototype.checkAreaTest = function () {
+        if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
+            this.isDead = true;
+        }
+    };
+    return Bullet;
+})(Character);
+var EnemyCharacter = (function (_super) {
+    __extends(EnemyCharacter, _super);
+    function EnemyCharacter(startframe) {
+        _super.call(this);
+        this.id = 0;
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.stageWidth = 0;
+        this.stageHeight = 0;
+        this.point = 150;
+        this.startFrame = 0;
+        this.currentFrame = 0;
+        this.bullets = new Array();
+        this.isShoted = false;
+        this.startFrame = startframe;
+        this.vy = -6;
+        var material = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            wireframe: true
+        });
+        this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(20), material);
+        this._obj.castShadow = true;
+        var s = GameManager.getInstance().getStageSize();
+        this.stageWidth = s.width;
+        this.stageHeight = s.height;
+    }
+    EnemyCharacter.prototype.update = function (nowFrame) {
+        this.currentFrame = nowFrame - this.startFrame;
+        this.frameTest();
+        this.x += this.vx;
+        this.y += this.vy;
+        this.checkAreaTest();
+        this._obj.position.set(this.x, this.y, 50);
+        for (var i = 0; this.bullets.length < i; i++) {
+            this.bullets[i].update(nowFrame);
+        }
+    };
+    EnemyCharacter.prototype.checkAreaTest = function () {
+        if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
+            this.isDead = true;
+        }
+    };
+    EnemyCharacter.prototype.frameTest = function () {
+        if (this.currentFrame >= 50 && this.currentFrame < 70) {
+            this.vy = 0;
+        }
+        else if (this.currentFrame >= 70 && this.currentFrame < 100) {
+            if (this.isShoted == true)
+                return;
+            this.isShoted = true;
+            this.shot();
+        }
+        else if (this.currentFrame >= 100) {
+            this.vy = 6;
+        }
+    };
+    EnemyCharacter.prototype.shot = function () {
+        var s = GameManager.getInstance().getSelfCharacter();
+        var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
+        var b = new Bullet((s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
+        b.x = this.x;
+        b.y = this.y;
+        var v = GameManager.getInstance().getCurrentView();
+        v.addCharacter(b);
+        this.bullets.push(b);
+    };
+    EnemyCharacter.prototype.getBullets = function () {
+        return this.bullets;
+    };
+    return EnemyCharacter;
+})(Character);
+var Explosion = (function (_super) {
+    __extends(Explosion, _super);
+    function Explosion(x, y) {
+        _super.call(this);
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.movementSpeed = 80;
+        this.totalObjects = 500;
+        this.objectSize = 10;
+        this.sizeRandomness = 4000;
+        this.colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
+        this.dirs = [];
+        this.parts = [];
+        this.status = false;
+        this.xDir = 0;
+        this.yDir = 0;
+        this.zDir = 0;
+        var particles = new THREE.Geometry();
+        for (var i = 0; i < this.totalObjects; i++) {
+            var vertex = new THREE.Vector3();
+            vertex.x = x;
+            vertex.y = y;
+            vertex.z = 0;
+            particles.vertices.push(vertex);
+            this.dirs.push({
+                x: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
+                y: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
+                z: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2)
+            });
+        }
+        var materialParticle = new THREE.PointCloudMaterial({
+            color: 0xFF0000,
+            size: 5,
+            transparent: true
+        });
+        this._pc = new THREE.PointCloud(particles, materialParticle);
+        this.status = true;
+        this.xDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
+        this.yDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
+        this.zDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
+    }
+    Explosion.prototype.init = function () {
+    };
+    Explosion.prototype.getParticles = function () {
+        return this._pc;
+    };
+    Explosion.prototype.update = function () {
+        if (this.status == true) {
+            var pCount = this.totalObjects;
+            while (pCount--) {
+                var particle = this._pc.geometry.vertices[pCount];
+                particle.y += this.dirs[pCount].y;
+                particle.x += this.dirs[pCount].x;
+                particle.z += this.dirs[pCount].z;
+            }
+            this._pc.geometry.verticesNeedUpdate = true;
+        }
+    };
+    return Explosion;
+})(Character);
+var MenuView = (function (_super) {
+    __extends(MenuView, _super);
+    function MenuView() {
+        _super.call(this);
+    }
+    return MenuView;
+})(View);
+var Scene = (function () {
+    function Scene() {
+    }
+    Scene.prototype.init = function () {
+    };
+    Scene.prototype.destructor = function () {
+    };
+    return Scene;
+})();
 var Stage = (function (_super) {
     __extends(Stage, _super);
     function Stage() {
@@ -867,47 +895,46 @@ var TestGameView = (function (_super) {
         console.log(this.sceneData);
     }
     TestGameView.prototype.init = function () {
-        var _this = this;
+        _super.prototype.init.call(this);
         this.gm = GameManager.getInstance();
         this.bg = new Stage();
         this.bg.init();
         this.addCharacter(this.bg);
-        var cm = ControlManager.getInstance();
-        cm.addEventListener("onKeyPress", function (e) {
-            if (_this.isKeyLock == true) {
-                return;
-            }
-            switch (e.data.keyCode) {
-                case 32:
-                    if (_this.waitingRestart == true) {
-                        _this.restart();
-                        return;
-                    }
-                    var b = new Bullet(0, 6);
-                    b.x = _this.self.x;
-                    b.y = _this.self.y;
-                    _this.addCharacter(b);
-                    _this.bullets.push(b);
-                    break;
-                case 65:
-                    console.log("left");
-                    _this.self.x -= 10;
-                    break;
-                case 87:
-                    console.log("up");
-                    _this.self.y += 10;
-                    break;
-                case 68:
-                    console.log("right");
-                    _this.self.x += 10;
-                    break;
-                case 83:
-                    console.log("down");
-                    _this.self.y -= 10;
-                    break;
-            }
-        });
         this.startGame();
+    };
+    TestGameView.prototype.keyEvent = function (e) {
+        if (this.isKeyLock == true) {
+            return;
+        }
+        switch (e.data.keyCode) {
+            case 32:
+                if (this.waitingRestart == true) {
+                    this.restart();
+                    return;
+                }
+                var b = new Bullet(0, 6);
+                b.x = this.self.x;
+                b.y = this.self.y;
+                this.addCharacter(b);
+                this.bullets.push(b);
+                break;
+            case 65:
+                console.log("left");
+                this.self.x -= 10;
+                break;
+            case 87:
+                console.log("up");
+                this.self.y += 10;
+                break;
+            case 68:
+                console.log("right");
+                this.self.x += 10;
+                break;
+            case 83:
+                console.log("down");
+                this.self.y -= 10;
+                break;
+        }
     };
     TestGameView.prototype.update = function () {
         this.hitTest();
@@ -961,6 +988,8 @@ var TestGameView = (function (_super) {
             this.waitingRestart = true;
             this.isKeyLock = true;
             setTimeout(function () {
+                $("#overlay").show();
+                $("#view-gameover").show();
                 _this.isKeyLock = false;
             }, 3000);
             return;
@@ -988,6 +1017,7 @@ var TestGameView = (function (_super) {
     };
     TestGameView.prototype.startGame = function () {
         var _this = this;
+        $("#overlay").hide();
         this.bg = new Stage();
         this.bg.init();
         this.addCharacter(this.bg);
@@ -1018,4 +1048,28 @@ var TestGameView = (function (_super) {
         this.startGame();
     };
     return TestGameView;
+})(View);
+var TopView = (function (_super) {
+    __extends(TopView, _super);
+    function TopView() {
+        _super.call(this);
+    }
+    TopView.prototype.init = function () {
+        _super.prototype.init.call(this);
+        this.gm = GameManager.getInstance();
+        $("#view-top").show();
+    };
+    TopView.prototype.keyEvent = function (e) {
+        switch (e.data.keyCode) {
+            case 32:
+                this.moveNextScene();
+                $("#view-top").hide();
+                break;
+        }
+    };
+    TopView.prototype.moveNextScene = function () {
+        $("#overlay").hide();
+        this.gm.setView(new TestGameView({ "test": "dummy" }));
+    };
+    return TopView;
 })(View);

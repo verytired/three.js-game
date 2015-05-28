@@ -76,7 +76,6 @@ class EnemyCharacter extends Character {
 	}
 
 	public shot() {
-		console.log("enemyShot");
 		var s = GameManager.getInstance().getSelfCharacter();
 		var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
 		var b = new Bullet((s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);

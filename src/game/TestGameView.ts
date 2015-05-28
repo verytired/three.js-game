@@ -30,7 +30,7 @@ class TestGameView extends View {
 	}
 
 	public init() {
-
+		super.init();
 		this.gm = GameManager.getInstance();
 
 		//create background
@@ -38,46 +38,43 @@ class TestGameView extends View {
 		this.bg.init();
 		this.addCharacter(this.bg);
 
-		//set control manager
-		var cm = ControlManager.getInstance();
-		cm.addEventListener("onKeyPress", (e)=> {
-			if (this.isKeyLock == true) {
-				return
-			}
-			switch (e.data.keyCode) {
-				case 32:
-
-					if (this.waitingRestart == true) {
-						this.restart();
-						return
-					}
-					//todo ショットを打つ
-					var b = new Bullet(0, 6);
-					b.x = this.self.x
-					b.y = this.self.y
-					this.addCharacter(b);
-					this.bullets.push(b);
-					break
-				case 65:
-					console.log("left");
-					this.self.x -= 10;
-					break
-				case 87:
-					console.log("up");
-					this.self.y += 10;
-					break
-				case 68:
-					console.log("right");
-					this.self.x += 10;
-					break
-				case 83:
-					console.log("down");
-					this.self.y -= 10;
-					break
-			}
-		})
-
 		this.startGame();
+	}
+
+	public keyEvent(e:any){
+		if (this.isKeyLock == true) {
+			return
+		}
+		switch (e.data.keyCode) {
+			case 32:
+				if (this.waitingRestart == true) {
+					this.restart();
+					return
+				}
+				//todo ショットを打つ
+				var b = new Bullet(0, 6);
+				b.x = this.self.x;
+				b.y = this.self.y;
+				this.addCharacter(b);
+				this.bullets.push(b);
+				break
+			case 65:
+				console.log("left");
+				this.self.x -= 10;
+				break
+			case 87:
+				console.log("up");
+				this.self.y += 10;
+				break
+			case 68:
+				console.log("right");
+				this.self.x += 10;
+				break
+			case 83:
+				console.log("down");
+				this.self.y -= 10;
+				break
+		}
 	}
 
 	public update() {
@@ -153,8 +150,9 @@ class TestGameView extends View {
 			this.waitingRestart = true;
 			this.isKeyLock = true;
 			setTimeout(()=> {
-				//this.restart();
 				//gameover表示
+				$("#overlay").show();
+				$("#view-gameover").show();
 				this.isKeyLock = false;
 			}, 3000)
 			return
@@ -187,6 +185,7 @@ class TestGameView extends View {
 	 * ゲーム開始
 	 */
 	public startGame() {
+		$("#overlay").hide();
 		this.bg = new Stage();
 		this.bg.init();
 		this.addCharacter(this.bg);

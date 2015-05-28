@@ -19,8 +19,8 @@ class Bullet extends Character {
 		this.stageWidth = s.width;
 		this.stageHeight = s.height;
 
-		this.vx = vx
-		this.vy = vy
+		this.vx = vx;
+		this.vy = vy;
 		this._obj = new THREE.Mesh(
 			//球のジオメトリ　（半径：２００）
 			new THREE.SphereGeometry(5),

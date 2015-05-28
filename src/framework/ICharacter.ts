@@ -1,5 +1,5 @@
 
-interface ICharacter{
+interface IMover{
 	x : number;
 	y : number;
 	z : number;

@@ -1,6 +1,6 @@
 //弾クラス
 
-class Bullet extends Character {
+class Bullet extends CMover {
 
 	public x = 0;
 	public y = 0;

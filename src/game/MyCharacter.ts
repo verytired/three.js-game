@@ -1,7 +1,7 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
-/// <reference path="../framework/Character.ts"/>
+/// <reference path="../framework/CMover.ts"/>
 
-class MyCharacter extends Character {
+class MyCharacter extends CMover {
 
 	public x = 0;
 	public y = 0;

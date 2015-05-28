@@ -1,10 +1,10 @@
-/// <reference path="Character.ts"/>
+/// <reference path="CMover.ts"/>
 /// <reference path="../game/GameManager.ts"/>
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
 
-class View {
+class CView {
 
-	private objs:Character[] = new Array()
+	private objs:CMover[] = new Array()
 	private scene:THREE.Scene;
 
 	private cm:ControlManager;
@@ -33,7 +33,7 @@ class View {
 		for (var i = 0; i < this.objs.length; i++) {
 			this.objs[i].update(nowFrame);
 			if (this.objs[i].isDead == true) {
-				this.removeCharacter(this.objs[i], i)
+				this.removeMover(this.objs[i], i)
 			}
 		}
 	}
@@ -46,12 +46,12 @@ class View {
 		this.scene.remove(obj);
 	}
 
-	public addCharacter(chara:Character) {
+	public addMover(chara:CMover) {
 		this.objs.push(chara)
 		this.scene.add(chara.getObject());
 	}
 
-	public removeCharacter(chara:Character, index) {
+	public removeMover(chara:CMover, index) {
 		this.objs.splice(index, 1);
 		this.scene.remove(chara.getObject());
 		chara.remove();

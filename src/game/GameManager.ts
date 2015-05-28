@@ -5,7 +5,7 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
 /// <reference path="../DefinitelyTyped/jquery/jquery.d.ts" />
 /// <reference path="MyCharacter.ts"/>
-/// <reference path="../framework/View.ts"/>
+/// <reference path="../framework/CView.ts"/>
 /// <reference path="ControlManager.ts"/>
 /// <reference path="../DefinitelyTyped/stats/stats.d.ts" />
 
@@ -45,7 +45,7 @@ class GameManager {
 	private score = 0;
 
 	//現在のビュー
-	private currentView:View;
+	private currentView:CView;
 
 	//dom
 	private $viewScore = null;
@@ -227,7 +227,7 @@ class GameManager {
 		return this.scene;
 	}
 
-	public setView(v:View) {
+	public setView(v:CView) {
 		if(this.currentView){
 			this.currentView.destructor();
 		}

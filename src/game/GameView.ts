@@ -1,17 +1,17 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
-/// <reference path="../framework/View.ts"/>
-/// <reference path="../framework/Stage.ts"/>
+/// <reference path="../framework/CView.ts"/>
+/// <reference path="Stage.ts"/>
 /// <reference path="EnemyCharacter.ts"/>
 
 
-class TestGameView extends View {
+class GameView extends CView {
 
 	private enemies:EnemyCharacter[] = new Array();
-	private enemyBullets:Character[] = new Array();
-	private bullets:Character[] = new Array();
+	private enemyBullets:CMover[] = new Array();
+	private bullets:CMover[] = new Array();
 	private explosions:Explosion[] = new Array();
 
-	private self:Character;
+	private self:CMover;
 
 	private gm:GameManager;
 
@@ -22,11 +22,8 @@ class TestGameView extends View {
 
 	private sceneData;
 
-	constructor(data) {
-		super()
-		this.sceneData = data;
-		console.log("view init")
-		console.log(this.sceneData)
+	constructor() {
+		super();
 	}
 
 	public init() {
@@ -36,7 +33,7 @@ class TestGameView extends View {
 		//create background
 		this.bg = new Stage();
 		this.bg.init();
-		this.addCharacter(this.bg);
+		this.addMover(this.bg);
 
 		this.startGame();
 	}
@@ -55,7 +52,7 @@ class TestGameView extends View {
 				var b = new Bullet(0, 6);
 				b.x = this.self.x;
 				b.y = this.self.y;
-				this.addCharacter(b);
+				this.addMover(b);
 				this.bullets.push(b);
 				break
 			case 65:
@@ -188,11 +185,11 @@ class TestGameView extends View {
 		$("#overlay").hide();
 		this.bg = new Stage();
 		this.bg.init();
-		this.addCharacter(this.bg);
+		this.addMover(this.bg);
 
 		this.self = new MyCharacter()
 		this.self.y = -150;
-		this.addCharacter(this.self);
+		this.addMover(this.self);
 		this.gm.setSelfCharacter(this.self);
 
 		this.gm.setStartTime();
@@ -202,7 +199,7 @@ class TestGameView extends View {
 				var e = new EnemyCharacter(this.gm.getCurrentFrame());
 				e.y = 320;
 				e.x = -320 + Math.random() * 640;
-				this.addCharacter(e);
+				this.addMover(e);
 				this.enemies.push(e);
 				func();
 			}, 500)

@@ -1,7 +1,7 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
-/// <reference path="EventDispatcher.ts"/>
+/// <reference path="CEventDispatcher.ts"/>
 
-class Character extends events.EventDispatcher implements ICharacter {
+class CMover extends events.EventDispatcher implements IMover {
 
 	x = 0;
 	y = 0;

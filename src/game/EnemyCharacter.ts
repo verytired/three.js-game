@@ -2,7 +2,7 @@
 /// <reference path="GameManager.ts"/>
 
 
-class EnemyCharacter extends Character {
+class EnemyCharacter extends CMover {
 
 	public id = 0;
 
@@ -21,7 +21,7 @@ class EnemyCharacter extends Character {
 	private startFrame = 0;
 	private currentFrame = 0;
 
-	private bullets:Character[] = new Array();
+	private bullets:CMover[] = new Array();
 
 	constructor(startframe) {
 		super()
@@ -82,7 +82,7 @@ class EnemyCharacter extends Character {
 		b.x = this.x
 		b.y = this.y
 		var v = GameManager.getInstance().getCurrentView();
-		v.addCharacter(b);
+		v.addMover(b);
 		this.bullets.push(b);
 	}
 

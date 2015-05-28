@@ -1,4 +1,4 @@
-class TopView extends View {
+class TopView extends CView {
 
 	private gm:GameManager;
 
@@ -23,7 +23,7 @@ class TopView extends View {
 
 	public moveNextScene(){
 		$("#overlay").hide();
-		this.gm.setView(new TestGameView({"test":"dummy"}))
+		this.gm.setView(new GameView())
 	}
 
 }

@@ -1,6 +1,6 @@
 /// <reference path="../utils/SimplexNoise.ts"/>
 
-class Stage extends Character{
+class Stage extends CMover{
 
 	constructor() {
 		super();

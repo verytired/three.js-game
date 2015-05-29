@@ -19,6 +19,11 @@ class TopView extends CView {
 		}
 	}
 
+	public onMouseDown(e:any) {
+		this.moveNextScene();
+		$("#view-top").hide();
+	}
+
 	public moveNextScene(){
 		$("#overlay").hide();
 		this.gm.setView(new GameView())

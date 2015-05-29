@@ -277,21 +277,41 @@ var ControlManager = (function (_super) {
             et.data = e;
             _this.dispatchEvent(et);
         });
-        document.addEventListener("mousedown", function (e) {
-            var et = new events.Event("onMouseDown");
-            et.data = e;
-            _this.dispatchEvent(et);
-        });
-        document.addEventListener("mousemove", function (e) {
-            var et = new events.Event("onMouseMove");
-            et.data = e;
-            _this.dispatchEvent(et);
-        });
-        document.addEventListener("mouseup", function (e) {
-            var et = new events.Event("onMouseUp");
-            et.data = e;
-            _this.dispatchEvent(et);
-        });
+        var type = GameManager.getInstance().ua;
+        if (type == "pc") {
+            document.addEventListener("mousedown", function (e) {
+                var et = new events.Event("onMouseDown");
+                et.data = e;
+                _this.dispatchEvent(et);
+            });
+            document.addEventListener("mousemove", function (e) {
+                var et = new events.Event("onMouseMove");
+                et.data = e;
+                _this.dispatchEvent(et);
+            });
+            document.addEventListener("mouseup", function (e) {
+                var et = new events.Event("onMouseUp");
+                et.data = e;
+                _this.dispatchEvent(et);
+            });
+        }
+        else {
+            document.addEventListener("touchstart", function (e) {
+                var et = new events.Event("onMouseDown");
+                et.data = e;
+                _this.dispatchEvent(et);
+            });
+            document.addEventListener("touchmove", function (e) {
+                var et = new events.Event("onMouseMove");
+                et.data = e;
+                _this.dispatchEvent(et);
+            });
+            document.addEventListener("touchend", function (e) {
+                var et = new events.Event("onMouseUp");
+                et.data = e;
+                _this.dispatchEvent(et);
+            });
+        }
     };
     ControlManager._instance = null;
     return ControlManager;
@@ -308,6 +328,7 @@ var GameManager = (function () {
         this.currentFrame = 0;
         this.fps = 60.0;
         this.frameLength = 60.0;
+        this.useControl = false;
         this.overlay = ["#view-top", "#view-gameover"];
         if (GameManager._instance) {
             throw new Error("must use the getInstance.");
@@ -327,6 +348,7 @@ var GameManager = (function () {
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
         this.camera.position.set(0, -300, 240);
+        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setClearColor(0x000000);
@@ -365,9 +387,19 @@ var GameManager = (function () {
         this.stats.domElement.style.right = '0px';
         this.stats.domElement.style.top = '0px';
         document.body.appendChild(this.stats.domElement);
-        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-        this.controls.addEventListener('change', function () {
-        });
+        this.ua = "pc";
+        var ua = navigator.userAgent;
+        if (ua.indexOf('iPhone') > 0) {
+            this.ua = "ios";
+        }
+        else if (ua.indexOf('Android') > 0) {
+            this.ua = "android";
+        }
+        if (this.useControl == true) {
+            this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+            this.controls.addEventListener('change', function () {
+            });
+        }
         var ctmanager = ControlManager.getInstance();
         this.$viewScore = $("#score");
         this.setScore(0);
@@ -394,7 +426,8 @@ var GameManager = (function () {
         }
     };
     GameManager.prototype.update = function () {
-        this.controls.update();
+        if (this.useControl == true)
+            this.controls.update();
         if (this.currentView && this.isStop == false) {
             this.currentView.update(this.currentFrame);
         }
@@ -1139,9 +1172,15 @@ var Shooter = (function () {
     function Shooter() {
         this.bullets = new Array();
     }
-    Shooter.prototype.update = function () {
+    Shooter.prototype.update = function (frame) {
+        for (var i = 0; i < this.bullets.length; i++) {
+            this.bullets[i].update(frame);
+        }
     };
     Shooter.prototype.shot = function () {
+    };
+    Shooter.prototype.getBullets = function () {
+        return this.bullets;
     };
     return Shooter;
 })();
@@ -1163,9 +1202,20 @@ var TopView = (function (_super) {
                 break;
         }
     };
+    TopView.prototype.onMouseDown = function (e) {
+        this.moveNextScene();
+        $("#view-top").hide();
+    };
     TopView.prototype.moveNextScene = function () {
         $("#overlay").hide();
         this.gm.setView(new GameView());
     };
     return TopView;
 })(CView);
+var TwoWayShooter = (function (_super) {
+    __extends(TwoWayShooter, _super);
+    function TwoWayShooter() {
+        _super.call(this);
+    }
+    return TwoWayShooter;
+})(Shooter);

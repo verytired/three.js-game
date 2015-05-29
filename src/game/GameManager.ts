@@ -62,6 +62,9 @@ class GameManager {
 	private fps = 60.0;
 	private frameLength = 60.0;
 
+	public ua;
+	private useControl = false;
+
 	constructor() {
 		if (GameManager._instance) {
 			throw new Error("must use the getInstance.");
@@ -82,6 +85,7 @@ class GameManager {
 		this.scene = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
 		this.camera.position.set(0, -300, 240);
+		this.camera.lookAt(new THREE.Vector3(0, 0, 0))
 		this.renderer = new THREE.WebGLRenderer();
 
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -147,12 +151,24 @@ class GameManager {
 		this.stats.domElement.style.top = '0px';
 		document.body.appendChild(this.stats.domElement);
 
-		//orbitcontrol
-		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 
-		this.controls.addEventListener( 'change', ()=>{
-			//console.log(this.camera)
-		} );
+		this.ua = "pc";
+		var ua = navigator.userAgent;
+		if (ua.indexOf('iPhone') > 0) {
+			this.ua = "ios";
+		} else if (ua.indexOf('Android') > 0) {
+			this.ua = "android"
+		}
+
+		//orbitcontrol
+		if(	this.useControl == true){
+			this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+			this.controls.addEventListener('change', ()=> {
+				//console.log(this.camera)
+			});
+		}
+
+
 
 		//操作機能
 		var ctmanager = ControlManager.getInstance();
@@ -179,24 +195,24 @@ class GameManager {
 		});
 		//this.setView(new TestGameView(data));
 	}
-	private sceneData:SceneData;
-	private overlay:String[] = ["#view-top","#view-gameover"];
 
-	public resize(){
+	private sceneData:SceneData;
+	private overlay:String[] = ["#view-top", "#view-gameover"];
+
+	public resize() {
 		var w = window.innerWidth;
 		var h = window.innerHeight;
 		this.renderer.setSize(w, h);
 		this.camera.aspect = w / h;
 
-		for(var i=0;i<this.overlay.length;i++){
-			$(this.overlay[i]).css({top:h/2-$(this.overlay[i]).height()/2})
+		for (var i = 0; i < this.overlay.length; i++) {
+			$(this.overlay[i]).css({top: h / 2 - $(this.overlay[i]).height() / 2})
 			$(this.overlay[i]).hide()
 		}
-
 	}
 
 	public update() {
-		this.controls.update();
+		if(this.useControl == true)this.controls.update();
 		if (this.currentView && this.isStop == false) {
 			this.currentView.update(this.currentFrame);
 		}
@@ -233,7 +249,7 @@ class GameManager {
 	}
 
 	public setView(v:CView) {
-		if(this.currentView){
+		if (this.currentView) {
 			this.currentView.destructor();
 		}
 		this.currentView = v;
@@ -255,9 +271,9 @@ class GameManager {
 		this.$viewScore.html("Score:" + this.score);
 	}
 
-    public debug(str){
-        this.$viewDebug.html(str);
-    }
+	public debug(str) {
+		this.$viewDebug.html(str);
+	}
 
 	//viewへの参照
 	public getCurrentFrame() {
@@ -280,7 +296,7 @@ class GameManager {
 	}
 
 	//シーン情報取得
-	public getSceneData(index){
+	public getSceneData(index) {
 		return this.sceneData.getData(index);
 	}
 }

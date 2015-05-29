@@ -3,12 +3,12 @@
 
 class Enemy extends CMover {
 
-		public id = 0;
+	public id = 0;
 
 	private stageWidth = 0;
 	private stageHeight = 0;
 
-	private  point = 150; //得点
+	private point = 150; //得点
 	private life = 1;//生存時間
 	private lifeTime = 500;//生存時間
 
@@ -19,9 +19,16 @@ class Enemy extends CMover {
 	private shooter:Shooter;//弾発射オブジェクト
 
 	constructor(startframe) {
-		super()
+		super();
+		this.startFrame = startframe;
+		var s = GameManager.getInstance().getStageSize();
+		this.stageWidth = s.width;
+		this.stageHeight = s.height;
+		this.initialize();
+	}
 
-		this.startFrame = startframe
+	public initialize() {
+
 		this.vy = -6;
 
 		var material = new THREE.MeshBasicMaterial({
@@ -30,11 +37,6 @@ class Enemy extends CMover {
 		});
 		this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(20), material);
 		this._obj.castShadow = true;
-
-		var s = GameManager.getInstance().getStageSize();
-		this.stageWidth = s.width;
-		this.stageHeight = s.height;
-
 		this.shooter = new SingleShooter();
 	}
 
@@ -99,24 +101,33 @@ class Enemy extends CMover {
 	}
 
 	//hit
-	public hit(){
+	public hit() {
 		var ma:any = this._obj.material
 		ma.color.setHex(0xFF0000);
-		setTimeout(()=>{
+		setTimeout(()=> {
 			ma.color.setHex(0xFFFFF);
-		},200)
+		}, 200)
 		this.life--;
-		if(this.life<=0){
+		if (this.life <= 0) {
 			this.isDead = true;
 			this.explode();
 		}
 	}
 
-	public getPoint(){
+	public getPoint() {
 		return this.point;
 	}
 
-	public setLifeTime(t){
+	public setLifeTime(t) {
 		this.lifeTime = t;
+	}
+
+	public setLife(l) {
+		this.life = l;
+	}
+
+	public setShooter(s){
+		this.shooter = s
+
 	}
 }

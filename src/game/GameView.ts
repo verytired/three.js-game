@@ -22,7 +22,6 @@ class GameView extends CView {
 	private nextActionFrame = 0;
 	private nextActionNum = 0;
 
-
 	constructor() {
 		super();
 	}
@@ -110,7 +109,11 @@ class GameView extends CView {
 		if (this.nextActionNum < this.sceneData.length && currentFrame == this.sceneData[this.nextActionNum].frame) {
 			var enemies = this.sceneData[this.nextActionNum].enemies;
 			for (var i = 0; i < enemies.length; i++) {
-				var e = new Enemy(this.gm.getCurrentFrame());
+				if(enemies[i].type == 1){
+					var e = new Enemy(this.gm.getCurrentFrame());
+				}else if(enemies[i].type == 2){
+					var e = new EnemyMid(this.gm.getCurrentFrame());
+				}
 				e.x = enemies[i].x;
 				e.y = enemies[i].y;
 				this.addMover(e);
@@ -180,7 +183,6 @@ class GameView extends CView {
 				this.waitingRestart = true;
 				this.isKeyLock = true;
 			setTimeout(()=> {
-
 				this.setGameOver();
 			}, 3000)
 			return
@@ -222,7 +224,7 @@ class GameView extends CView {
 		this.bg.init();
 		this.addMover(this.bg);
 
-		this.self = new MyShip()
+		this.self = new MyShip();
 		this.self.y = -150;
 		this.addMover(this.self);
 		this.gm.setSelfCharacter(this.self);

@@ -156,8 +156,6 @@ var MyShip = (function (_super) {
         });
         this._obj = new THREE.Mesh(geometry, material);
         this._obj.castShadow = true;
-        var ma = this._obj.material;
-        ma.color.setHex(0x0000FF);
         console.log(this._obj.material);
     }
     MyShip.prototype.update = function (nowFrame) {
@@ -546,6 +544,12 @@ var Enemy = (function (_super) {
         this.currentFrame = 0;
         this.isShoted = false;
         this.startFrame = startframe;
+        var s = GameManager.getInstance().getStageSize();
+        this.stageWidth = s.width;
+        this.stageHeight = s.height;
+        this.initialize();
+    }
+    Enemy.prototype.initialize = function () {
         this.vy = -6;
         var material = new THREE.MeshBasicMaterial({
             color: 0xffffff,
@@ -553,11 +557,8 @@ var Enemy = (function (_super) {
         });
         this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(20), material);
         this._obj.castShadow = true;
-        var s = GameManager.getInstance().getStageSize();
-        this.stageWidth = s.width;
-        this.stageHeight = s.height;
         this.shooter = new SingleShooter();
-    }
+    };
     Enemy.prototype.update = function (nowFrame) {
         this.currentFrame = nowFrame - this.startFrame;
         this.doAction();
@@ -626,8 +627,32 @@ var Enemy = (function (_super) {
     Enemy.prototype.setLifeTime = function (t) {
         this.lifeTime = t;
     };
+    Enemy.prototype.setLife = function (l) {
+        this.life = l;
+    };
+    Enemy.prototype.setShooter = function (s) {
+        this.shooter = s;
+    };
     return Enemy;
 })(CMover);
+var EnemyMid = (function (_super) {
+    __extends(EnemyMid, _super);
+    function EnemyMid(startframe) {
+        _super.call(this, startframe);
+    }
+    EnemyMid.prototype.initialize = function () {
+        this.vy = -6;
+        var material = new THREE.MeshBasicMaterial({
+            color: 0x00ff00,
+            wireframe: true
+        });
+        this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(40), material);
+        this._obj.castShadow = true;
+        this.setShooter(new SingleShooter());
+        this.setLife(3);
+    };
+    return EnemyMid;
+})(Enemy);
 var Explosion = (function (_super) {
     __extends(Explosion, _super);
     function Explosion(x, y, color) {
@@ -1076,7 +1101,12 @@ var GameView = (function (_super) {
         if (this.nextActionNum < this.sceneData.length && currentFrame == this.sceneData[this.nextActionNum].frame) {
             var enemies = this.sceneData[this.nextActionNum].enemies;
             for (var i = 0; i < enemies.length; i++) {
-                var e = new Enemy(this.gm.getCurrentFrame());
+                if (enemies[i].type == 1) {
+                    var e = new Enemy(this.gm.getCurrentFrame());
+                }
+                else if (enemies[i].type == 2) {
+                    var e = new EnemyMid(this.gm.getCurrentFrame());
+                }
                 e.x = enemies[i].x;
                 e.y = enemies[i].y;
                 this.addMover(e);

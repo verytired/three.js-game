@@ -1,14 +1,14 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
 /// <reference path="../framework/CView.ts"/>
 /// <reference path="Stage.ts"/>
-/// <reference path="EnemyCharacter.ts"/>
+/// <reference path="Enemy.ts"/>
 
 
 class GameView extends CView {
 
 	//Game Objects
 	private self:CMover;
-	private enemies:EnemyCharacter[] = new Array();
+	private enemies:Enemy[] = new Array();
 	private enemyBullets:CMover[] = new Array();
 	private bullets:CMover[] = new Array();
 	private bg:Stage;
@@ -110,7 +110,7 @@ class GameView extends CView {
 		if (this.nextActionNum < this.sceneData.length && currentFrame == this.sceneData[this.nextActionNum].frame) {
 			var enemies = this.sceneData[this.nextActionNum].enemies;
 			for (var i = 0; i < enemies.length; i++) {
-				var e = new EnemyCharacter(this.gm.getCurrentFrame());
+				var e = new Enemy(this.gm.getCurrentFrame());
 				e.x = enemies[i].x;
 				e.y = enemies[i].y;
 				this.addMover(e);
@@ -222,7 +222,7 @@ class GameView extends CView {
 		this.bg.init();
 		this.addMover(this.bg);
 
-		this.self = new MyCharacter()
+		this.self = new MyShip()
 		this.self.y = -150;
 		this.addMover(this.self);
 		this.gm.setSelfCharacter(this.self);
@@ -231,7 +231,7 @@ class GameView extends CView {
 
 		var func = ()=> {
 			this.timerId = setTimeout(()=> {
-				var e = new EnemyCharacter(this.gm.getCurrentFrame());
+				var e = new Enemy(this.gm.getCurrentFrame());
 				e.y = 320;
 				e.x = -320 + Math.random() * 640;
 				this.addMover(e);

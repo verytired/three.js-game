@@ -3,12 +3,12 @@
 
 class CMover extends events.EventDispatcher implements IMover {
 
-	x = 0;
-	y = 0;
-	z = 0;
+	public x = 0;
+	public y = 0;
+	public z = 0;
 
-	vx = 0;
-	vy = 0;
+	public vx = 0;
+	public vy = 0;
 
 	public _obj:THREE.Mesh;
 

@@ -2,9 +2,7 @@ class Shooter {
 
 	private bullets:CMover[] = new Array();
 
-	constructor() {
-
-	}
+	constructor() {}
 
 	public update(frame) {
 		for (var i = 0; i < this.bullets.length; i++) {

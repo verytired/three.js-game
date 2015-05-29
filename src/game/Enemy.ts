@@ -1,39 +1,27 @@
 //敵クラス
 /// <reference path="GameManager.ts"/>
 
-
-class EnemyCharacter extends CMover {
+class Enemy extends CMover {
 
 	public id = 0;
-
-	public x = 0;
-	public y = 0;
-	z = 0;
-
-	public vx = 0;
-	public vy = 0;
 
 	private stageWidth = 0;
 	private stageHeight = 0;
 
-	public point = 150;
+	public point = 150; //得点
+	private lifeTime = 500;//生存時間
 
 	private startFrame = 0;
 	private currentFrame = 0;
 
-	private bullets:CMover[] = new Array();
-
-	private explosionObj;
-
-	private lifeTime = 500;
-
-	private shooter:Shooter;
+	private explosionObj;//爆発オブジェクト格納
+	private shooter:Shooter;//弾発射オブジェクト
 
 	constructor(startframe) {
 		super()
 
 		this.startFrame = startframe
-		this.vy = -6
+		this.vy = -6;
 
 		var material = new THREE.MeshBasicMaterial({
 			color: 0xffffff,
@@ -51,15 +39,12 @@ class EnemyCharacter extends CMover {
 
 	public update(nowFrame) {
 		this.currentFrame = nowFrame - this.startFrame;
-		this.frameTest();
+		this.doAction();
 		this.x += this.vx;
-		this.y += this.vy
-		//this.checkAreaTest()
+		this.y += this.vy;
+
 		this._obj.position.set(this.x, this.y, 50);
 
-		for (var i = 0; this.bullets.length < i; i++) {
-			this.bullets[i].update(nowFrame);
-		}
 		if (this.explosionObj != null) {
 			this.explosionObj.update(nowFrame);
 			if (this.explosionObj.isFinished == true) {
@@ -70,21 +55,17 @@ class EnemyCharacter extends CMover {
 		}
 	}
 
-	public checkAreaTest() {
-		//if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
-		//	this.isDead = true;
-		//}
-	}
-
 	private isShoted = false;
 
-	public frameTest() {
+	/**
+	 * 行動処理
+	 */
+	public doAction() {
 		if (this.currentFrame >= 50 && this.currentFrame < 70) {
 			this.vy = 0
 		} else if (this.currentFrame >= 70 && this.currentFrame < 100) {
 			//フレームが進まない場合の行動制限
 			if (this.isShoted == true)return
-
 			this.isShoted = true;
 			this.shot()
 		} else if (this.currentFrame >= 100) {

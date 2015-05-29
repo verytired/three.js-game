@@ -6,11 +6,14 @@
 
 class GameView extends CView {
 
+	//Game Objects
 	private self:CMover;
 	private enemies:EnemyCharacter[] = new Array();
 	private enemyBullets:CMover[] = new Array();
 	private bullets:CMover[] = new Array();
 	private bg:Stage;
+
+	private isKeyLock = false;
 
 	private waitingRestart = false;
 	private timerId = 0;
@@ -18,6 +21,7 @@ class GameView extends CView {
 	private sceneData;
 	private nextActionFrame = 0;
 	private nextActionNum = 0;
+
 
 	constructor() {
 		super();
@@ -91,7 +95,6 @@ class GameView extends CView {
 	}
 
 	public onMouseUp(e:any){
-		console.log("onMouseUp on view")
 		if (this.isKeyLock == true) {
 			return
 		}
@@ -171,9 +174,6 @@ class GameView extends CView {
 	/**
 	 * キャラクタの表示確認
 	 */
-
-	private isKeyLock = false;
-
 	public checkLiveTest() {
 		if (this.self.isDead == true && this.waitingRestart == false) {
 			//3秒後くらいにゲームオーバー表示させる→スペース押したらreplay

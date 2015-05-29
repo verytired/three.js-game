@@ -19,8 +19,6 @@ class ControlManager extends events.EventDispatcher {
 
 	public initialize() {
 
-
-
 		document.addEventListener("keydown", (e)=> {
 			var et = new events.Event("onKeyPress");
 			et.data = e;
@@ -29,7 +27,6 @@ class ControlManager extends events.EventDispatcher {
 
 		var type = GameManager.getInstance().ua;
 		if(type == "pc"){
-			//todo 将来的にスマホとPCの判定処理を入れて出し分けたい
 			document.addEventListener("mousedown", (e)=> {
 				var et = new events.Event("onMouseDown");
 				et.data = e;
@@ -46,7 +43,6 @@ class ControlManager extends events.EventDispatcher {
 				this.dispatchEvent(et);
 			});
 		}else{
-			//todo 将来的にスマホとPCの判定処理を入れて出し分けたい
 			document.addEventListener("touchstart", (e)=> {
 				var et = new events.Event("onMouseDown");
 				et.data = e;

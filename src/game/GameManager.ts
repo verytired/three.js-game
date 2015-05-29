@@ -223,7 +223,6 @@ class GameManager {
 	public animate() {
 
 		this.currentFrame = Math.floor(( this.getTime() - this.startTime ) / ( 1000.0 / this.fps ));
-		//console.log(this.currentFrame);
 
 		this.stats.begin();
 		this.update();

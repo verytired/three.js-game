@@ -54,7 +54,7 @@ class EnemyCharacter extends CMover {
 		this.frameTest();
 		this.x += this.vx;
 		this.y += this.vy
-		this.checkAreaTest()
+		//this.checkAreaTest()
 		this._obj.position.set(this.x, this.y, 50);
 
 		for (var i = 0; this.bullets.length < i; i++) {

@@ -25,6 +25,8 @@ class EnemyCharacter extends CMover {
 
 	private explosionObj;
 
+	private lifeTime = 500;
+
 	constructor(startframe) {
 		super()
 
@@ -65,9 +67,9 @@ class EnemyCharacter extends CMover {
 	}
 
 	public checkAreaTest() {
-		if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
-			this.isDead = true;
-		}
+		//if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
+		//	this.isDead = true;
+		//}
 	}
 
 	private isShoted = false;
@@ -78,14 +80,21 @@ class EnemyCharacter extends CMover {
 		} else if (this.currentFrame >= 70 && this.currentFrame < 100) {
 			//フレームが進まない場合の行動制限
 			if (this.isShoted == true)return
+
 			this.isShoted = true;
 			this.shot()
 		} else if (this.currentFrame >= 100) {
 			this.vy = 6
 		}
+
+		if(this.currentTime >= this.lifeTime){
+			this.isDead = true;
+			this.waitRemove = true;
+		}
 	}
 
 	public shot() {
+		if (this.isDead == true)return
 		var s = GameManager.getInstance().getSelfCharacter();
 		var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
 		var b = new Bullet((s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);

@@ -48,7 +48,7 @@ class GameView extends CView {
 					return
 				}
 				//shot bullets
-				var b = new Bullet(0, 6);
+				var b = new Bullet(0, 12);
 				b.x = this.self.x;
 				b.y = this.self.y;
 				this.addMover(b);
@@ -120,6 +120,7 @@ class GameView extends CView {
 			for (var j = 0; j < this.enemies.length; j++) {
 				if (this.bullets[i].x > this.enemies[j].x - 15 && this.bullets[i].x < this.enemies[j].x + 15 && this.bullets[i].y > this.enemies[j].y - 15 && this.bullets[i].y < this.enemies[j].y + 15) {
 					if (!this.enemies[j].isDead) {
+						this.bullets[i].isDead = true;
 						this.bullets[i].waitRemove = true;
 						this.enemies[j].isDead = true;
 						this.enemies[j].explode();

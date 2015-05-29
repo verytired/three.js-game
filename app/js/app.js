@@ -1000,6 +1000,18 @@ var GameView = (function (_super) {
                 break;
         }
     };
+    GameView.prototype.onMouseDown = function (e) {
+    };
+    GameView.prototype.onMouseMove = function (e) {
+        var nowX = e.data.x;
+        var nowY = e.data.y;
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        this.self.x = -240 + 480 * nowX / w;
+        this.self.y = 320 - 640 * nowY / h;
+    };
+    GameView.prototype.onMouseUp = function (e) {
+    };
     GameView.prototype.update = function () {
         var currentFrame = this.gm.getCurrentFrame();
         this.gm.debug(currentFrame);
@@ -1058,9 +1070,7 @@ var GameView = (function (_super) {
             this.waitingRestart = true;
             this.isKeyLock = true;
             setTimeout(function () {
-                $("#overlay").show();
-                $("#view-gameover").show();
-                _this.isKeyLock = false;
+                _this.setGameOver();
             }, 3000);
             return;
         }
@@ -1084,6 +1094,9 @@ var GameView = (function (_super) {
         }
     };
     GameView.prototype.setGameOver = function () {
+        $("#overlay").show();
+        $("#view-gameover").show();
+        this.isKeyLock = false;
     };
     GameView.prototype.startGame = function () {
         $("#overlay").hide();

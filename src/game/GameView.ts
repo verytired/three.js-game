@@ -16,6 +16,8 @@ class GameView extends CView {
 	private timerId = 0;
 
 	private sceneData;
+	private nextActionFrame = 0;
+	private nextActionNum = 0;
 
 	constructor() {
 		super();
@@ -67,8 +69,27 @@ class GameView extends CView {
 		}
 	}
 
-	private nextActionFrame = 0;
-	private nextActionNum = 0;
+	public onMouseDown(e:any) {
+		//console.log("onMouseStart");
+	}
+
+	public onMouseMove(e:any) {
+		var nowX = e.data.x
+		var nowY = e.data.y
+		var w = window.innerWidth;
+		var h = window.innerHeight;
+
+		this.self.x = -240 + 480 * nowX / w
+		this.self.y = 320 - 640 * nowY / h
+
+		//console.log("onMouseMove");
+		//console.log(e.data.x)
+
+	}
+
+	public onMouseUp(e:any) {
+		//console.log("onMouseEnd");
+	}
 
 	public update() {
 		var currentFrame = this.gm.getCurrentFrame();
@@ -148,10 +169,7 @@ class GameView extends CView {
 			this.waitingRestart = true;
 			this.isKeyLock = true;
 			setTimeout(()=> {
-				//gameover表示
-				$("#overlay").show();
-				$("#view-gameover").show();
-				this.isKeyLock = false;
+			  this.setGameOver();
 			}, 3000)
 			return
 		}
@@ -177,6 +195,10 @@ class GameView extends CView {
 	 * ゲームオーバー処理
 	 */
 	public setGameOver() {
+		//gameover表示
+		$("#overlay").show();
+		$("#view-gameover").show();
+		this.isKeyLock = false;
 	}
 
 	/**

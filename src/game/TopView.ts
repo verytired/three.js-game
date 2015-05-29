@@ -1,7 +1,5 @@
 class TopView extends CView {
 
-	private gm:GameManager;
-
 	constructor() {
 		super();
 	}

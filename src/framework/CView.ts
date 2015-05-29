@@ -7,7 +7,7 @@ class CView {
 	private objs:CMover[] = new Array()
 	private scene:THREE.Scene;
 
-	private gm:GameManager;
+	public gm:GameManager;
 	private cm:ControlManager;
 
 	constructor() {

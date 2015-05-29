@@ -1,6 +1,6 @@
 class Shooter {
 
-	private bullets:CMover[]=new Arrary();
+	private bullets:CMover[]=new Array();
 
 	constructor(){
 

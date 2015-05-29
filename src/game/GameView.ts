@@ -21,8 +21,6 @@ class GameView extends CView {
 		super();
 	}
 
-	private sceneData;
-
 	public init() {
 		super.init();
 

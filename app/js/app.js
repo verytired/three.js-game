@@ -835,7 +835,6 @@ var EnemyCharacter = (function (_super) {
         this.frameTest();
         this.x += this.vx;
         this.y += this.vy;
-        this.checkAreaTest();
         this._obj.position.set(this.x, this.y, 50);
         for (var i = 0; this.bullets.length < i; i++) {
             this.bullets[i].update(nowFrame);
@@ -882,7 +881,7 @@ var EnemyCharacter = (function (_super) {
     EnemyCharacter.prototype.explode = function () {
         var v = GameManager.getInstance().getCurrentView();
         v.remove(this._obj);
-        var ex = new Explosion(this.x, this.y);
+        var ex = new Explosion(this.x, this.y, 0xFFFFFFF);
         v.add(ex.getParticles());
         this.explosionObj = ex;
     };
@@ -890,7 +889,7 @@ var EnemyCharacter = (function (_super) {
 })(CMover);
 var Explosion = (function (_super) {
     __extends(Explosion, _super);
-    function Explosion(x, y) {
+    function Explosion(x, y, color) {
         _super.call(this);
         this.x = 0;
         this.y = 0;
@@ -992,11 +991,11 @@ var GameView = (function (_super) {
         this.enemies = new Array();
         this.enemyBullets = new Array();
         this.bullets = new Array();
+        this.isKeyLock = false;
         this.waitingRestart = false;
         this.timerId = 0;
         this.nextActionFrame = 0;
         this.nextActionNum = 0;
-        this.isKeyLock = false;
     }
     GameView.prototype.init = function () {
         _super.prototype.init.call(this);
@@ -1052,7 +1051,6 @@ var GameView = (function (_super) {
         this.self.y = 320 - 640 * nowY / h;
     };
     GameView.prototype.onMouseUp = function (e) {
-        console.log("onMouseUp on view");
         if (this.isKeyLock == true) {
             return;
         }

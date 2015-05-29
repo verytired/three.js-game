@@ -111,7 +111,7 @@ class EnemyCharacter extends CMover {
 	public explode() {
 		var v = GameManager.getInstance().getCurrentView();
 		v.remove(this._obj)
-		var ex = new Explosion(this.x, this.y);
+		var ex = new Explosion(this.x, this.y, 0xFFFFFFF);
 		v.add(ex.getParticles());
 		this.explosionObj = ex;
 	}

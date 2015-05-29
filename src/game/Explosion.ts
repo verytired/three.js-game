@@ -26,10 +26,10 @@ class Explosion extends CMover {
 	private _pc:THREE.PointCloud;
 	private particle;
 
-	constructor(x, y) {
+	constructor(x, y, color) {
 		super();
 		var color = arguments[2];
-		if(color == undefined || color == null){
+		if (color == undefined || color == null) {
 			color = 0xFFFFFF
 		}
 		var particles = new THREE.Geometry();

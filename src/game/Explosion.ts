@@ -28,6 +28,10 @@ class Explosion extends CMover {
 
 	constructor(x, y) {
 		super();
+		var color = arguments[2];
+		if(color == undefined || color == null){
+			color = 0xFFFFFF
+		}
 		var particles = new THREE.Geometry();
 		for (var i = 0; i < this.totalObjects; i++) {
 
@@ -46,7 +50,7 @@ class Explosion extends CMover {
 		}
 
 		var materialParticle = new THREE.PointCloudMaterial({
-			color: 0xFF0000,
+			color: color,
 			size: 5,
 			transparent: true
 		});

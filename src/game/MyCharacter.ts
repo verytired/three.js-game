@@ -30,7 +30,7 @@ class MyCharacter extends CMover {
 
 		if (this.explosionObj != null) {
 			this.explosionObj.update(nowFrame);
-			if(this.explosionObj.isFinished == true){
+			if (this.explosionObj.isFinished == true) {
 				var v = GameManager.getInstance().getCurrentView();
 				v.remove(this.explosionObj);
 				this.waitRemove = true;
@@ -41,7 +41,7 @@ class MyCharacter extends CMover {
 	public explode() {
 		var v = GameManager.getInstance().getCurrentView();
 		v.remove(this._obj)
-		var ex = new Explosion(this.x, this.y);
+		var ex = new Explosion(this.x, this.y, 0xFF0000);
 		v.add(ex.getParticles());
 		this.explosionObj = ex;
 	}

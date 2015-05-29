@@ -168,8 +168,6 @@ class GameManager {
 			});
 		}
 
-
-
 		//操作機能
 		var ctmanager = ControlManager.getInstance();
 

@@ -151,7 +151,7 @@ class GameManager {
 		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 
 		this.controls.addEventListener( 'change', ()=>{
-			console.log(this.camera)
+			//console.log(this.camera)
 		} );
 
 		//操作機能
@@ -169,7 +169,6 @@ class GameManager {
 		$(window).resize(()=> {
 			this.resize();
 		});
-
 
 		$.getJSON("data/scenedata.json", (data)=> {
 			//start point

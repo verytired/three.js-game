@@ -7,26 +7,46 @@ class CView {
 	private objs:CMover[] = new Array()
 	private scene:THREE.Scene;
 
+	private gm:GameManager;
 	private cm:ControlManager;
 
 	constructor() {
-		console.log("new scene");
 		this.getScene();
 		this.init();
 	}
 
-	private _func:Function;
+	private _keyEvent:Function;
+	private _onMouseDown:Function;
+	private _onMouseMove:Function;
+	private _onMouseUp:Function;
+
 	public init() {
+		this.gm = GameManager.getInstance();
 		this.cm = ControlManager.getInstance();
-		this._func = (e)=>{
+		this._keyEvent = (e)=> {
 			this.keyEvent(e);
 		}
-		this.cm.addEventListener("onKeyPress",this._func);
+		this._onMouseDown = (e)=> {
+			this.onMouseDown(e);
+		}
+		this._onMouseMove = (e)=> {
+			this.onMouseMove(e);
+		}
+		this._onMouseUp = (e)=> {
+			this.onMouseUp(e);
+		}
+		this.cm.addEventListener("onKeyPress", this._keyEvent);
+		this.cm.addEventListener("onMouseDown", this._onMouseDown);
+		this.cm.addEventListener("onMouseMove", this._onMouseMove);
+		this.cm.addEventListener("onMouseUp", this._onMouseUp);
 	}
 
 	public destructor() {
 		this.removeAll();
-		this.cm.removeEventListener("onKeyPress",this._func);
+		this.cm.removeEventListener("onKeyPress", this._keyEvent);
+		this.cm.removeEventListener("onMouseDown", this._onMouseDown);
+		this.cm.removeEventListener("onMouseMove", this._onMouseMove);
+		this.cm.removeEventListener("onMouseUp", this._onMouseUp);
 	}
 
 	public update(nowFrame) {
@@ -69,5 +89,19 @@ class CView {
 		}
 	}
 
-	public keyEvent(e:any){}
+	public keyEvent(e:any) {
+	}
+
+	public onMouseDown(e:any) {
+		//console.log("onMouseStart");
+	}
+
+	public onMouseMove(e:any) {
+		//console.log("onMouseMove");
+		//console.log(e.data.x)
+	}
+
+	public onMouseUp(e:any) {
+		//console.log("onMouseEnd");
+	}
 }

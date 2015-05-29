@@ -180,21 +180,36 @@ var MyCharacter = (function (_super) {
 var CView = (function () {
     function CView() {
         this.objs = new Array();
-        console.log("new scene");
         this.getScene();
         this.init();
     }
     CView.prototype.init = function () {
         var _this = this;
+        this.gm = GameManager.getInstance();
         this.cm = ControlManager.getInstance();
-        this._func = function (e) {
+        this._keyEvent = function (e) {
             _this.keyEvent(e);
         };
-        this.cm.addEventListener("onKeyPress", this._func);
+        this._onMouseDown = function (e) {
+            _this.onMouseDown(e);
+        };
+        this._onMouseMove = function (e) {
+            _this.onMouseMove(e);
+        };
+        this._onMouseUp = function (e) {
+            _this.onMouseUp(e);
+        };
+        this.cm.addEventListener("onKeyPress", this._keyEvent);
+        this.cm.addEventListener("onMouseDown", this._onMouseDown);
+        this.cm.addEventListener("onMouseMove", this._onMouseMove);
+        this.cm.addEventListener("onMouseUp", this._onMouseUp);
     };
     CView.prototype.destructor = function () {
         this.removeAll();
-        this.cm.removeEventListener("onKeyPress", this._func);
+        this.cm.removeEventListener("onKeyPress", this._keyEvent);
+        this.cm.removeEventListener("onMouseDown", this._onMouseDown);
+        this.cm.removeEventListener("onMouseMove", this._onMouseMove);
+        this.cm.removeEventListener("onMouseUp", this._onMouseUp);
     };
     CView.prototype.update = function (nowFrame) {
         for (var i = 0; i < this.objs.length; i++) {
@@ -231,6 +246,12 @@ var CView = (function () {
     };
     CView.prototype.keyEvent = function (e) {
     };
+    CView.prototype.onMouseDown = function (e) {
+    };
+    CView.prototype.onMouseMove = function (e) {
+    };
+    CView.prototype.onMouseUp = function (e) {
+    };
     return CView;
 })();
 var ControlManager = (function (_super) {
@@ -253,6 +274,21 @@ var ControlManager = (function (_super) {
         var _this = this;
         document.addEventListener("keydown", function (e) {
             var et = new events.Event("onKeyPress");
+            et.data = e;
+            _this.dispatchEvent(et);
+        });
+        document.addEventListener("mousedown", function (e) {
+            var et = new events.Event("onMouseDown");
+            et.data = e;
+            _this.dispatchEvent(et);
+        });
+        document.addEventListener("mousemove", function (e) {
+            var et = new events.Event("onMouseMove");
+            et.data = e;
+            _this.dispatchEvent(et);
+        });
+        document.addEventListener("mouseup", function (e) {
+            var et = new events.Event("onMouseUp");
             et.data = e;
             _this.dispatchEvent(et);
         });
@@ -331,7 +367,6 @@ var GameManager = (function () {
         document.body.appendChild(this.stats.domElement);
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         this.controls.addEventListener('change', function () {
-            console.log(_this.camera);
         });
         var ctmanager = ControlManager.getInstance();
         this.$viewScore = $("#score");
@@ -928,12 +963,10 @@ var GameView = (function (_super) {
     }
     GameView.prototype.init = function () {
         _super.prototype.init.call(this);
-        this.gm = GameManager.getInstance();
         this.bg = new Stage();
         this.bg.init();
         this.addMover(this.bg);
         this.sceneData = this.gm.getSceneData(0);
-        console.log(this.sceneData);
         this.nextActionNum = 0;
         this.startGame();
     };
@@ -1058,7 +1091,7 @@ var GameView = (function (_super) {
         this.bg.init();
         this.addMover(this.bg);
         this.self = new MyCharacter();
-        this.self.y = -250;
+        this.self.y = -150;
         this.addMover(this.self);
         this.gm.setSelfCharacter(this.self);
         this.gm.setStartTime();
@@ -1075,6 +1108,25 @@ var GameView = (function (_super) {
     };
     return GameView;
 })(CView);
+var SceneData = (function () {
+    function SceneData(data) {
+        this._data = data;
+    }
+    SceneData.prototype.getData = function (index) {
+        return this._data[index];
+    };
+    return SceneData;
+})();
+var Shooter = (function () {
+    function Shooter() {
+        this.bullets = new Arrary();
+    }
+    Shooter.prototype.update = function () {
+    };
+    Shooter.prototype.shot = function () {
+    };
+    return Shooter;
+})();
 var TopView = (function (_super) {
     __extends(TopView, _super);
     function TopView() {
@@ -1099,12 +1151,3 @@ var TopView = (function (_super) {
     };
     return TopView;
 })(CView);
-var SceneData = (function () {
-    function SceneData(data) {
-        this._data = data;
-    }
-    SceneData.prototype.getData = function (index) {
-        return this._data[index];
-    };
-    return SceneData;
-})();

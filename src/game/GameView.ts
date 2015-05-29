@@ -135,13 +135,13 @@ class GameView extends CView {
 		for (var i = 0; i < this.bullets.length; i++) {
 			for (var j = 0; j < this.enemies.length; j++) {
 				if (this.bullets[i].x > this.enemies[j].x - 15 && this.bullets[i].x < this.enemies[j].x + 15 && this.bullets[i].y > this.enemies[j].y - 15 && this.bullets[i].y < this.enemies[j].y + 15) {
-					if (!this.enemies[j].isDead) {
-						this.bullets[i].isDead = true;
-						this.bullets[i].waitRemove = true;
-						this.enemies[j].isDead = true;
-						this.enemies[j].explode();
-						this.gm.addScore(this.enemies[j].getPoint())
-					}
+                    this.enemies[j].hit();
+                    if (!this.enemies[j].isDead) {
+                        this.gm.addScore(this.enemies[j].getPoint())
+                    }
+                    this.bullets[i].isDead = true;
+                    this.bullets[i].waitRemove = true;
+
 				}
 			}
 		}

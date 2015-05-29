@@ -3,131 +3,136 @@
 
 class Enemy extends CMover {
 
-	public id = 0;
+    public id = 0;
 
-	private stageWidth = 0;
-	private stageHeight = 0;
+    private stageWidth = 0;
+    private stageHeight = 0;
 
-	private point = 150; //得点
-	private life = 1;//生存時間
-	private lifeTime = 500;//生存時間
+    private point = 150; //得点
+    private life = 1;
+    private lifeTime = 500;//生存時間
 
-	private startFrame = 0;
-	private currentFrame = 0;
+    private startFrame = 0;
+    private currentFrame = 0;
 
-	private explosionObj;//爆発オブジェクト格納
-	private shooter:Shooter;//弾発射オブジェクト
+    private explosionObj;//爆発オブジェクト格納
+    private shooter:Shooter;//弾発射オブジェクト
 
-	constructor(startframe) {
-		super();
-		this.startFrame = startframe;
-		var s = GameManager.getInstance().getStageSize();
-		this.stageWidth = s.width;
-		this.stageHeight = s.height;
-		this.initialize();
-	}
+    private isShoted = false;
 
-	public initialize() {
+    private baseColor = 0xFFFFFF;
+    constructor(startframe) {
+        super();
+        this.startFrame = startframe;
+        var s = GameManager.getInstance().getStageSize();
+        this.stageWidth = s.width;
+        this.stageHeight = s.height;
+        this.initialize();
+    }
 
-		this.vy = -6;
+    public initialize() {
 
-		var material = new THREE.MeshBasicMaterial({
-			color: 0xffffff,
-			wireframe: true
-		});
-		this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(20), material);
-		this._obj.castShadow = true;
-		this.shooter = new SingleShooter();
-	}
+        this.vy = -6;
 
-	public update(nowFrame) {
-		this.currentFrame = nowFrame - this.startFrame;
-		this.doAction();
-		this.x += this.vx;
-		this.y += this.vy;
+        var material = new THREE.MeshBasicMaterial({
+            color: this.baseColor,
+            wireframe: true
+        });
+        this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(20), material);
+        this._obj.castShadow = true;
+        this.shooter = new SingleShooter();
+    }
 
-		this._obj.position.set(this.x, this.y, 50);
+    public update(nowFrame) {
+        this.currentFrame = nowFrame - this.startFrame;
+        this.doAction();
+        this.x += this.vx;
+        this.y += this.vy;
 
-		if (this.explosionObj != null) {
-			this.explosionObj.update(nowFrame);
-			if (this.explosionObj.isFinished == true) {
-				var v = GameManager.getInstance().getCurrentView();
-				v.remove(this.explosionObj);
-				this.waitRemove = true;
-			}
-		}
-	}
+        this._obj.position.set(this.x, this.y, 50);
 
-	private isShoted = false;
+        if (this.explosionObj != null) {
+            this.explosionObj.update(nowFrame);
+            if (this.explosionObj.isFinished == true) {
+                var v = GameManager.getInstance().getCurrentView();
+                v.remove(this.explosionObj);
+                this.waitRemove = true;
+            }
+        }
+    }
 
-	/**
-	 * 行動処理
-	 */
-	public doAction() {
-		if (this.currentFrame >= 50 && this.currentFrame < 70) {
-			this.vy = 0
-		} else if (this.currentFrame >= 70 && this.currentFrame < 100) {
-			//フレームが進まない場合の行動制限
-			if (this.isShoted == true)return
-			this.isShoted = true;
-			this.shot()
-		} else if (this.currentFrame >= 100) {
-			this.vy = 6
-		}
+    /**
+     * 行動処理
+     */
+    public doAction() {
+        if (this.currentFrame >= 50 && this.currentFrame < 70) {
+            this.vy = 0
+        } else if (this.currentFrame >= 70 && this.currentFrame < 100) {
+            //フレームが進まない場合の行動制限
+            if (this.isShoted == true)return
+            this.isShoted = true;
+            this.shot()
+        } else if (this.currentFrame >= 100) {
+            this.vy = 6
+        }
 
-		if (this.currentFrame >= this.lifeTime) {
-			this.isDead = true;
-			this.waitRemove = true;
-		}
-	}
+        if (this.currentFrame >= this.lifeTime) {
+            this.isDead = true;
+            this.waitRemove = true;
+        }
+    }
 
-	public shot() {
-		if (this.isDead == true)return
-		var s = GameManager.getInstance().getSelfCharacter();
-		var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
-		this.shooter.shot(this.x, this.y, (s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
-	}
+    public shot() {
+        if (this.isDead == true)return
+        var s = GameManager.getInstance().getSelfCharacter();
+        var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
+        this.shooter.shot(this.x, this.y, (s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
+    }
 
-	public getBullets() {
-		return this.shooter.getBullets();
-	}
+    public getBullets() {
+        return this.shooter.getBullets();
+    }
 
-	public explode() {
-		var v = GameManager.getInstance().getCurrentView();
-		v.remove(this._obj)
-		var ex = new Explosion(this.x, this.y, 0xFFFFFFF);
-		v.add(ex.getParticles());
-		this.explosionObj = ex;
-	}
+    private  explode() {
+        var v = GameManager.getInstance().getCurrentView();
+        v.remove(this._obj)
+        var ex = new Explosion(this.x, this.y, this.baseColor);
+        v.add(ex.getParticles());
+        this.explosionObj = ex;
+    }
 
-	//hit
-	public hit() {
-		var ma:any = this._obj.material
-		ma.color.setHex(0xFF0000);
-		setTimeout(()=> {
-			ma.color.setHex(0xFFFFF);
-		}, 200)
-		this.life--;
-		if (this.life <= 0) {
-			this.isDead = true;
-			this.explode();
-		}
-	}
+    //hit
+    public hit() {
+        if(this.isDead === true) return;
+        var ma:any = this._obj.material
+        ma.color.setHex(0xFF0000);
+        setTimeout(()=> {
+            ma.color.setHex(this.baseColor);
+        }, 200)
+        this.life--;
+        if (this.life <= 0) {
+            this.isDead = true;
+            this.explode();
+        }
+    }
 
-	public getPoint() {
-		return this.point;
-	}
+    public getPoint() {
+        return this.point;
+    }
 
-	public setLifeTime(t) {
-		this.lifeTime = t;
-	}
+    public setLifeTime(t) {
+        this.lifeTime = t;
+    }
 
-	public setLife(l) {
-		this.life = l;
-	}
+    public setLife(l) {
+        this.life = l;
+    }
 
-	public setShooter(s){
-		this.shooter = s
+    public setShooter(s) {
+        this.shooter = s
+    }
 
-	}
+    public setBaseColor(Color){
+        this.baseColor = Color;
+    }
 }

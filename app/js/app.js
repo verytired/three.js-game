@@ -1038,12 +1038,24 @@ var GameView = (function (_super) {
     GameView.prototype.onMouseMove = function (e) {
         var nowX = e.data.x;
         var nowY = e.data.y;
+        if (this.gm.ua != "pc") {
+            nowX = e.data.touches[0].clientX;
+            nowY = e.data.touches[0].clientY;
+        }
         var w = window.innerWidth;
         var h = window.innerHeight;
         this.self.x = -240 + 480 * nowX / w;
         this.self.y = 320 - 640 * nowY / h;
     };
     GameView.prototype.onMouseUp = function (e) {
+        console.log("onMouseUp on view");
+        if (this.isKeyLock == true) {
+            return;
+        }
+        if (this.waitingRestart == true) {
+            this.restart();
+            return;
+        }
     };
     GameView.prototype.update = function () {
         var currentFrame = this.gm.getCurrentFrame();

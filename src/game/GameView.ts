@@ -74,21 +74,31 @@ class GameView extends CView {
 	}
 
 	public onMouseMove(e:any) {
+
 		var nowX = e.data.x
 		var nowY = e.data.y
+
+		if (this.gm.ua != "pc") {
+			nowX = e.data.touches[0].clientX;
+			nowY = e.data.touches[0].clientY;
+		}
+
 		var w = window.innerWidth;
 		var h = window.innerHeight;
 
-		this.self.x = -240 + 480 * nowX / w
-		this.self.y = 320 - 640 * nowY / h
-
-		//console.log("onMouseMove");
-		//console.log(e.data.x)
-
+		this.self.x = -240 + 480 * nowX / w;
+		this.self.y = 320 - 640 * nowY / h;
 	}
 
-	public onMouseUp(e:any) {
-		//console.log("onMouseEnd");
+	public onMouseUp(e:any){
+		console.log("onMouseUp on view")
+		if (this.isKeyLock == true) {
+			return
+		}
+		if (this.waitingRestart == true) {
+			this.restart();
+			return
+		}
 	}
 
 	public update() {
@@ -167,10 +177,11 @@ class GameView extends CView {
 	public checkLiveTest() {
 		if (this.self.isDead == true && this.waitingRestart == false) {
 			//3秒後くらいにゲームオーバー表示させる→スペース押したらreplay
-			this.waitingRestart = true;
-			this.isKeyLock = true;
+				this.waitingRestart = true;
+				this.isKeyLock = true;
 			setTimeout(()=> {
-			  this.setGameOver();
+
+				this.setGameOver();
 			}, 3000)
 			return
 		}

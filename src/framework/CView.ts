@@ -93,15 +93,11 @@ class CView {
 	}
 
 	public onMouseDown(e:any) {
-		//console.log("onMouseStart");
 	}
 
 	public onMouseMove(e:any) {
-		//console.log("onMouseMove");
-		//console.log(e.data.x)
 	}
 
 	public onMouseUp(e:any) {
-		//console.log("onMouseEnd");
 	}
 }

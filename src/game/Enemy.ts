@@ -3,12 +3,13 @@
 
 class Enemy extends CMover {
 
-	public id = 0;
+		public id = 0;
 
 	private stageWidth = 0;
 	private stageHeight = 0;
 
-	public point = 150; //得点
+	private  point = 150; //得点
+	private life = 1;//生存時間
 	private lifeTime = 500;//生存時間
 
 	private startFrame = 0;
@@ -95,5 +96,27 @@ class Enemy extends CMover {
 		var ex = new Explosion(this.x, this.y, 0xFFFFFFF);
 		v.add(ex.getParticles());
 		this.explosionObj = ex;
+	}
+
+	//hit
+	public hit(){
+		var ma:any = this._obj.material
+		ma.color.setHex(0xFF0000);
+		setTimeout(()=>{
+			ma.color.setHex(0xFFFFF);
+		},200)
+		this.life--;
+		if(this.life<=0){
+			this.isDead = true;
+			this.explode();
+		}
+	}
+
+	public getPoint(){
+		return this.point;
+	}
+
+	public setLifeTime(t){
+		this.lifeTime = t;
 	}
 }

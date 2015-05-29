@@ -156,6 +156,9 @@ var MyShip = (function (_super) {
         });
         this._obj = new THREE.Mesh(geometry, material);
         this._obj.castShadow = true;
+        var ma = this._obj.material;
+        ma.color.setHex(0x0000FF);
+        console.log(this._obj.material);
     }
     MyShip.prototype.update = function (nowFrame) {
         this._obj.position.set(this.x, this.y, 50);
@@ -537,6 +540,7 @@ var Enemy = (function (_super) {
         this.stageWidth = 0;
         this.stageHeight = 0;
         this.point = 150;
+        this.life = 1;
         this.lifeTime = 500;
         this.startFrame = 0;
         this.currentFrame = 0;
@@ -603,6 +607,24 @@ var Enemy = (function (_super) {
         var ex = new Explosion(this.x, this.y, 0xFFFFFFF);
         v.add(ex.getParticles());
         this.explosionObj = ex;
+    };
+    Enemy.prototype.hit = function () {
+        var ma = this._obj.material;
+        ma.color.setHex(0xFF0000);
+        setTimeout(function () {
+            ma.color.setHex(0xFFFFF);
+        }, 200);
+        this.life--;
+        if (this.life <= 0) {
+            this.isDead = true;
+            this.explode();
+        }
+    };
+    Enemy.prototype.getPoint = function () {
+        return this.point;
+    };
+    Enemy.prototype.setLifeTime = function (t) {
+        this.lifeTime = t;
     };
     return Enemy;
 })(CMover);
@@ -1075,7 +1097,7 @@ var GameView = (function (_super) {
                         this.bullets[i].waitRemove = true;
                         this.enemies[j].isDead = true;
                         this.enemies[j].explode();
-                        this.gm.addScore(this.enemies[j].point);
+                        this.gm.addScore(this.enemies[j].getPoint());
                     }
                 }
             }

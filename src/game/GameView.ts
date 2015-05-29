@@ -137,7 +137,7 @@ class GameView extends CView {
 						this.bullets[i].waitRemove = true;
 						this.enemies[j].isDead = true;
 						this.enemies[j].explode();
-						this.gm.addScore(this.enemies[j].point)
+						this.gm.addScore(this.enemies[j].getPoint())
 					}
 				}
 			}

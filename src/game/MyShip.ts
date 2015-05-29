@@ -22,6 +22,11 @@ class MyShip extends CMover {
 
 		this._obj = new THREE.Mesh(geometry, material);
 		this._obj.castShadow = true;
+
+		var ma:any = this._obj.material
+		ma.color.setHex(0x0000FF);
+
+		console.log(this._obj.material)
 	}
 
 	public update(nowFrame) {
@@ -45,6 +50,7 @@ class MyShip extends CMover {
 		v.add(ex.getParticles());
 		this.explosionObj = ex;
 	}
+
 }
 
 

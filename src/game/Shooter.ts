@@ -12,8 +12,13 @@ class Shooter {
 		}
 	}
 
-	public shot() {
-
+	public shot(x, y, vx, vy) {
+		var b = new Bullet(vx, vy);
+		b.x = x;
+		b.y = y;
+		var v = GameManager.getInstance().getCurrentView();
+		v.addMover(b);
+		this.bullets.push(b);
 	}
 
 	public getBullets() {

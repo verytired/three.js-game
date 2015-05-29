@@ -1,7 +1,7 @@
 [
   [
     {
-      "frame": 100,
+      "frame": 60,
       "enemies": [
         {
           "type": 1,
@@ -11,7 +11,7 @@
       ]
     },
     {
-      "frame": 300,
+      "frame": 180,
       "enemies": [
         {
           "type": 1,
@@ -26,7 +26,7 @@
       ]
     },
     {
-      "frame": 500,
+      "frame": 300,
       "enemies": [
         {
           "type": 1,
@@ -45,7 +45,7 @@
       ]
     },
     {
-      "frame": 1100,
+      "frame": 420,
       "enemies": [
         {
           "type": 1,
@@ -60,7 +60,7 @@
       ]
     },
     {
-      "frame": 1300,
+      "frame": 640,
       "enemies": [
         {
           "type": 1,
@@ -75,7 +75,7 @@
       ]
     },
     {
-      "frame": 1500,
+      "frame": 760,
       "enemies": [
         {
           "type": 1,

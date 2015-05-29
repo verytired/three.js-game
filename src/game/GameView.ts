@@ -218,17 +218,17 @@ class GameView extends CView {
 
 		this.gm.setStartTime();
 
-		//var func = ()=> {
-		//	this.timerId = setTimeout(()=> {
-		//		var e = new EnemyCharacter(this.gm.getCurrentFrame());
-		//		e.y = 320;
-		//		e.x = -320 + Math.random() * 640;
-		//		this.addMover(e);
-		//		this.enemies.push(e);
-		//		func();
-		//	}, 500)
-		//}
-		//func();
+		var func = ()=> {
+			this.timerId = setTimeout(()=> {
+				var e = new EnemyCharacter(this.gm.getCurrentFrame());
+				e.y = 320;
+				e.x = -320 + Math.random() * 640;
+				this.addMover(e);
+				this.enemies.push(e);
+				func();
+			}, 500)
+		}
+		func();
 	}
 
 	/**

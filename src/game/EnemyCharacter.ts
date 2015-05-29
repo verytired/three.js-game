@@ -27,6 +27,8 @@ class EnemyCharacter extends CMover {
 
 	private lifeTime = 500;
 
+	private shooter:Shooter;
+
 	constructor(startframe) {
 		super()
 
@@ -43,6 +45,8 @@ class EnemyCharacter extends CMover {
 		var s = GameManager.getInstance().getStageSize();
 		this.stageWidth = s.width;
 		this.stageHeight = s.height;
+
+		this.shooter = new SingleShooter();
 	}
 
 	public update(nowFrame) {
@@ -87,7 +91,7 @@ class EnemyCharacter extends CMover {
 			this.vy = 6
 		}
 
-		if(this.currentFrame >= this.lifeTime){
+		if (this.currentFrame >= this.lifeTime) {
 			this.isDead = true;
 			this.waitRemove = true;
 		}
@@ -97,16 +101,11 @@ class EnemyCharacter extends CMover {
 		if (this.isDead == true)return
 		var s = GameManager.getInstance().getSelfCharacter();
 		var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
-		var b = new Bullet((s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
-		b.x = this.x
-		b.y = this.y
-		var v = GameManager.getInstance().getCurrentView();
-		v.addMover(b);
-		this.bullets.push(b);
+		this.shooter.shot(this.x, this.y, (s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
 	}
 
 	public getBullets() {
-		return this.bullets;
+		return this.shooter.getBullets();
 	}
 
 	public explode() {

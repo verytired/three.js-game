@@ -87,7 +87,7 @@ class EnemyCharacter extends CMover {
 			this.vy = 6
 		}
 
-		if(this.currentTime >= this.lifeTime){
+		if(this.currentFrame >= this.lifeTime){
 			this.isDead = true;
 			this.waitRemove = true;
 		}

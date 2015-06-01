@@ -24,6 +24,7 @@ class GameView extends CView {
 
 	private gm:GameManager;
 
+	private zPosition = 50;
 	constructor() {
 		super();
 	}
@@ -35,7 +36,6 @@ class GameView extends CView {
 		this.bg = new Stage();
 		this.bg.init();
 		this.addMover(this.bg);
-
 
 		this.nextActionNum = 0;
 
@@ -57,8 +57,7 @@ class GameView extends CView {
 				}
 				//shot bullets
 				var b = new Bullet(0, 12);
-				b.x = this.self.x;
-				b.y = this.self.y;
+				b.setPosition(this.self.x, this.self.y, this.zPosition);
 				this.addMover(b);
 				this.bullets.push(b);
 				break
@@ -94,8 +93,7 @@ class GameView extends CView {
 		var w = window.innerWidth;
 		var h = window.innerHeight;
 
-		this.self.x = -240 + 480 * nowX / w;
-		this.self.y = 320 - 640 * nowY / h;
+		this.self.setPosition(-240 + 480 * nowX / w, 320 - 640 * nowY / h, this.zPosition)
 	}
 
 	public onMouseUp(e:any) {
@@ -119,8 +117,9 @@ class GameView extends CView {
 				} else if (enemies[i].type == 2) {
 					var e = new EnemyMid(this.app.getCurrentFrame());
 				}
-				e.x = enemies[i].x;
-				e.y = enemies[i].y;
+				//e.x = enemies[i].x;
+				//e.y = enemies[i].y;
+				e.setPosition(enemies[i].x, enemies[i].y, this.zPosition)
 				this.addMover(e);
 				this.enemies.push(e);
 			}
@@ -237,8 +236,7 @@ class GameView extends CView {
 		var func = ()=> {
 			this.timerId = setTimeout(()=> {
 				var e = new Enemy(this.app.getCurrentFrame());
-				e.y = 320;
-				e.x = -320 + Math.random() * 640;
+				e.setPosition(-320 + Math.random() * 640, 320, this.zPosition);
 				this.addMover(e);
 				this.enemies.push(e);
 				func();

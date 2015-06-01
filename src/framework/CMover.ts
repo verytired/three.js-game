@@ -34,7 +34,7 @@ class CMover extends events.EventDispatcher implements IMover {
 		this.x = x;
 		this.y = y;
 		this.z = z;
-
+		this._obj.position.set(x,y,z);
 	}
 
 	public explode(){}

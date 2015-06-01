@@ -133,6 +133,7 @@ var CMover = (function (_super) {
         this.x = x;
         this.y = y;
         this.z = z;
+        this._obj.position.set(x, y, z);
     };
     CMover.prototype.explode = function () {
     };
@@ -142,11 +143,6 @@ var MyShip = (function (_super) {
     __extends(MyShip, _super);
     function MyShip() {
         _super.call(this);
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-        this.vx = 0;
-        this.vy = 0;
         this.explosionObj = null;
         this.vy = -2;
         var geometry = new THREE.BoxGeometry(20, 20, 20);
@@ -159,7 +155,7 @@ var MyShip = (function (_super) {
         console.log(this._obj.material);
     }
     MyShip.prototype.update = function (nowFrame) {
-        this._obj.position.set(this.x, this.y, 50);
+        this.setPosition(this.x, this.y, this.z);
         if (this.explosionObj != null) {
             this.explosionObj.update(nowFrame);
             if (this.explosionObj.isFinished == true) {
@@ -403,7 +399,6 @@ var Bullet = (function (_super) {
             color: 0xffffff,
             wireframe: true
         }));
-        this._obj.position.set(0, 60, 50);
         this._obj.castShadow = true;
     }
     Bullet.prototype.update = function () {
@@ -602,7 +597,7 @@ var Enemy = (function (_super) {
         this.doAction();
         this.x += this.vx;
         this.y += this.vy;
-        this._obj.position.set(this.x, this.y, 50);
+        this.setPosition(this.x, this.y, this.z);
         if (this.explosionObj != null) {
             this.explosionObj.update(nowFrame);
             if (this.explosionObj.isFinished == true) {
@@ -688,8 +683,27 @@ var EnemyMid = (function (_super) {
         this._obj = new THREE.Mesh(new THREE.IcosahedronGeometry(40, 1), material);
         this._obj.castShadow = true;
         this.setShooter(new SingleShooter());
-        this.setLife(3);
+        this.setLife(30);
+        this.setLifeTime(540);
         this.setBaseColor(0x00FF00);
+    };
+    EnemyMid.prototype.doAction = function () {
+        if (this.currentFrame >= 70 && this.currentFrame < 120) {
+            this.vy = 0;
+        }
+        else if (this.currentFrame >= 160 && this.currentFrame < 200) {
+            if (this.isShoted == true)
+                return;
+            this.isShoted = true;
+            this.shot();
+        }
+        else if (this.currentFrame >= 200) {
+            this.vy = 6;
+        }
+        if (this.currentFrame >= this.lifeTime) {
+            this.isDead = true;
+            this.waitRemove = true;
+        }
     };
     return EnemyMid;
 })(Enemy);
@@ -1072,6 +1086,7 @@ var GameView = (function (_super) {
         this.timerId = 0;
         this.nextActionFrame = 0;
         this.nextActionNum = 0;
+        this.zPosition = 50;
     }
     GameView.prototype.init = function () {
         _super.prototype.init.call(this);
@@ -1094,8 +1109,7 @@ var GameView = (function (_super) {
                     return;
                 }
                 var b = new Bullet(0, 12);
-                b.x = this.self.x;
-                b.y = this.self.y;
+                b.setPosition(this.self.x, this.self.y, this.zPosition);
                 this.addMover(b);
                 this.bullets.push(b);
                 break;
@@ -1124,8 +1138,7 @@ var GameView = (function (_super) {
         }
         var w = window.innerWidth;
         var h = window.innerHeight;
-        this.self.x = -240 + 480 * nowX / w;
-        this.self.y = 320 - 640 * nowY / h;
+        this.self.setPosition(-240 + 480 * nowX / w, 320 - 640 * nowY / h, this.zPosition);
     };
     GameView.prototype.onMouseUp = function (e) {
         if (this.isKeyLock == true) {
@@ -1148,8 +1161,7 @@ var GameView = (function (_super) {
                 else if (enemies[i].type == 2) {
                     var e = new EnemyMid(this.app.getCurrentFrame());
                 }
-                e.x = enemies[i].x;
-                e.y = enemies[i].y;
+                e.setPosition(enemies[i].x, enemies[i].y, this.zPosition);
                 this.addMover(e);
                 this.enemies.push(e);
             }
@@ -1241,8 +1253,7 @@ var GameView = (function (_super) {
         var func = function () {
             _this.timerId = setTimeout(function () {
                 var e = new Enemy(_this.app.getCurrentFrame());
-                e.y = 320;
-                e.x = -320 + Math.random() * 640;
+                e.setPosition(-320 + Math.random() * 640, 320, _this.zPosition);
                 _this.addMover(e);
                 _this.enemies.push(e);
                 func();

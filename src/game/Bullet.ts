@@ -30,7 +30,7 @@ class Bullet extends CMover {
 				color: 0xffffff,
 				wireframe:true
 			}));
-		this._obj.position.set(0, 60, 50);
+		//this._obj.position.set(0, 60, 50);
 		this._obj.castShadow = true;
 	}
 

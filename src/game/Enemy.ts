@@ -10,15 +10,17 @@ class Enemy extends CMover {
 
 	private point = 150; //得点
 	private life = 1;//生存時間
-	private lifeTime = 500;//生存時間
+	public lifeTime = 500;//生存時間
 
 	private startFrame = 0;
-	private currentFrame = 0;
+	public currentFrame = 0;
 
 	private explosionObj;//爆発オブジェクト格納
 	private shooter:Shooter;//弾発射オブジェクト
 
 	private baseColor = 0xFFFFFF;
+
+	public isShoted = false;
 
 	constructor(startframe) {
 		super();
@@ -45,10 +47,11 @@ class Enemy extends CMover {
 		if (frame <= this.currentFrame)return
 		this.currentFrame = frame;
 		this.doAction();
+
 		this.x += this.vx;
 		this.y += this.vy;
 
-		this._obj.position.set(this.x, this.y, 50);
+		this.setPosition(this.x, this.y, this.z);
 
 		if (this.explosionObj != null) {
 			this.explosionObj.update(nowFrame);
@@ -59,8 +62,6 @@ class Enemy extends CMover {
 			}
 		}
 	}
-
-	private isShoted = false;
 
 	/**
 	 * 行動処理
@@ -73,7 +74,6 @@ class Enemy extends CMover {
 		} else if (this.currentFrame == 100) {
 			this.vy = 6
 		}
-
 		if (this.currentFrame >= this.lifeTime) {
 			this.isDead = true;
 			this.waitRemove = true;

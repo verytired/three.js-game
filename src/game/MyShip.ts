@@ -3,12 +3,6 @@
 
 class MyShip extends CMover {
 
-	public x = 0;
-	public y = 0;
-	z = 0;
-	public vx = 0;
-	public vy = 0;
-
 	private explosionObj = null;
 
 	constructor() {
@@ -31,7 +25,7 @@ class MyShip extends CMover {
 
 	public update(nowFrame) {
 
-		this._obj.position.set(this.x, this.y, 50);
+		this.setPosition(this.x, this.y, this.z);
 
 		if (this.explosionObj != null) {
 			this.explosionObj.update(nowFrame);

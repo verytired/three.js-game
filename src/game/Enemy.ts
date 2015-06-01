@@ -18,7 +18,8 @@ class Enemy extends CMover {
 	private explosionObj;//爆発オブジェクト格納
 	private shooter:Shooter;//弾発射オブジェクト
 
-	private baseColor=0xFFFFFF;
+	private baseColor = 0xFFFFFF;
+
 	constructor(startframe) {
 		super();
 		this.startFrame = startframe;
@@ -34,13 +35,15 @@ class Enemy extends CMover {
 			color: this.baseColor,
 			wireframe: true
 		});
-		this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(20), material);
+		this._obj = new THREE.Mesh(new THREE.OctahedronGeometry(20,1), material);
 		this._obj.castShadow = true;
 		this.shooter = new SingleShooter();
 	}
 
 	public update(nowFrame) {
-		this.currentFrame = nowFrame - this.startFrame;
+		var frame = nowFrame - this.startFrame;
+		if (frame <= this.currentFrame)return
+		this.currentFrame = frame;
 		this.doAction();
 		this.x += this.vx;
 		this.y += this.vy;
@@ -63,14 +66,11 @@ class Enemy extends CMover {
 	 * 行動処理
 	 */
 	public doAction() {
-		if (this.currentFrame >= 50 && this.currentFrame < 70) {
+		if (this.currentFrame == 50) {
 			this.vy = 0
-		} else if (this.currentFrame >= 70 && this.currentFrame < 100) {
-			//フレームが進まない場合の行動制限
-			if (this.isShoted == true)return
-			this.isShoted = true;
+		} else if (this.currentFrame == 70) {
 			this.shot()
-		} else if (this.currentFrame >= 100) {
+		} else if (this.currentFrame == 100) {
 			this.vy = 6
 		}
 
@@ -126,11 +126,10 @@ class Enemy extends CMover {
 	}
 
 	public setShooter(s) {
-		this.shooter = s
-
+		this.shooter = s;
 	}
 
-	private setBaseColor(c){
-		this.baseColor=c
+	public setBaseColor(c) {
+		this.baseColor = c
 	}
 }

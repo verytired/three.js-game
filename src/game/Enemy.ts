@@ -1,5 +1,4 @@
 //敵クラス
-/// <reference path="GameApp.ts"/>
 
 class Enemy extends CMover {
 

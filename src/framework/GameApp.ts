@@ -8,7 +8,6 @@
 //定義ファイル
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
 /// <reference path="../DefinitelyTyped/jquery/jquery.d.ts" />
-/// <reference path="MyShip.ts"/>
 /// <reference path="../framework/CView.ts"/>
 /// <reference path="ControlManager.ts"/>
 /// <reference path="../DefinitelyTyped/stats/stats.d.ts" />

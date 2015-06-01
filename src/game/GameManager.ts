@@ -6,7 +6,7 @@
 /// <reference path="../DefinitelyTyped/jquery/jquery.d.ts" />
 /// <reference path="MyShip.ts"/>
 /// <reference path="../framework/CView.ts"/>
-/// <reference path="ControlManager.ts"/>
+/// <reference path="../framework/ControlManager.ts"/>
 /// <reference path="../DefinitelyTyped/stats/stats.d.ts" />
 
 class GameManager {

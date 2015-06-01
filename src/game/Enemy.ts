@@ -21,6 +21,8 @@ class Enemy extends CMover {
 
 	public isShoted = false;
 
+	public receiveDamage = true;
+
 	constructor(startframe) {
 		super();
 		this.startFrame = startframe;
@@ -36,7 +38,7 @@ class Enemy extends CMover {
 			color: this.baseColor,
 			wireframe: true
 		});
-		this._obj = new THREE.Mesh(new THREE.OctahedronGeometry(20,1), material);
+		this._obj = new THREE.Mesh(new THREE.OctahedronGeometry(20, 1), material);
 		this._obj.castShadow = true;
 		this.shooter = new SingleShooter();
 	}
@@ -73,6 +75,7 @@ class Enemy extends CMover {
 		} else if (this.currentFrame == 100) {
 			this.vy = 6
 		}
+		if (this.lifeTime == -1)return;
 		if (this.currentFrame >= this.lifeTime) {
 			this.isDead = true;
 			this.waitRemove = true;
@@ -100,6 +103,7 @@ class Enemy extends CMover {
 
 	//hit
 	public hit() {
+		if(this.receiveDamage == false) return
 		var ma:any = this._obj.material
 		ma.color.setHex(0xFF0000);
 		setTimeout(()=> {

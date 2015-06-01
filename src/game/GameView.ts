@@ -3,7 +3,6 @@
 /// <reference path="Stage.ts"/>
 /// <reference path="Enemy.ts"/>
 
-
 class GameView extends CView {
 
 	//Game Objects
@@ -116,6 +115,8 @@ class GameView extends CView {
 					var e = new Enemy(this.app.getCurrentFrame());
 				} else if (enemies[i].type == 2) {
 					var e = new EnemyMid(this.app.getCurrentFrame());
+				} else if (enemies[i].type == 3) {
+					var e = new EnemyBoss(this.app.getCurrentFrame());
 				}
 				//e.x = enemies[i].x;
 				//e.y = enemies[i].y;
@@ -233,16 +234,17 @@ class GameView extends CView {
 		this.gm.setSelfCharacter(this.self);
 		this.app.setStartTime();
 
-		var func = ()=> {
-			this.timerId = setTimeout(()=> {
-				var e = new Enemy(this.app.getCurrentFrame());
-				e.setPosition(-320 + Math.random() * 640, 320, this.zPosition);
-				this.addMover(e);
-				this.enemies.push(e);
-				func();
-			}, 500)
-		}
-		func();
+		//dummy enemy generate
+		//var func = ()=> {
+		//	this.timerId = setTimeout(()=> {
+		//		var e = new Enemy(this.app.getCurrentFrame());
+		//		e.setPosition(-320 + Math.random() * 640, 320, this.zPosition);
+		//		this.addMover(e);
+		//		this.enemies.push(e);
+		//		func();
+		//	}, 500)
+		//}
+		//func();
 	}
 
 	/**

@@ -379,151 +379,6 @@ var GameManager = (function () {
     return GameManager;
 })();
 GameManager.getInstance().initialize();
-var GameApp = (function () {
-    function GameApp() {
-        this.stageWidth = 480;
-        this.stageHeight = 640;
-        this.isStop = false;
-        this.startTime = 0;
-        this.currentFrame = 0;
-        this.fps = 60.0;
-        this.frameLength = 60.0;
-        this.useControl = false;
-        if (GameApp._instance) {
-            throw new Error("must use the getInstance.");
-        }
-        GameApp._instance = this;
-        this.initialize();
-    }
-    GameApp.getInstance = function () {
-        if (GameApp._instance === null) {
-            GameApp._instance = new GameApp();
-        }
-        return GameApp._instance;
-    };
-    GameApp.prototype.initialize = function () {
-        var _this = this;
-        console.log("app initialize");
-        this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-        this.camera.position.set(0, -300, 240);
-        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
-        this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setClearColor(0x000000);
-        var container = document.getElementById('container');
-        container.appendChild(this.renderer.domElement);
-        this.requestAnimationFrame = (function () {
-            return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
-                window.setTimeout(callback, 1000.0 / 60.0);
-            };
-        })();
-        var now = window.performance && (performance.now || performance.mozNow || performance.msNow || performance.oNow || performance.webkitNow);
-        this.getTime = function () {
-            return (now && now.call(performance)) || (new Date().getTime());
-        };
-        this.startTime = this.getTime();
-        var axis = new THREE.AxisHelper(1000);
-        axis.position.set(0, 0, 0);
-        this.scene.add(axis);
-        window.addEventListener("keyup", function (e) {
-            var imgData, imgNode;
-            if (e.which !== 80)
-                return;
-            try {
-                imgData = _this.renderer.domElement.toDataURL();
-                console.log(imgData);
-            }
-            catch (e) {
-                console.log(e);
-                console.log("Browser does not support taking screenshot of 3d context");
-                return;
-            }
-        });
-        this.stats = new Stats();
-        this.stats.setMode(0);
-        this.stats.domElement.style.position = 'absolute';
-        this.stats.domElement.style.right = '0px';
-        this.stats.domElement.style.top = '0px';
-        document.body.appendChild(this.stats.domElement);
-        this.ua = "pc";
-        var ua = navigator.userAgent;
-        if (ua.indexOf('iPhone') > 0) {
-            this.ua = "ios";
-        }
-        else if (ua.indexOf('Android') > 0) {
-            this.ua = "android";
-        }
-        if (this.useControl == true) {
-            this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-            this.controls.addEventListener('change', function () {
-            });
-        }
-        var ctmanager = ControlManager.getInstance();
-        this.resize();
-        $(window).resize(function () {
-            _this.resize();
-            if (_this.currentView != undefined && _this.currentView != null) {
-                _this.currentView.resize();
-            }
-        });
-    };
-    GameApp.prototype.resize = function () {
-        var w = window.innerWidth;
-        var h = window.innerHeight;
-        this.renderer.setSize(w, h);
-        this.camera.aspect = w / h;
-    };
-    GameApp.prototype.update = function () {
-        if (this.useControl == true)
-            this.controls.update();
-        if (this.currentView && this.isStop == false) {
-            this.currentView.update(this.currentFrame);
-        }
-    };
-    GameApp.prototype.render = function () {
-        this.renderer.render(this.scene, this.camera);
-    };
-    GameApp.prototype.animate = function () {
-        var _this = this;
-        this.stats.begin();
-        this.update();
-        this.render();
-        this.stats.end();
-        requestAnimationFrame(function (e) {
-            _this.animate();
-        });
-        this.currentFrame++;
-    };
-    GameApp.prototype.setStartTime = function () {
-        this.startTime = this.getTime();
-        this.currentFrame = 0;
-    };
-    GameApp.prototype.getScene = function () {
-        return this.scene;
-    };
-    GameApp.prototype.setView = function (v) {
-        if (this.currentView) {
-            this.currentView.destructor();
-        }
-        this.currentView = v;
-        this.currentView.resize();
-    };
-    GameApp.prototype.getStageSize = function () {
-        return { width: this.stageWidth, height: this.stageHeight };
-    };
-    GameApp.prototype.getCurrentFrame = function () {
-        return this.currentFrame;
-    };
-    GameApp.prototype.getCurrentView = function () {
-        return this.currentView;
-    };
-    GameApp.prototype.start = function () {
-        this.animate();
-    };
-    GameApp._instance = null;
-    return GameApp;
-})();
 var SimplexNoise = (function () {
     function SimplexNoise(r) {
         if (r === void 0) { r = undefined; }
@@ -794,6 +649,151 @@ var SimplexNoise = (function () {
     };
     return SimplexNoise;
 })();
+var GameApp = (function () {
+    function GameApp() {
+        this.stageWidth = 480;
+        this.stageHeight = 640;
+        this.isStop = false;
+        this.startTime = 0;
+        this.currentFrame = 0;
+        this.fps = 60.0;
+        this.frameLength = 60.0;
+        this.useControl = false;
+        if (GameApp._instance) {
+            throw new Error("must use the getInstance.");
+        }
+        GameApp._instance = this;
+        this.initialize();
+    }
+    GameApp.getInstance = function () {
+        if (GameApp._instance === null) {
+            GameApp._instance = new GameApp();
+        }
+        return GameApp._instance;
+    };
+    GameApp.prototype.initialize = function () {
+        var _this = this;
+        console.log("app initialize");
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+        this.camera.position.set(0, -300, 240);
+        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+        this.renderer = new THREE.WebGLRenderer();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setClearColor(0x000000);
+        var container = document.getElementById('container');
+        container.appendChild(this.renderer.domElement);
+        this.requestAnimationFrame = (function () {
+            return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
+                window.setTimeout(callback, 1000.0 / 60.0);
+            };
+        })();
+        var now = window.performance && (performance.now || performance.mozNow || performance.msNow || performance.oNow || performance.webkitNow);
+        this.getTime = function () {
+            return (now && now.call(performance)) || (new Date().getTime());
+        };
+        this.startTime = this.getTime();
+        var axis = new THREE.AxisHelper(1000);
+        axis.position.set(0, 0, 0);
+        this.scene.add(axis);
+        window.addEventListener("keyup", function (e) {
+            var imgData, imgNode;
+            if (e.which !== 80)
+                return;
+            try {
+                imgData = _this.renderer.domElement.toDataURL();
+                console.log(imgData);
+            }
+            catch (e) {
+                console.log(e);
+                console.log("Browser does not support taking screenshot of 3d context");
+                return;
+            }
+        });
+        this.stats = new Stats();
+        this.stats.setMode(0);
+        this.stats.domElement.style.position = 'absolute';
+        this.stats.domElement.style.right = '0px';
+        this.stats.domElement.style.top = '0px';
+        document.body.appendChild(this.stats.domElement);
+        this.ua = "pc";
+        var ua = navigator.userAgent;
+        if (ua.indexOf('iPhone') > 0) {
+            this.ua = "ios";
+        }
+        else if (ua.indexOf('Android') > 0) {
+            this.ua = "android";
+        }
+        if (this.useControl == true) {
+            this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+            this.controls.addEventListener('change', function () {
+            });
+        }
+        var ctmanager = ControlManager.getInstance();
+        this.resize();
+        $(window).resize(function () {
+            _this.resize();
+            if (_this.currentView != undefined && _this.currentView != null) {
+                _this.currentView.resize();
+            }
+        });
+    };
+    GameApp.prototype.resize = function () {
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        this.renderer.setSize(w, h);
+        this.camera.aspect = w / h;
+    };
+    GameApp.prototype.update = function () {
+        if (this.useControl == true)
+            this.controls.update();
+        if (this.currentView && this.isStop == false) {
+            this.currentView.update(this.currentFrame);
+        }
+    };
+    GameApp.prototype.render = function () {
+        this.renderer.render(this.scene, this.camera);
+    };
+    GameApp.prototype.animate = function () {
+        var _this = this;
+        this.stats.begin();
+        this.update();
+        this.render();
+        this.stats.end();
+        requestAnimationFrame(function (e) {
+            _this.animate();
+        });
+        this.currentFrame++;
+    };
+    GameApp.prototype.setStartTime = function () {
+        this.startTime = this.getTime();
+        this.currentFrame = 0;
+    };
+    GameApp.prototype.getScene = function () {
+        return this.scene;
+    };
+    GameApp.prototype.setView = function (v) {
+        if (this.currentView) {
+            this.currentView.destructor();
+        }
+        this.currentView = v;
+        this.currentView.resize();
+    };
+    GameApp.prototype.getStageSize = function () {
+        return { width: this.stageWidth, height: this.stageHeight };
+    };
+    GameApp.prototype.getCurrentFrame = function () {
+        return this.currentFrame;
+    };
+    GameApp.prototype.getCurrentView = function () {
+        return this.currentView;
+    };
+    GameApp.prototype.start = function () {
+        this.animate();
+    };
+    GameApp._instance = null;
+    return GameApp;
+})();
 var Bullet = (function (_super) {
     __extends(Bullet, _super);
     function Bullet(vx, vy) {
@@ -843,6 +843,7 @@ var Enemy = (function (_super) {
         this.currentFrame = 0;
         this.baseColor = 0xFFFFFF;
         this.isShoted = false;
+        this.receiveDamage = true;
         this.startFrame = startframe;
         var s = GameApp.getInstance().getStageSize();
         this.stageWidth = s.width;
@@ -887,6 +888,8 @@ var Enemy = (function (_super) {
         else if (this.currentFrame == 100) {
             this.vy = 6;
         }
+        if (this.lifeTime == -1)
+            return;
         if (this.currentFrame >= this.lifeTime) {
             this.isDead = true;
             this.waitRemove = true;
@@ -911,6 +914,8 @@ var Enemy = (function (_super) {
     };
     Enemy.prototype.hit = function () {
         var _this = this;
+        if (this.receiveDamage == false)
+            return;
         var ma = this._obj.material;
         ma.color.setHex(0xFF0000);
         setTimeout(function () {
@@ -943,9 +948,10 @@ var EnemyBoss = (function (_super) {
     __extends(EnemyBoss, _super);
     function EnemyBoss(startframe) {
         _super.call(this, startframe);
+        this.moveType = 0;
     }
     EnemyBoss.prototype.initialize = function () {
-        this.vy = -4;
+        this.vy = -2;
         var material = new THREE.MeshBasicMaterial({
             color: 0x00ff00,
             wireframe: true
@@ -954,8 +960,9 @@ var EnemyBoss = (function (_super) {
         this._obj.castShadow = true;
         this.setShooter(new SingleShooter());
         this.setLife(30);
-        this.setLifeTime(540);
+        this.setLifeTime(-1);
         this.setBaseColor(0x00FF00);
+        this.receiveDamage = false;
     };
     EnemyBoss.prototype.doAction = function () {
         if (this.currentFrame == 70) {
@@ -968,7 +975,6 @@ var EnemyBoss = (function (_super) {
             this.shot();
         }
         else if (this.currentFrame == 200) {
-            this.vy = 6;
         }
     };
     return EnemyBoss;
@@ -1195,6 +1201,9 @@ var GameView = (function (_super) {
                 else if (enemies[i].type == 2) {
                     var e = new EnemyMid(this.app.getCurrentFrame());
                 }
+                else if (enemies[i].type == 3) {
+                    var e = new EnemyBoss(this.app.getCurrentFrame());
+                }
                 e.setPosition(enemies[i].x, enemies[i].y, this.zPosition);
                 this.addMover(e);
                 this.enemies.push(e);
@@ -1274,7 +1283,6 @@ var GameView = (function (_super) {
         this.isKeyLock = false;
     };
     GameView.prototype.startGame = function () {
-        var _this = this;
         $("#overlay").hide();
         this.bg = new Stage();
         this.bg.init();
@@ -1284,16 +1292,6 @@ var GameView = (function (_super) {
         this.addMover(this.self);
         this.gm.setSelfCharacter(this.self);
         this.app.setStartTime();
-        var func = function () {
-            _this.timerId = setTimeout(function () {
-                var e = new Enemy(_this.app.getCurrentFrame());
-                e.setPosition(-320 + Math.random() * 640, 320, _this.zPosition);
-                _this.addMover(e);
-                _this.enemies.push(e);
-                func();
-            }, 500);
-        };
-        func();
     };
     GameView.prototype.restart = function () {
         this.waitingRestart = false;

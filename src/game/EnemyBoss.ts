@@ -1,11 +1,13 @@
 class EnemyBoss extends Enemy {
 
+	private moveType = 0;
+
 	constructor(startframe) {
 		super(startframe);
 	}
 
 	public initialize() {
-		this.vy = -4;
+		this.vy = -2;
 
 		var material = new THREE.MeshBasicMaterial({
 			color: 0x00ff00,
@@ -15,8 +17,10 @@ class EnemyBoss extends Enemy {
 		this._obj.castShadow = true;
 		this.setShooter(new SingleShooter());
 		this.setLife(30);
-		this.setLifeTime(540);
+		this.setLifeTime(-1);
 		this.setBaseColor(0x00FF00);
+
+		this.receiveDamage = false;
 	}
 
 	public doAction() {
@@ -29,9 +33,7 @@ class EnemyBoss extends Enemy {
 
 			this.shot()
 		} else if (this.currentFrame == 200) {
-			this.vy = 6
 		}
-
 
 	}
 }

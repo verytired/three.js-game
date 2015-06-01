@@ -143,8 +143,7 @@ class GameView extends CView {
 					if (!this.enemies[j].isDead) {
 						this.bullets[i].isDead = true;
 						this.bullets[i].waitRemove = true;
-						this.enemies[j].isDead = true;
-						this.enemies[j].explode();
+						this.enemies[j].hit();
 						this.gm.addScore(this.enemies[j].getPoint())
 					}
 				}
@@ -233,7 +232,6 @@ class GameView extends CView {
 		this.self.y = -150;
 		this.addMover(this.self);
 		this.gm.setSelfCharacter(this.self);
-
 		this.app.setStartTime();
 
 		var func = ()=> {

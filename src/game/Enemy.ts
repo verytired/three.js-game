@@ -18,6 +18,7 @@ class Enemy extends CMover {
 	private explosionObj;//爆発オブジェクト格納
 	private shooter:Shooter;//弾発射オブジェクト
 
+	private baseColor=0xFFFFFF;
 	constructor(startframe) {
 		super();
 		this.startFrame = startframe;
@@ -28,11 +29,9 @@ class Enemy extends CMover {
 	}
 
 	public initialize() {
-
 		this.vy = -6;
-
 		var material = new THREE.MeshBasicMaterial({
-			color: 0xffffff,
+			color: this.baseColor,
 			wireframe: true
 		});
 		this._obj = new THREE.Mesh(new THREE.TetrahedronGeometry(20), material);
@@ -105,7 +104,7 @@ class Enemy extends CMover {
 		var ma:any = this._obj.material
 		ma.color.setHex(0xFF0000);
 		setTimeout(()=> {
-			ma.color.setHex(0xFFFFF);
+			ma.color.setHex(this.baseColor);
 		}, 200)
 		this.life--;
 		if (this.life <= 0) {
@@ -126,8 +125,12 @@ class Enemy extends CMover {
 		this.life = l;
 	}
 
-	public setShooter(s){
+	public setShooter(s) {
 		this.shooter = s
 
+	}
+
+	private setBaseColor(c){
+		this.baseColor=c
 	}
 }

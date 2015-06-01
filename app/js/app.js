@@ -379,408 +379,6 @@ var GameManager = (function () {
     return GameManager;
 })();
 GameManager.getInstance().initialize();
-var Bullet = (function (_super) {
-    __extends(Bullet, _super);
-    function Bullet(vx, vy) {
-        _super.call(this);
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-        this.vx = 0;
-        this.vy = 0;
-        this.stageWidth = 0;
-        this.stageHeight = 0;
-        var s = GameApp.getInstance().getStageSize();
-        this.stageWidth = s.width;
-        this.stageHeight = s.height;
-        this.vx = vx;
-        this.vy = vy;
-        this._obj = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            wireframe: true
-        }));
-        this._obj.castShadow = true;
-    }
-    Bullet.prototype.update = function () {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.checkAreaTest();
-        this._obj.position.set(this.x, this.y, 50);
-    };
-    Bullet.prototype.checkAreaTest = function () {
-        if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
-            this.isDead = true;
-        }
-    };
-    return Bullet;
-})(CMover);
-var GameApp = (function () {
-    function GameApp() {
-        this.stageWidth = 480;
-        this.stageHeight = 640;
-        this.isStop = false;
-        this.startTime = 0;
-        this.currentFrame = 0;
-        this.fps = 60.0;
-        this.frameLength = 60.0;
-        this.useControl = false;
-        if (GameApp._instance) {
-            throw new Error("must use the getInstance.");
-        }
-        GameApp._instance = this;
-        this.initialize();
-    }
-    GameApp.getInstance = function () {
-        if (GameApp._instance === null) {
-            GameApp._instance = new GameApp();
-        }
-        return GameApp._instance;
-    };
-    GameApp.prototype.initialize = function () {
-        var _this = this;
-        console.log("app initialize");
-        this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-        this.camera.position.set(0, -300, 240);
-        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
-        this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setClearColor(0x000000);
-        var container = document.getElementById('container');
-        container.appendChild(this.renderer.domElement);
-        this.requestAnimationFrame = (function () {
-            return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
-                window.setTimeout(callback, 1000.0 / 60.0);
-            };
-        })();
-        var now = window.performance && (performance.now || performance.mozNow || performance.msNow || performance.oNow || performance.webkitNow);
-        this.getTime = function () {
-            return (now && now.call(performance)) || (new Date().getTime());
-        };
-        this.startTime = this.getTime();
-        var axis = new THREE.AxisHelper(1000);
-        axis.position.set(0, 0, 0);
-        this.scene.add(axis);
-        window.addEventListener("keyup", function (e) {
-            var imgData, imgNode;
-            if (e.which !== 80)
-                return;
-            try {
-                imgData = _this.renderer.domElement.toDataURL();
-                console.log(imgData);
-            }
-            catch (e) {
-                console.log(e);
-                console.log("Browser does not support taking screenshot of 3d context");
-                return;
-            }
-        });
-        this.stats = new Stats();
-        this.stats.setMode(0);
-        this.stats.domElement.style.position = 'absolute';
-        this.stats.domElement.style.right = '0px';
-        this.stats.domElement.style.top = '0px';
-        document.body.appendChild(this.stats.domElement);
-        this.ua = "pc";
-        var ua = navigator.userAgent;
-        if (ua.indexOf('iPhone') > 0) {
-            this.ua = "ios";
-        }
-        else if (ua.indexOf('Android') > 0) {
-            this.ua = "android";
-        }
-        if (this.useControl == true) {
-            this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-            this.controls.addEventListener('change', function () {
-            });
-        }
-        var ctmanager = ControlManager.getInstance();
-        this.resize();
-        $(window).resize(function () {
-            _this.resize();
-            if (_this.currentView != undefined && _this.currentView != null) {
-                _this.currentView.resize();
-            }
-        });
-    };
-    GameApp.prototype.resize = function () {
-        var w = window.innerWidth;
-        var h = window.innerHeight;
-        this.renderer.setSize(w, h);
-        this.camera.aspect = w / h;
-    };
-    GameApp.prototype.update = function () {
-        if (this.useControl == true)
-            this.controls.update();
-        if (this.currentView && this.isStop == false) {
-            this.currentView.update(this.currentFrame);
-        }
-    };
-    GameApp.prototype.render = function () {
-        this.renderer.render(this.scene, this.camera);
-    };
-    GameApp.prototype.animate = function () {
-        var _this = this;
-        this.currentFrame = Math.floor((this.getTime() - this.startTime) / (1000.0 / this.fps));
-        this.stats.begin();
-        this.update();
-        this.render();
-        this.stats.end();
-        requestAnimationFrame(function (e) {
-            _this.animate();
-        });
-    };
-    GameApp.prototype.setStartTime = function () {
-        this.startTime = this.getTime();
-        this.currentFrame = 0;
-    };
-    GameApp.prototype.getScene = function () {
-        return this.scene;
-    };
-    GameApp.prototype.setView = function (v) {
-        if (this.currentView) {
-            this.currentView.destructor();
-        }
-        this.currentView = v;
-        this.currentView.resize();
-    };
-    GameApp.prototype.getStageSize = function () {
-        return { width: this.stageWidth, height: this.stageHeight };
-    };
-    GameApp.prototype.getCurrentFrame = function () {
-        return this.currentFrame;
-    };
-    GameApp.prototype.getCurrentView = function () {
-        return this.currentView;
-    };
-    GameApp.prototype.start = function () {
-        this.animate();
-    };
-    GameApp._instance = null;
-    return GameApp;
-})();
-var Enemy = (function (_super) {
-    __extends(Enemy, _super);
-    function Enemy(startframe) {
-        _super.call(this);
-        this.id = 0;
-        this.stageWidth = 0;
-        this.stageHeight = 0;
-        this.point = 150;
-        this.life = 1;
-        this.lifeTime = 500;
-        this.startFrame = 0;
-        this.currentFrame = 0;
-        this.baseColor = 0xFFFFFF;
-        this.isShoted = false;
-        this.startFrame = startframe;
-        var s = GameApp.getInstance().getStageSize();
-        this.stageWidth = s.width;
-        this.stageHeight = s.height;
-        this.initialize();
-    }
-    Enemy.prototype.initialize = function () {
-        this.vy = -6;
-        var material = new THREE.MeshBasicMaterial({
-            color: this.baseColor,
-            wireframe: true
-        });
-        this._obj = new THREE.Mesh(new THREE.OctahedronGeometry(20, 1), material);
-        this._obj.castShadow = true;
-        this.shooter = new SingleShooter();
-    };
-    Enemy.prototype.update = function (nowFrame) {
-        var frame = nowFrame - this.startFrame;
-        if (frame <= this.currentFrame)
-            return;
-        this.currentFrame = frame;
-        this.doAction();
-        this.x += this.vx;
-        this.y += this.vy;
-        this.setPosition(this.x, this.y, this.z);
-        if (this.explosionObj != null) {
-            this.explosionObj.update(nowFrame);
-            if (this.explosionObj.isFinished == true) {
-                var v = GameApp.getInstance().getCurrentView();
-                v.remove(this.explosionObj);
-                this.waitRemove = true;
-            }
-        }
-    };
-    Enemy.prototype.doAction = function () {
-        if (this.currentFrame == 50) {
-            this.vy = 0;
-        }
-        else if (this.currentFrame == 70) {
-            this.shot();
-        }
-        else if (this.currentFrame == 100) {
-            this.vy = 6;
-        }
-        if (this.currentFrame >= this.lifeTime) {
-            this.isDead = true;
-            this.waitRemove = true;
-        }
-    };
-    Enemy.prototype.shot = function () {
-        if (this.isDead == true)
-            return;
-        var s = GameManager.getInstance().getSelfCharacter();
-        var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
-        this.shooter.shot(this.x, this.y, (s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
-    };
-    Enemy.prototype.getBullets = function () {
-        return this.shooter.getBullets();
-    };
-    Enemy.prototype.explode = function () {
-        var v = GameApp.getInstance().getCurrentView();
-        v.remove(this._obj);
-        var ex = new Explosion(this.x, this.y, 0xFFFFFFF);
-        v.add(ex.getParticles());
-        this.explosionObj = ex;
-    };
-    Enemy.prototype.hit = function () {
-        var _this = this;
-        var ma = this._obj.material;
-        ma.color.setHex(0xFF0000);
-        setTimeout(function () {
-            ma.color.setHex(_this.baseColor);
-        }, 200);
-        this.life--;
-        if (this.life <= 0) {
-            this.isDead = true;
-            this.explode();
-        }
-    };
-    Enemy.prototype.getPoint = function () {
-        return this.point;
-    };
-    Enemy.prototype.setLifeTime = function (t) {
-        this.lifeTime = t;
-    };
-    Enemy.prototype.setLife = function (l) {
-        this.life = l;
-    };
-    Enemy.prototype.setShooter = function (s) {
-        this.shooter = s;
-    };
-    Enemy.prototype.setBaseColor = function (c) {
-        this.baseColor = c;
-    };
-    return Enemy;
-})(CMover);
-var EnemyMid = (function (_super) {
-    __extends(EnemyMid, _super);
-    function EnemyMid(startframe) {
-        _super.call(this, startframe);
-    }
-    EnemyMid.prototype.initialize = function () {
-        this.vy = -4;
-        var material = new THREE.MeshBasicMaterial({
-            color: 0x00ff00,
-            wireframe: true
-        });
-        this._obj = new THREE.Mesh(new THREE.IcosahedronGeometry(40, 1), material);
-        this._obj.castShadow = true;
-        this.setShooter(new SingleShooter());
-        this.setLife(30);
-        this.setLifeTime(540);
-        this.setBaseColor(0x00FF00);
-    };
-    EnemyMid.prototype.doAction = function () {
-        if (this.currentFrame >= 70 && this.currentFrame < 120) {
-            this.vy = 0;
-        }
-        else if (this.currentFrame >= 160 && this.currentFrame < 200) {
-            if (this.isShoted == true)
-                return;
-            this.isShoted = true;
-            this.shot();
-        }
-        else if (this.currentFrame >= 200) {
-            this.vy = 6;
-        }
-        if (this.currentFrame >= this.lifeTime) {
-            this.isDead = true;
-            this.waitRemove = true;
-        }
-    };
-    return EnemyMid;
-})(Enemy);
-var Explosion = (function (_super) {
-    __extends(Explosion, _super);
-    function Explosion(x, y, color) {
-        _super.call(this);
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-        this.vx = 0;
-        this.vy = 0;
-        this.movementSpeed = 80;
-        this.totalObjects = 500;
-        this.objectSize = 10;
-        this.sizeRandomness = 4000;
-        this.colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
-        this.dirs = [];
-        this.parts = [];
-        this.status = false;
-        this.xDir = 0;
-        this.yDir = 0;
-        this.zDir = 0;
-        this.frameCount = 0;
-        this.isFinished = false;
-        var color = arguments[2];
-        if (color == undefined || color == null) {
-            color = 0xFFFFFF;
-        }
-        var particles = new THREE.Geometry();
-        for (var i = 0; i < this.totalObjects; i++) {
-            var vertex = new THREE.Vector3();
-            vertex.x = x;
-            vertex.y = y;
-            vertex.z = 0;
-            particles.vertices.push(vertex);
-            this.dirs.push({
-                x: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
-                y: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
-                z: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2)
-            });
-        }
-        var materialParticle = new THREE.PointCloudMaterial({
-            color: color,
-            size: 5,
-            transparent: true
-        });
-        this._pc = new THREE.PointCloud(particles, materialParticle);
-        this.status = true;
-        this.xDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
-        this.yDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
-        this.zDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
-    }
-    Explosion.prototype.init = function () {
-    };
-    Explosion.prototype.getParticles = function () {
-        return this._pc;
-    };
-    Explosion.prototype.update = function () {
-        if (this.status == true) {
-            var pCount = this.totalObjects;
-            while (pCount--) {
-                var particle = this._pc.geometry.vertices[pCount];
-                particle.y += this.dirs[pCount].y;
-                particle.x += this.dirs[pCount].x;
-                particle.z += this.dirs[pCount].z;
-            }
-            this.frameCount++;
-            if (this.frameCount > 300) {
-                this.status = false;
-                this.isFinished = true;
-            }
-            this._pc.geometry.verticesNeedUpdate = true;
-        }
-    };
-    return Explosion;
-})(CMover);
 var SimplexNoise = (function () {
     function SimplexNoise(r) {
         if (r === void 0) { r = undefined; }
@@ -1051,6 +649,442 @@ var SimplexNoise = (function () {
     };
     return SimplexNoise;
 })();
+var Bullet = (function (_super) {
+    __extends(Bullet, _super);
+    function Bullet(vx, vy) {
+        _super.call(this);
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.stageWidth = 0;
+        this.stageHeight = 0;
+        var s = GameApp.getInstance().getStageSize();
+        this.stageWidth = s.width;
+        this.stageHeight = s.height;
+        this.vx = vx;
+        this.vy = vy;
+        this._obj = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            wireframe: true
+        }));
+        this._obj.castShadow = true;
+    }
+    Bullet.prototype.update = function () {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.checkAreaTest();
+        this._obj.position.set(this.x, this.y, 50);
+    };
+    Bullet.prototype.checkAreaTest = function () {
+        if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
+            this.isDead = true;
+        }
+    };
+    return Bullet;
+})(CMover);
+var GameApp = (function () {
+    function GameApp() {
+        this.stageWidth = 480;
+        this.stageHeight = 640;
+        this.isStop = false;
+        this.startTime = 0;
+        this.currentFrame = 0;
+        this.fps = 60.0;
+        this.frameLength = 60.0;
+        this.useControl = false;
+        if (GameApp._instance) {
+            throw new Error("must use the getInstance.");
+        }
+        GameApp._instance = this;
+        this.initialize();
+    }
+    GameApp.getInstance = function () {
+        if (GameApp._instance === null) {
+            GameApp._instance = new GameApp();
+        }
+        return GameApp._instance;
+    };
+    GameApp.prototype.initialize = function () {
+        var _this = this;
+        console.log("app initialize");
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+        this.camera.position.set(0, -300, 240);
+        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+        this.renderer = new THREE.WebGLRenderer();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setClearColor(0x000000);
+        var container = document.getElementById('container');
+        container.appendChild(this.renderer.domElement);
+        this.requestAnimationFrame = (function () {
+            return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
+                window.setTimeout(callback, 1000.0 / 60.0);
+            };
+        })();
+        var now = window.performance && (performance.now || performance.mozNow || performance.msNow || performance.oNow || performance.webkitNow);
+        this.getTime = function () {
+            return (now && now.call(performance)) || (new Date().getTime());
+        };
+        this.startTime = this.getTime();
+        var axis = new THREE.AxisHelper(1000);
+        axis.position.set(0, 0, 0);
+        this.scene.add(axis);
+        window.addEventListener("keyup", function (e) {
+            var imgData, imgNode;
+            if (e.which !== 80)
+                return;
+            try {
+                imgData = _this.renderer.domElement.toDataURL();
+                console.log(imgData);
+            }
+            catch (e) {
+                console.log(e);
+                console.log("Browser does not support taking screenshot of 3d context");
+                return;
+            }
+        });
+        this.stats = new Stats();
+        this.stats.setMode(0);
+        this.stats.domElement.style.position = 'absolute';
+        this.stats.domElement.style.right = '0px';
+        this.stats.domElement.style.top = '0px';
+        document.body.appendChild(this.stats.domElement);
+        this.ua = "pc";
+        var ua = navigator.userAgent;
+        if (ua.indexOf('iPhone') > 0) {
+            this.ua = "ios";
+        }
+        else if (ua.indexOf('Android') > 0) {
+            this.ua = "android";
+        }
+        if (this.useControl == true) {
+            this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+            this.controls.addEventListener('change', function () {
+            });
+        }
+        var ctmanager = ControlManager.getInstance();
+        this.resize();
+        $(window).resize(function () {
+            _this.resize();
+            if (_this.currentView != undefined && _this.currentView != null) {
+                _this.currentView.resize();
+            }
+        });
+    };
+    GameApp.prototype.resize = function () {
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        this.renderer.setSize(w, h);
+        this.camera.aspect = w / h;
+    };
+    GameApp.prototype.update = function () {
+        if (this.useControl == true)
+            this.controls.update();
+        if (this.currentView && this.isStop == false) {
+            this.currentView.update(this.currentFrame);
+        }
+    };
+    GameApp.prototype.render = function () {
+        this.renderer.render(this.scene, this.camera);
+    };
+    GameApp.prototype.animate = function () {
+        var _this = this;
+        this.stats.begin();
+        this.update();
+        this.render();
+        this.stats.end();
+        requestAnimationFrame(function (e) {
+            _this.animate();
+        });
+        this.currentFrame++;
+    };
+    GameApp.prototype.setStartTime = function () {
+        this.startTime = this.getTime();
+        this.currentFrame = 0;
+    };
+    GameApp.prototype.getScene = function () {
+        return this.scene;
+    };
+    GameApp.prototype.setView = function (v) {
+        if (this.currentView) {
+            this.currentView.destructor();
+        }
+        this.currentView = v;
+        this.currentView.resize();
+    };
+    GameApp.prototype.getStageSize = function () {
+        return { width: this.stageWidth, height: this.stageHeight };
+    };
+    GameApp.prototype.getCurrentFrame = function () {
+        return this.currentFrame;
+    };
+    GameApp.prototype.getCurrentView = function () {
+        return this.currentView;
+    };
+    GameApp.prototype.start = function () {
+        this.animate();
+    };
+    GameApp._instance = null;
+    return GameApp;
+})();
+var Enemy = (function (_super) {
+    __extends(Enemy, _super);
+    function Enemy(startframe) {
+        _super.call(this);
+        this.id = 0;
+        this.stageWidth = 0;
+        this.stageHeight = 0;
+        this.point = 150;
+        this.life = 1;
+        this.lifeTime = 500;
+        this.startFrame = 0;
+        this.currentFrame = 0;
+        this.baseColor = 0xFFFFFF;
+        this.isShoted = false;
+        this.startFrame = startframe;
+        var s = GameApp.getInstance().getStageSize();
+        this.stageWidth = s.width;
+        this.stageHeight = s.height;
+        this.initialize();
+    }
+    Enemy.prototype.initialize = function () {
+        this.vy = -6;
+        var material = new THREE.MeshBasicMaterial({
+            color: this.baseColor,
+            wireframe: true
+        });
+        this._obj = new THREE.Mesh(new THREE.OctahedronGeometry(20, 1), material);
+        this._obj.castShadow = true;
+        this.shooter = new SingleShooter();
+    };
+    Enemy.prototype.update = function (nowFrame) {
+        var frame = nowFrame - this.startFrame;
+        if (frame <= this.currentFrame)
+            return;
+        this.currentFrame = frame;
+        this.doAction();
+        this.x += this.vx;
+        this.y += this.vy;
+        this.setPosition(this.x, this.y, this.z);
+        if (this.explosionObj != null) {
+            this.explosionObj.update(nowFrame);
+            if (this.explosionObj.isFinished == true) {
+                var v = GameApp.getInstance().getCurrentView();
+                v.remove(this.explosionObj);
+                this.waitRemove = true;
+            }
+        }
+    };
+    Enemy.prototype.doAction = function () {
+        if (this.currentFrame == 50) {
+            this.vy = 0;
+        }
+        else if (this.currentFrame == 70) {
+            this.shot();
+        }
+        else if (this.currentFrame == 100) {
+            this.vy = 6;
+        }
+        if (this.currentFrame >= this.lifeTime) {
+            this.isDead = true;
+            this.waitRemove = true;
+        }
+    };
+    Enemy.prototype.shot = function () {
+        if (this.isDead == true)
+            return;
+        var s = GameManager.getInstance().getSelfCharacter();
+        var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
+        this.shooter.shot(this.x, this.y, (s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
+    };
+    Enemy.prototype.getBullets = function () {
+        return this.shooter.getBullets();
+    };
+    Enemy.prototype.explode = function () {
+        var v = GameApp.getInstance().getCurrentView();
+        v.remove(this._obj);
+        var ex = new Explosion(this.x, this.y, 0xFFFFFFF);
+        v.add(ex.getParticles());
+        this.explosionObj = ex;
+    };
+    Enemy.prototype.hit = function () {
+        var _this = this;
+        var ma = this._obj.material;
+        ma.color.setHex(0xFF0000);
+        setTimeout(function () {
+            ma.color.setHex(_this.baseColor);
+        }, 200);
+        this.life--;
+        if (this.life <= 0) {
+            this.isDead = true;
+            this.explode();
+        }
+    };
+    Enemy.prototype.getPoint = function () {
+        return this.point;
+    };
+    Enemy.prototype.setLifeTime = function (t) {
+        this.lifeTime = t;
+    };
+    Enemy.prototype.setLife = function (l) {
+        this.life = l;
+    };
+    Enemy.prototype.setShooter = function (s) {
+        this.shooter = s;
+    };
+    Enemy.prototype.setBaseColor = function (c) {
+        this.baseColor = c;
+    };
+    return Enemy;
+})(CMover);
+var EnemyBoss = (function (_super) {
+    __extends(EnemyBoss, _super);
+    function EnemyBoss(startframe) {
+        _super.call(this, startframe);
+    }
+    EnemyBoss.prototype.initialize = function () {
+        this.vy = -4;
+        var material = new THREE.MeshBasicMaterial({
+            color: 0x00ff00,
+            wireframe: true
+        });
+        this._obj = new THREE.Mesh(new THREE.IcosahedronGeometry(40, 1), material);
+        this._obj.castShadow = true;
+        this.setShooter(new SingleShooter());
+        this.setLife(30);
+        this.setLifeTime(540);
+        this.setBaseColor(0x00FF00);
+    };
+    EnemyBoss.prototype.doAction = function () {
+        if (this.currentFrame == 70) {
+            this.vy = 0;
+        }
+        else if (this.currentFrame == 160) {
+            if (this.isShoted == true)
+                return;
+            this.isShoted = true;
+            this.shot();
+        }
+        else if (this.currentFrame == 200) {
+            this.vy = 6;
+        }
+    };
+    return EnemyBoss;
+})(Enemy);
+var EnemyMid = (function (_super) {
+    __extends(EnemyMid, _super);
+    function EnemyMid(startframe) {
+        _super.call(this, startframe);
+    }
+    EnemyMid.prototype.initialize = function () {
+        this.vy = -4;
+        var material = new THREE.MeshBasicMaterial({
+            color: 0x00ff00,
+            wireframe: true
+        });
+        this._obj = new THREE.Mesh(new THREE.IcosahedronGeometry(40, 1), material);
+        this._obj.castShadow = true;
+        this.setShooter(new SingleShooter());
+        this.setLife(30);
+        this.setLifeTime(540);
+        this.setBaseColor(0x00FF00);
+    };
+    EnemyMid.prototype.doAction = function () {
+        if (this.currentFrame == 70) {
+            this.vy = 0;
+        }
+        else if (this.currentFrame == 160) {
+            if (this.isShoted == true)
+                return;
+            this.isShoted = true;
+            this.shot();
+        }
+        else if (this.currentFrame == 200) {
+            this.vy = 6;
+        }
+        if (this.currentFrame >= this.lifeTime) {
+            this.isDead = true;
+            this.waitRemove = true;
+        }
+    };
+    return EnemyMid;
+})(Enemy);
+var Explosion = (function (_super) {
+    __extends(Explosion, _super);
+    function Explosion(x, y, color) {
+        _super.call(this);
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.movementSpeed = 80;
+        this.totalObjects = 500;
+        this.objectSize = 10;
+        this.sizeRandomness = 4000;
+        this.colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
+        this.dirs = [];
+        this.parts = [];
+        this.status = false;
+        this.xDir = 0;
+        this.yDir = 0;
+        this.zDir = 0;
+        this.frameCount = 0;
+        this.isFinished = false;
+        var color = arguments[2];
+        if (color == undefined || color == null) {
+            color = 0xFFFFFF;
+        }
+        var particles = new THREE.Geometry();
+        for (var i = 0; i < this.totalObjects; i++) {
+            var vertex = new THREE.Vector3();
+            vertex.x = x;
+            vertex.y = y;
+            vertex.z = 0;
+            particles.vertices.push(vertex);
+            this.dirs.push({
+                x: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
+                y: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
+                z: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2)
+            });
+        }
+        var materialParticle = new THREE.PointCloudMaterial({
+            color: color,
+            size: 5,
+            transparent: true
+        });
+        this._pc = new THREE.PointCloud(particles, materialParticle);
+        this.status = true;
+        this.xDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
+        this.yDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
+        this.zDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
+    }
+    Explosion.prototype.init = function () {
+    };
+    Explosion.prototype.getParticles = function () {
+        return this._pc;
+    };
+    Explosion.prototype.update = function () {
+        if (this.status == true) {
+            var pCount = this.totalObjects;
+            while (pCount--) {
+                var particle = this._pc.geometry.vertices[pCount];
+                particle.y += this.dirs[pCount].y;
+                particle.x += this.dirs[pCount].x;
+                particle.z += this.dirs[pCount].z;
+            }
+            this.frameCount++;
+            if (this.frameCount > 300) {
+                this.status = false;
+                this.isFinished = true;
+            }
+            this._pc.geometry.verticesNeedUpdate = true;
+        }
+    };
+    return Explosion;
+})(CMover);
 var Stage = (function (_super) {
     __extends(Stage, _super);
     function Stage() {

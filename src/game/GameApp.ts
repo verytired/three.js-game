@@ -115,6 +115,7 @@ class GameApp {
 			performance.msNow ||
 			performance.oNow ||
 			performance.webkitNow );
+
 		this.getTime = function () {
 			return ( now && now.call(performance) ) || ( new Date().getTime() );
 		}
@@ -198,8 +199,6 @@ class GameApp {
 
 	public animate() {
 
-		this.currentFrame = Math.floor(( this.getTime() - this.startTime ) / ( 1000.0 / this.fps ));
-
 		this.stats.begin();
 		this.update();
 		this.render();
@@ -209,6 +208,10 @@ class GameApp {
 				this.animate();
 			}
 		);
+
+		//do not frame skip
+		//this.currentFrame = Math.floor(( this.getTime() - this.startTime ) / ( 1000.0 / this.fps ));
+		this.currentFrame++;
 	}
 
 	public setStartTime() {

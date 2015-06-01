@@ -9,25 +9,6 @@
 /// <reference path="ControlManager.ts"/>
 /// <reference path="../DefinitelyTyped/stats/stats.d.ts" />
 
-declare module THREE {
-	export var OrbitControls;
-	export var TrackballControls;
-}
-
-//interface Window {
-//	webkitRequestAnimationFrame: any;
-//	mozRequestAnimationFrame: any;
-//	oRequestAnimationFrame: any;
-//
-//}
-
-//interface Performance {
-//	mozNow: any;
-//	msNow: any;
-//	oNow: any;
-//	webkitNow: any;
-//}
-
 class GameManager {
 
 	private static _instance:GameManager = null;

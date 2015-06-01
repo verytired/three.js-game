@@ -7,7 +7,7 @@ class CView {
 	private objs:CMover[] = new Array()
 	private scene:THREE.Scene;
 
-	public gm:GameManager;
+	public app:GameApp;
 	private cm:ControlManager;
 
 	constructor() {
@@ -21,7 +21,7 @@ class CView {
 	private _onMouseUp:Function;
 
 	public init() {
-		this.gm = GameManager.getInstance();
+		this.app = GameApp.getInstance();
 		this.cm = ControlManager.getInstance();
 		this._keyEvent = (e)=> {
 			this.keyEvent(e);
@@ -78,8 +78,8 @@ class CView {
 	}
 
 	private getScene() {
-		var gm = GameManager.getInstance();
-		this.scene = gm.getScene();
+		var app = GameApp.getInstance();
+		this.scene = app.getScene();
 	}
 
 	public removeAll() {
@@ -88,6 +88,8 @@ class CView {
 			this.objs[i].remove();
 		}
 	}
+
+	public resize(){}
 
 	public keyEvent(e:any) {
 	}

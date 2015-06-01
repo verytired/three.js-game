@@ -15,7 +15,7 @@ class Bullet extends CMover {
 	constructor(vx,vy) {
 		super()
 
-		var s = GameManager.getInstance().getStageSize();
+		var s = GameApp.getInstance().getStageSize();
 		this.stageWidth = s.width;
 		this.stageHeight = s.height;
 

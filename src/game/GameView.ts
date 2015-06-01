@@ -22,6 +22,8 @@ class GameView extends CView {
 	private nextActionFrame = 0;
 	private nextActionNum = 0;
 
+	private gm:GameManager;
+
 	constructor() {
 		super();
 	}
@@ -34,8 +36,11 @@ class GameView extends CView {
 		this.bg.init();
 		this.addMover(this.bg);
 
-		this.sceneData = this.gm.getSceneData(0);
+
 		this.nextActionNum = 0;
+
+		this.gm = GameManager.getInstance();
+		this.sceneData = this.gm.getSceneData(0);
 
 		this.startGame();
 	}
@@ -81,7 +86,7 @@ class GameView extends CView {
 		var nowX = e.data.x
 		var nowY = e.data.y
 
-		if (this.gm.ua != "pc") {
+		if (this.app.ua != "pc") {
 			nowX = e.data.touches[0].clientX;
 			nowY = e.data.touches[0].clientY;
 		}
@@ -93,7 +98,7 @@ class GameView extends CView {
 		this.self.y = 320 - 640 * nowY / h;
 	}
 
-	public onMouseUp(e:any){
+	public onMouseUp(e:any) {
 		if (this.isKeyLock == true) {
 			return
 		}
@@ -104,15 +109,15 @@ class GameView extends CView {
 	}
 
 	public update() {
-		var currentFrame = this.gm.getCurrentFrame();
+		var currentFrame = this.app.getCurrentFrame();
 		this.gm.debug(currentFrame);
 		if (this.nextActionNum < this.sceneData.length && currentFrame == this.sceneData[this.nextActionNum].frame) {
 			var enemies = this.sceneData[this.nextActionNum].enemies;
 			for (var i = 0; i < enemies.length; i++) {
-				if(enemies[i].type == 1){
-					var e = new Enemy(this.gm.getCurrentFrame());
-				}else if(enemies[i].type == 2){
-					var e = new EnemyMid(this.gm.getCurrentFrame());
+				if (enemies[i].type == 1) {
+					var e = new Enemy(this.app.getCurrentFrame());
+				} else if (enemies[i].type == 2) {
+					var e = new EnemyMid(this.app.getCurrentFrame());
 				}
 				e.x = enemies[i].x;
 				e.y = enemies[i].y;
@@ -123,7 +128,7 @@ class GameView extends CView {
 		}
 		this.hitTest()
 		this.checkLiveTest()
-		super.update(this.gm.getCurrentFrame());
+		super.update(this.app.getCurrentFrame());
 	}
 
 	/**
@@ -180,8 +185,8 @@ class GameView extends CView {
 	public checkLiveTest() {
 		if (this.self.isDead == true && this.waitingRestart == false) {
 			//3秒後くらいにゲームオーバー表示させる→スペース押したらreplay
-				this.waitingRestart = true;
-				this.isKeyLock = true;
+			this.waitingRestart = true;
+			this.isKeyLock = true;
 			setTimeout(()=> {
 				this.setGameOver();
 			}, 3000)
@@ -229,11 +234,11 @@ class GameView extends CView {
 		this.addMover(this.self);
 		this.gm.setSelfCharacter(this.self);
 
-		this.gm.setStartTime();
+		this.app.setStartTime();
 
 		var func = ()=> {
 			this.timerId = setTimeout(()=> {
-				var e = new Enemy(this.gm.getCurrentFrame());
+				var e = new Enemy(this.app.getCurrentFrame());
 				e.y = 320;
 				e.x = -320 + Math.random() * 640;
 				this.addMover(e);
@@ -256,5 +261,9 @@ class GameView extends CView {
 		this.gm.setScore(0);
 		this.startGame();
 		this.nextActionNum = 0;
+	}
+
+	public resize() {
+		this.gm.resize();
 	}
 }

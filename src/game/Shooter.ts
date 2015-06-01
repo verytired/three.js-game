@@ -14,7 +14,7 @@ class Shooter {
 		var b = new Bullet(vx, vy);
 		b.x = x;
 		b.y = y;
-		var v = GameManager.getInstance().getCurrentView();
+		var v = GameApp.getInstance().getCurrentView();
 		v.addMover(b);
 		this.bullets.push(b);
 	}

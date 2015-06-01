@@ -1,5 +1,5 @@
 //敵クラス
-/// <reference path="GameManager.ts"/>
+/// <reference path="GameApp.ts"/>
 
 class Enemy extends CMover {
 
@@ -21,7 +21,7 @@ class Enemy extends CMover {
 	constructor(startframe) {
 		super();
 		this.startFrame = startframe;
-		var s = GameManager.getInstance().getStageSize();
+		var s = GameApp.getInstance().getStageSize();
 		this.stageWidth = s.width;
 		this.stageHeight = s.height;
 		this.initialize();
@@ -51,7 +51,7 @@ class Enemy extends CMover {
 		if (this.explosionObj != null) {
 			this.explosionObj.update(nowFrame);
 			if (this.explosionObj.isFinished == true) {
-				var v = GameManager.getInstance().getCurrentView();
+				var v = GameApp.getInstance().getCurrentView();
 				v.remove(this.explosionObj);
 				this.waitRemove = true;
 			}
@@ -93,7 +93,7 @@ class Enemy extends CMover {
 	}
 
 	public explode() {
-		var v = GameManager.getInstance().getCurrentView();
+		var v = GameApp.getInstance().getCurrentView();
 		v.remove(this._obj)
 		var ex = new Explosion(this.x, this.y, 0xFFFFFFF);
 		v.add(ex.getParticles());

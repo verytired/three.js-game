@@ -6,8 +6,9 @@ class TopView extends CView {
 
 	public init() {
 		super.init();
-		this.gm = GameManager.getInstance();
 		$("#view-top").show();
+
+		this.resize();
 	}
 
 	public keyEvent(e:any){
@@ -26,7 +27,7 @@ class TopView extends CView {
 
 	public moveNextScene(){
 		$("#overlay").hide();
-		this.gm.setView(new GameView())
+		this.app.setView(new GameView())
 	}
 
 }

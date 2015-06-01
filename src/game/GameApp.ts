@@ -239,12 +239,7 @@ class GameApp {
 	}
 
 	public getCurrentView() {
-		return this.currentView
-	}
-
-	//シーン情報取得
-	public getSceneData(index) {
-		return this.sceneData.getData(index);
+		return this.currentView;
 	}
 
 	public start() {

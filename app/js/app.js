@@ -558,9 +558,6 @@ var GameApp = (function () {
     GameApp.prototype.getCurrentView = function () {
         return this.currentView;
     };
-    GameApp.prototype.getSceneData = function (index) {
-        return this.sceneData.getData(index);
-    };
     GameApp.prototype.start = function () {
         this.animate();
     };
@@ -687,14 +684,6 @@ var EnemyMid = (function (_super) {
         this._obj.castShadow = true;
         this.setShooter(new SingleShooter());
         this.setLife(3);
-    };
-    EnemyMid.prototype.resize = function () {
-        var w = window.innerWidth;
-        var h = window.innerHeight;
-        for (var i = 0; i < this.overlay.length; i++) {
-            $(this.overlay[i]).css({ top: h / 2 - $(this.overlay[i]).height() / 2 });
-            $(this.overlay[i]).hide();
-        }
     };
     return EnemyMid;
 })(Enemy);

@@ -141,22 +141,9 @@ class GameView extends CView {
 	 */
 	public hitTest() {
 
-		//弾と敵の当たり判定
-		//for (var i = 0; i < this.bullets.length; i++) {
-		//	for (var j = 0; j < this.enemies.length; j++) {
-		//		if (this.bullets[i].x > this.enemies[j].x - 15 && this.bullets[i].x < this.enemies[j].x + 15 && this.bullets[i].y > this.enemies[j].y - 15 && this.bullets[i].y < this.enemies[j].y + 15) {
-		//			if (!this.enemies[j].isDead) {
-		//				this.bullets[i].isDead = true;
-		//				this.bullets[i].waitRemove = true;
-		//				this.enemies[j].hit();
-		//				this.gm.addScore(this.enemies[j].getPoint())
-		//			}
-		//		}
-		//	}
-		//}
-
 		for (var i = 0; i < this.bullets.length; i++) {
 			for (var j = 0; j < this.enemies.length; j++) {
+				//攻撃受ける側でhitTes行う仕様
 				if (this.enemies[j].hitTest(this.bullets[i] .hitArea) == true) {
 					if (!this.enemies[j].isDead) {
 						this.bullets[i].isDead = true;
@@ -173,7 +160,7 @@ class GameView extends CView {
 			var bulletArray = this.enemies[j].getBullets();
 			for (var k = 0; k < bulletArray.length; k++) {
 				var b = bulletArray[k]
-				if (this.self.x > b.x - 15 && this.self.x < b.x + 15 && this.self.y > b.y - 15 && this.self.y < b.y + 15) {
+				if(this.self.hitTest(b.hitArea)==true){
 					if (!this.self.isDead) {
 						this.self.isDead = true;
 						this.self.explode();
@@ -184,12 +171,9 @@ class GameView extends CView {
 
 		//敵と自分の当たり判定
 		for (var j = 0; j < this.enemies.length; j++) {
-			if (this.self.x > this.enemies[j].x - 15 && this.self.x < this.enemies[j].x + 15 && this.self.y > this.enemies[j].y - 15 && this.self.y < this.enemies[j].y + 15) {
+			if(this.self.hitTest(this.enemies[j].hitArea)==true){
 				if (!this.self.isDead) {
 					this.self.isDead = true;
-					//var ex = new Explosion(this.self.x, this.self.y);
-					//this.add(ex.getParticles());
-					//this.explosions.push(ex)
 					this.self.explode();
 				}
 			}

@@ -978,9 +978,12 @@ var EnemyBoss = (function (_super) {
     function EnemyBoss(startframe) {
         _super.call(this, startframe);
         this.moveType = 0;
+        this.farmecount = 0;
+        this.isLoop = false;
     }
     EnemyBoss.prototype.initialize = function () {
         this.vy = -2;
+        this.vx = 0;
         var material = new THREE.MeshBasicMaterial({
             color: 0x00ff00,
             wireframe: true
@@ -993,18 +996,36 @@ var EnemyBoss = (function (_super) {
         this.setBaseColor(0x00FF00);
         this.hitArea.push(new HitArea(120, 120, this.x, this.y));
         this.hitAreaPos.push(new THREE.Vector2(0, 0));
+        this.receiveDamage = false;
     };
     EnemyBoss.prototype.doAction = function () {
-        if (this.currentFrame == 70) {
+        var duration = 30;
+        var vx = 3;
+        if (this.life <= 300) {
+            duration = 18;
+            vx = 5;
+        }
+        if (this.isLoop) {
+            this.farmecount++;
+            console.log();
+            if (this.farmecount % duration == 0) {
+                this.shot();
+            }
+            if (this.x > 320) {
+                this.x = 320;
+                this.vx = -vx;
+            }
+            else if (this.x < -320) {
+                this.x = -320;
+                this.vx = vx;
+            }
+            return;
+        }
+        if (this.currentFrame == 90) {
             this.vy = 0;
-        }
-        else if (this.currentFrame == 160) {
-            if (this.isShoted == true)
-                return;
-            this.isShoted = true;
-            this.shot();
-        }
-        else if (this.currentFrame == 200) {
+            this.vx = 2;
+            this.isLoop = true;
+            this.receiveDamage = true;
         }
     };
     return EnemyBoss;

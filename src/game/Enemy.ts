@@ -8,7 +8,7 @@ class Enemy extends CMover {
 	private stageHeight = 0;
 
 	private point = 150; //得点
-	private life = 1;//生存時間
+	public life = 1;//生存時間
 	public lifeTime = 500;//生存時間
 
 	private startFrame = 0;
@@ -17,7 +17,7 @@ class Enemy extends CMover {
 	private explosionObj;//爆発オブジェクト格納
 	private shooter:Shooter;//弾発射オブジェクト
 
-	private baseColor = 0xFFFFFF;
+	public baseColor = 0xFFFFFF;
 
 	public isShoted = false;
 

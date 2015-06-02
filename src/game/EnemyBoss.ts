@@ -13,14 +13,14 @@ class EnemyBoss extends Enemy {
 			color: 0x00ff00,
 			wireframe: true
 		});
-		this._obj = new THREE.Mesh(new THREE.IcosahedronGeometry(40, 1), material);
+		this._obj = new THREE.Mesh(new THREE.IcosahedronGeometry(120, 3), material);
 		this._obj.castShadow = true;
 		this.setShooter(new SingleShooter());
-		this.setLife(30);
+		this.setLife(1000);
 		this.setLifeTime(-1);
 		this.setBaseColor(0x00FF00);
 
-		this.hitArea.push(new HitArea(40, 40, this.x, this.y))
+		this.hitArea.push(new HitArea(120, 120, this.x, this.y))
 		this.hitAreaPos.push(new THREE.Vector2(0, 0));
 	}
 

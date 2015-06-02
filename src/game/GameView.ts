@@ -123,10 +123,15 @@ class GameView extends CView {
 					this.addMover(e);
 					this.enemies.push(e);
 				} else if (enemies[i].type == 3) {
-					var b = new EnemyBoss(this.app.getCurrentFrame());
+					var b = new EnemySmall(this.app.getCurrentFrame());
 					b.setPosition(enemies[i].x, enemies[i].y, this.zPosition)
 					this.addMover(b);
 					this.enemies.push(b);
+				}else if (enemies[i].type == 4) {
+					var boss = new EnemyBoss(this.app.getCurrentFrame());
+					boss.setPosition(enemies[i].x, enemies[i].y, this.zPosition)
+					this.addMover(boss);
+					this.enemies.push(boss);
 				}
 			}
 			this.nextActionNum++;

@@ -5,9 +5,6 @@ class MyShip extends CMover {
 
 	private explosionObj = null;
 
-	public hitArea:HitArea[] = new Array();
-	public hitAreaPos:THREE.Vector2[] = new Array();
-
 	constructor() {
 		super();
 		this.vy = -2;

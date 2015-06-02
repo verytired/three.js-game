@@ -12,9 +12,6 @@ class Bullet extends CMover {
 	private stageWidth = 0;
 	private stageHeight = 0;
 
-	public hitArea:HitArea[] = new Array();
-	public hitAreaPos:THREE.Vector2[] = new Array();
-
 	constructor(vx,vy) {
 		super()
 

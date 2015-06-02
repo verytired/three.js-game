@@ -17,6 +17,9 @@ class EnemyMid extends Enemy {
 		this.setLife(30);
 		this.setLifeTime(540);
 		this.setBaseColor(0x00FF00);
+
+		this.hitArea.push(new HitArea(40, 40, this.x, this.y))
+		this.hitAreaPos.push(new THREE.Vector2(0, 0));
 	}
 
 	public doAction() {

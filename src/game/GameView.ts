@@ -142,9 +142,22 @@ class GameView extends CView {
 	public hitTest() {
 
 		//弾と敵の当たり判定
+		//for (var i = 0; i < this.bullets.length; i++) {
+		//	for (var j = 0; j < this.enemies.length; j++) {
+		//		if (this.bullets[i].x > this.enemies[j].x - 15 && this.bullets[i].x < this.enemies[j].x + 15 && this.bullets[i].y > this.enemies[j].y - 15 && this.bullets[i].y < this.enemies[j].y + 15) {
+		//			if (!this.enemies[j].isDead) {
+		//				this.bullets[i].isDead = true;
+		//				this.bullets[i].waitRemove = true;
+		//				this.enemies[j].hit();
+		//				this.gm.addScore(this.enemies[j].getPoint())
+		//			}
+		//		}
+		//	}
+		//}
+
 		for (var i = 0; i < this.bullets.length; i++) {
 			for (var j = 0; j < this.enemies.length; j++) {
-				if (this.bullets[i].x > this.enemies[j].x - 15 && this.bullets[i].x < this.enemies[j].x + 15 && this.bullets[i].y > this.enemies[j].y - 15 && this.bullets[i].y < this.enemies[j].y + 15) {
+				if (this.enemies[j].hitTest(this.bullets[i] .hitArea) == true) {
 					if (!this.enemies[j].isDead) {
 						this.bullets[i].isDead = true;
 						this.bullets[i].waitRemove = true;

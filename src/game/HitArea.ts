@@ -20,9 +20,10 @@ class HitArea {
 
 	public hitTest(area:HitArea) {
 		var pos = area.getPositions();
+
 		for (var i = 0; i < pos.length; i++) {
 			var p:THREE.Vector2 = pos[i];
-			if (p.x > this.center.x - this.width / 2 && p.x < this.center.x + this.width / 2 && p.y > this.center.y - this.height / 2 && p.y < this.center.y + this.height / 2) {
+			if (p.x > (this.center.x - this.width / 2) && p.x < (this.center.x + this.width / 2) && p.y > (this.center.y - this.height / 2) && p.y < (this.center.y + this.height / 2)) {
 				return true;
 			}
 		}

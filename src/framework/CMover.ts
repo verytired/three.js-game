@@ -15,28 +15,42 @@ class CMover extends events.EventDispatcher implements IMover {
 	public isDead:boolean = false;
 	public waitRemove:boolean = false;
 
+	public hitArea:HitArea[] = new Array();
+	public hitAreaPos:THREE.Vector2[] = new Array();
+
 	constructor() {
 		super()
 	}
 
-	public update(nowFrame){
+	public update(nowFrame) {
 	}
 
-	public getObject(){
+	public getObject() {
 		return this._obj;
 	}
 
-	public remove(){
+	public remove() {
 
 	}
 
-	public setPosition(x,y,z){
+	public setPosition(x, y, z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
-		this._obj.position.set(x,y,z);
+		this._obj.position.set(x, y, z);
 	}
 
-	public explode(){}
+	public explode() {
+	}
 
+	public hitTest(hitAreaArray) {
+		for (var i = 0; i < this.hitArea.length; i++) {
+			for (var j = 0; j < hitAreaArray.length; j++) {
+				if (this.hitArea[i].hitTest(hitAreaArray[j]) == true) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }

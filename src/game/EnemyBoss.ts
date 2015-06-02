@@ -20,7 +20,8 @@ class EnemyBoss extends Enemy {
 		this.setLifeTime(-1);
 		this.setBaseColor(0x00FF00);
 
-		this.receiveDamage = false;
+		this.hitArea.push(new HitArea(40, 40, this.x, this.y))
+		this.hitAreaPos.push(new THREE.Vector2(0, 0));
 	}
 
 	public doAction() {

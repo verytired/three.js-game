@@ -23,9 +23,6 @@ class Enemy extends CMover {
 
 	public receiveDamage = true;
 
-	public hitArea:HitArea[] = new Array();
-	public hitAreaPos:THREE.Vector2[] = new Array();
-
 	constructor(startframe) {
 		super();
 		this.startFrame = startframe;

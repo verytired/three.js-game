@@ -19,7 +19,7 @@ class EnemyBoss extends Enemy {
 		this._obj = new THREE.Mesh(new THREE.IcosahedronGeometry(120, 3), material);
 		this._obj.castShadow = true;
 		this.setShooter(new SingleShooter());
-		this.setLife(1000);
+		this.setLife(10);
 		this.setLifeTime(-1);
 		this.setBaseColor(0x00FF00);
 

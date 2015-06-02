@@ -21,6 +21,8 @@ class GameView extends CView {
 	private nextActionFrame = 0;
 	private nextActionNum = 0;
 
+	private isInBossBattle = false;
+	private boss;
 	private gm:GameManager;
 
 	private zPosition = 50;
@@ -127,17 +129,20 @@ class GameView extends CView {
 					b.setPosition(enemies[i].x, enemies[i].y, this.zPosition)
 					this.addMover(b);
 					this.enemies.push(b);
-				}else if (enemies[i].type == 4) {
+				} else if (enemies[i].type == 4) {
 					var boss = new EnemyBoss(this.app.getCurrentFrame());
 					boss.setPosition(enemies[i].x, enemies[i].y, this.zPosition)
 					this.addMover(boss);
 					this.enemies.push(boss);
+					//todo boss
+					this.isInBossBattle = true;
+					this.boss = boss;
 				}
 			}
 			this.nextActionNum++;
 		}
-		this.hitTest()
-		this.checkLiveTest()
+		this.hitTest();
+		this.checkLiveTest();
 		super.update(this.app.getCurrentFrame());
 	}
 
@@ -145,11 +150,26 @@ class GameView extends CView {
 	 * 当たり判定
 	 */
 	public hitTest() {
+		if (this.boss != null && this.boss.isDead) {
+			for (var i = 0; i < this.bullets.length; i++) {
+				this.bullets[i].isDead = true;
+				this.bullets[i].waitRemove = true;
+			}
+			this.isInBossBattle = false
+			this.boss =null;
+			this.waitingRestart = true;
+			this.isKeyLock = true;
+			setTimeout(()=> {
+				this.setClear();
+			}, 3000)
+
+			return
+		}
 
 		for (var i = 0; i < this.bullets.length; i++) {
 			for (var j = 0; j < this.enemies.length; j++) {
 				//攻撃受ける側でhitTes行う仕様
-				if (this.enemies[j].hitTest(this.bullets[i] .hitArea) == true) {
+				if (this.enemies[j].hitTest(this.bullets[i].hitArea) == true) {
 					if (!this.enemies[j].isDead) {
 						this.bullets[i].isDead = true;
 						this.bullets[i].waitRemove = true;
@@ -165,7 +185,7 @@ class GameView extends CView {
 			var bulletArray = this.enemies[j].getBullets();
 			for (var k = 0; k < bulletArray.length; k++) {
 				var b = bulletArray[k]
-				if(this.self.hitTest(b.hitArea)==true){
+				if (this.self.hitTest(b.hitArea) == true) {
 					if (!this.self.isDead) {
 						this.self.isDead = true;
 						this.self.explode();
@@ -176,7 +196,7 @@ class GameView extends CView {
 
 		//敵と自分の当たり判定
 		for (var j = 0; j < this.enemies.length; j++) {
-			if(this.self.hitTest(this.enemies[j].hitArea)==true){
+			if (this.self.hitTest(this.enemies[j].hitArea) == true) {
 				if (!this.self.isDead) {
 					this.self.isDead = true;
 					this.self.explode();
@@ -189,6 +209,7 @@ class GameView extends CView {
 	 * キャラクタの表示確認
 	 */
 	public checkLiveTest() {
+
 		if (this.self.isDead == true && this.waitingRestart == false) {
 			//3秒後くらいにゲームオーバー表示させる→スペース押したらreplay
 			this.waitingRestart = true;
@@ -198,7 +219,7 @@ class GameView extends CView {
 			}, 3000)
 			return
 		}
-		var n = 0
+		var n = 0;
 		for (var i = 0; i < this.bullets.length; i++) {
 			if (this.bullets[n].isDead == true) {
 				this.bullets.splice(n, 1)
@@ -206,7 +227,7 @@ class GameView extends CView {
 				n++;
 			}
 		}
-		n = 0
+		n = 0;
 		for (var i = 0; i < this.enemies.length; i++) {
 			if (this.enemies[n].waitRemove == true) {
 				this.enemies.splice(n, 1)
@@ -226,10 +247,18 @@ class GameView extends CView {
 		this.isKeyLock = false;
 	}
 
+	public setClear() {
+		$("#overlay").show();
+		$("#view-stageclear").show();
+		this.isKeyLock = false;
+	}
+
 	/**
 	 * ゲーム開始
 	 */
 	public startGame() {
+		$("#view-gameover").hide();
+		$("#view-stageclear").hide();
 		$("#overlay").hide();
 		this.bg = new Stage();
 		this.bg.init();

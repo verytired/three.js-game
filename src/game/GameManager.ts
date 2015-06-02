@@ -21,7 +21,7 @@ class GameManager {
 	private $viewDebug = null;
 
 	private sceneData:SceneData;
-	private overlay:String[] = ["#view-top", "#view-gameover"];
+	private overlay:String[] = ["#view-top", "#view-gameover", "#view-stageclear"];
 
 	constructor() {
 		if (GameManager._instance) {

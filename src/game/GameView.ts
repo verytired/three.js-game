@@ -24,6 +24,7 @@ class GameView extends CView {
 	private gm:GameManager;
 
 	private zPosition = 50;
+
 	constructor() {
 		super();
 	}

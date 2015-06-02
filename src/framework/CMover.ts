@@ -49,6 +49,9 @@ class CMover extends events.EventDispatcher implements IMover {
 				if (this.hitArea[i].hitTest(hitAreaArray[j]) == true) {
 					return true;
 				}
+				if (hitAreaArray[j].hitTest(this.hitArea[i]) == true) {
+					return true;
+				}
 			}
 		}
 		return false;

@@ -12,6 +12,9 @@ class Bullet extends CMover {
 	private stageWidth = 0;
 	private stageHeight = 0;
 
+	public hitArea:HitArea[] = new Array();
+	public hitAreaPos:THREE.Vector2[] = new Array();
+
 	constructor(vx,vy) {
 		super()
 
@@ -32,6 +35,9 @@ class Bullet extends CMover {
 			}));
 		//this._obj.position.set(0, 60, 50);
 		this._obj.castShadow = true;
+
+		this.hitArea.push(new HitArea(10, 10, this.x, this.y))
+		this.hitAreaPos.push(new THREE.Vector2(0, 0));
 	}
 
 	public update() {
@@ -39,6 +45,10 @@ class Bullet extends CMover {
 		this.y += this.vy;
 		this.checkAreaTest()
 		this._obj.position.set(this.x, this.y, 50);
+
+		for (var i = 0; i < this.hitArea.length; i++) {
+			this.hitArea[i].update(this.x + this.hitAreaPos[i].x, this.y + this.hitAreaPos[i].y);
+		}
 	}
 
 	public checkAreaTest() {

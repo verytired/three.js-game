@@ -1,6 +1,6 @@
 class EnemyBoss extends Enemy {
 
-	//private moveType = 0;
+	private moveType = 0;
 
 	constructor(startframe) {
 		super(startframe);

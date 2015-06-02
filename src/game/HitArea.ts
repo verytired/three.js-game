@@ -4,29 +4,38 @@
 
 class HitArea {
 
-	public position:THREE.Vector2[] = new Array();
 	public center:THREE.Vector2;
 	private width;
 	private height;
 
-	constructor(x, y, w, h) {
+	constructor(w, h, x, y) {
 		this.center = new THREE.Vector2(x, y);
 		this.width = w;
 		this.height = h;
-		this.position.push(new THREE.Vector2(x - w / 2, y - h / 2));
-		this.position.push(new THREE.Vector2(x + w / 2, y - h / 2));
-		this.position.push(new THREE.Vector2(x - w / 2, y + h / 2));
-		this.position.push(new THREE.Vector2(x + w / 2, y + h / 2));
+	}
+
+	public update(x, y) {
+		this.center.set(x, y);
 	}
 
 	public hitTest(area:HitArea) {
-		for (var i = 0; i < area.position.length; i++) {
-			var p:THREE.Vector2 = area.position[i];
+		var pos = area.getPositions();
+		for (var i = 0; i < pos.length; i++) {
+			var p:THREE.Vector2 = pos[i];
 			if (p.x > this.center.x - this.width / 2 && p.x < this.center.x + this.width / 2 && p.y > this.center.y - this.height / 2 && p.y < this.center.y + this.height / 2) {
-				return true
+				return true;
 			}
 		}
 		return false
+	}
+
+	public getPositions() {
+		var positions:THREE.Vector2[] = new Array();
+		positions.push(new THREE.Vector2(this.center.x - this.width / 2, this.center.y - this.height / 2));
+		positions.push(new THREE.Vector2(this.center.x + this.width / 2, this.center.y - this.height / 2));
+		positions.push(new THREE.Vector2(this.center.x - this.width / 2, this.center.y + this.height / 2));
+		positions.push(new THREE.Vector2(this.center.x + this.width / 2, this.center.y + this.height / 2));
+		return positions;
 	}
 
 }

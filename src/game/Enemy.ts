@@ -23,6 +23,9 @@ class Enemy extends CMover {
 
 	public receiveDamage = true;
 
+	public hitArea:HitArea[] = new Array();
+	public hitAreaPos:THREE.Vector2[] = new Array();
+
 	constructor(startframe) {
 		super();
 		this.startFrame = startframe;
@@ -41,6 +44,9 @@ class Enemy extends CMover {
 		this._obj = new THREE.Mesh(new THREE.OctahedronGeometry(20, 1), material);
 		this._obj.castShadow = true;
 		this.shooter = new SingleShooter();
+
+		this.hitArea.push(new HitArea(20, 20, this.x, this.y))
+		this.hitAreaPos.push(new THREE.Vector2(0, 0));
 	}
 
 	public update(nowFrame) {
@@ -53,6 +59,10 @@ class Enemy extends CMover {
 		this.y += this.vy;
 
 		this.setPosition(this.x, this.y, this.z);
+
+		for (var i = 0; i < this.hitArea.length; i++) {
+			this.hitArea[i].update(this.x + this.hitAreaPos[i].x, this.y + this.hitAreaPos[i].y);
+		}
 
 		if (this.explosionObj != null) {
 			this.explosionObj.update(nowFrame);
@@ -103,7 +113,7 @@ class Enemy extends CMover {
 
 	//hit
 	public hit() {
-		if(this.receiveDamage == false) return
+		if (this.receiveDamage == false) return
 		var ma:any = this._obj.material
 		ma.color.setHex(0xFF0000);
 		setTimeout(()=> {

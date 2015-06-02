@@ -5,6 +5,9 @@ class MyShip extends CMover {
 
 	private explosionObj = null;
 
+	public hitArea:HitArea[] = new Array();
+	public hitAreaPos:THREE.Vector2[] = new Array();
+
 	constructor() {
 		super();
 		this.vy = -2;
@@ -20,13 +23,15 @@ class MyShip extends CMover {
 		//var ma:any = this._obj.material
 		//ma.color.setHex(0x0000FF);
 
-		console.log(this._obj.material)
+		this.hitArea.push(new HitArea(20, 20, this.x, this.y))
+		this.hitAreaPos.push(new THREE.Vector2(0, 0));
 	}
 
 	public update(nowFrame) {
-
 		this.setPosition(this.x, this.y, this.z);
-
+		for (var i = 0; i < this.hitArea.length; i++) {
+			this.hitArea[i].update(this.x + this.hitAreaPos[i].x, this.y + this.hitAreaPos[i].y);
+		}
 		if (this.explosionObj != null) {
 			this.explosionObj.update(nowFrame);
 			if (this.explosionObj.isFinished == true) {

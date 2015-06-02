@@ -114,16 +114,20 @@ class GameView extends CView {
 			for (var i = 0; i < enemies.length; i++) {
 				if (enemies[i].type == 1) {
 					var e = new Enemy(this.app.getCurrentFrame());
+					e.setPosition(enemies[i].x, enemies[i].y, this.zPosition)
+					this.addMover(e);
+					this.enemies.push(e);
 				} else if (enemies[i].type == 2) {
 					var e = new EnemyMid(this.app.getCurrentFrame());
+					e.setPosition(enemies[i].x, enemies[i].y, this.zPosition)
+					this.addMover(e);
+					this.enemies.push(e);
 				} else if (enemies[i].type == 3) {
-					var e = new EnemyBoss(this.app.getCurrentFrame());
+					var b = new EnemyBoss(this.app.getCurrentFrame());
+					b.setPosition(enemies[i].x, enemies[i].y, this.zPosition)
+					this.addMover(b);
+					this.enemies.push(b);
 				}
-				//e.x = enemies[i].x;
-				//e.y = enemies[i].y;
-				e.setPosition(enemies[i].x, enemies[i].y, this.zPosition)
-				this.addMover(e);
-				this.enemies.push(e);
 			}
 			this.nextActionNum++;
 		}

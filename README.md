@@ -1,6 +1,8 @@
 # three.js-game
 
-three.jsを使ったゲーム開発
+three.jsを使ったシューティングゲーム開発
+
+[http://verytired.github.io/three.js-game/app/index.html](http://verytired.github.io/three.js-game/app/index.html)
 
 #build setting
 

@@ -3,8 +3,6 @@
 
 class MyShip extends Mover {
 
-	private explosionObj = null;
-
 	constructor() {
 		super();
 		this.vy = -2;
@@ -26,22 +24,15 @@ class MyShip extends Mover {
 		for (var i = 0; i < this.hitArea.length; i++) {
 			this.hitArea[i].update(this.x + this.hitAreaPos[i].x, this.y + this.hitAreaPos[i].y);
 		}
-		if (this.explosionObj != null) {
-			this.explosionObj.update(nowFrame);
-			if (this.explosionObj.isFinished == true) {
-				var v = GameApp.getInstance().getCurrentView();
-				v.remove(this.explosionObj);
-				this.waitRemove = true;
-			}
-		}
 	}
 
 	public explode() {
+		this.waitRemove = true;
+
 		var v = GameApp.getInstance().getCurrentView();
-		v.remove(this._obj)
+		//v.remove(this._obj)
 		var ex = new Explosion(this.x, this.y, 0xFF0000);
-		v.add(ex.getObject());
-		this.explosionObj = ex;
+		v.addMover(ex);
 	}
 
 }

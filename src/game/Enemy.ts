@@ -15,7 +15,6 @@ class Enemy extends Mover {
 	private startFrame = 0;
 	public currentFrame = 0;
 
-	private explosionObj;//爆発オブジェクト格納
 	private shooter:Shooter;//弾発射オブジェクト
 
 	public baseColor = 0xFFFFFF;
@@ -62,14 +61,6 @@ class Enemy extends Mover {
 			this.hitArea[i].update(this.x + this.hitAreaPos[i].x, this.y + this.hitAreaPos[i].y);
 		}
 
-		if (this.explosionObj != null) {
-			this.explosionObj.update(nowFrame);
-			if (this.explosionObj.isFinished == true) {
-				var v = GameApp.getInstance().getCurrentView();
-				v.remove(this.explosionObj);
-				this.waitRemove = true;
-			}
-		}
 	}
 
 	/**
@@ -102,11 +93,12 @@ class Enemy extends Mover {
 	}
 
 	public explode() {
+		this.waitRemove = true;
+
 		var v = GameApp.getInstance().getCurrentView();
-		v.remove(this._obj)
+		//v.remove(this._obj)
 		var ex = new Explosion(this.x, this.y, 0xFFFFFFF);
-		v.add(ex.getObject());
-		this.explosionObj = ex;
+		v.addMover(ex);
 	}
 
 	//hit

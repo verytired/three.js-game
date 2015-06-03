@@ -18,7 +18,7 @@ class Explosion extends Mover {
 	zDir = 0;
 
 	private frameCount = 0;
-	private isFinished = false;
+	//private isFinished = false;
 
 	constructor(x, y, color) {
 		super();
@@ -75,7 +75,7 @@ class Explosion extends Mover {
 			this.frameCount++;
 			if (this.frameCount > 300) {
 				this.status = false;
-				this.isFinished = true;
+				this.waitRemove = true;
 			}
 			m.geometry.verticesNeedUpdate = true;
 		}

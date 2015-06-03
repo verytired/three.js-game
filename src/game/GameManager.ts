@@ -56,6 +56,7 @@ class GameManager {
 		directionalLight.position.set(0, -300, 300);
 		directionalLight.castShadow = true;
 		scene.add(directionalLight);
+			scene.fog = new THREE.Fog(0x000000, 480,640);
 
 		var axis = new THREE.AxisHelper(1000);
 		axis.position.set(0, 0, 0);

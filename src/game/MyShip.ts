@@ -1,7 +1,7 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
-/// <reference path="../framework/CMover.ts"/>
+/// <reference path="Mover.ts"/>
 
-class MyShip extends CMover {
+class MyShip extends Mover {
 
 	private explosionObj = null;
 

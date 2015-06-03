@@ -12,11 +12,7 @@ class CMover extends events.EventDispatcher implements IMover {
 
 	public _obj:THREE.Mesh;
 
-	public isDead:boolean = false;
 	public waitRemove:boolean = false;
-
-	public hitArea:HitArea[] = new Array();
-	public hitAreaPos:THREE.Vector2[] = new Array();
 
 	constructor() {
 		super()
@@ -40,20 +36,4 @@ class CMover extends events.EventDispatcher implements IMover {
 		this._obj.position.set(x, y, z);
 	}
 
-	public explode() {
-	}
-
-	public hitTest(hitAreaArray) {
-		for (var i = 0; i < this.hitArea.length; i++) {
-			for (var j = 0; j < hitAreaArray.length; j++) {
-				if (this.hitArea[i].hitTest(hitAreaArray[j]) == true) {
-					return true;
-				}
-				if (hitAreaArray[j].hitTest(this.hitArea[i]) == true) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 }

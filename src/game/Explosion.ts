@@ -1,12 +1,6 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
-/// <reference path="../framework/CMover.ts"/>
-
-class Explosion extends CMover {
-	public x = 0;
-	public y = 0;
-	z = 0;
-	public vx = 0;
-	public vy = 0;
+/// <reference path="Mover.ts"/>
+class Explosion extends Mover {
 
 	movementSpeed = 80;
 	totalObjects = 500;

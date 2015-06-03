@@ -1,13 +1,7 @@
 //弾クラス
+/// <reference path="Mover.ts"/>
 
-class Bullet extends CMover {
-
-	public x = 0;
-	public y = 0;
-	z = 0;
-
-	public vx = 0;
-	public vy = 0;
+class Bullet extends Mover {
 
 	private stageWidth = 0;
 	private stageHeight = 0;

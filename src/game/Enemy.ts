@@ -1,6 +1,7 @@
 //敵クラス
+/// <reference path="Mover.ts"/>
 
-class Enemy extends CMover {
+class Enemy extends Mover {
 
 	public id = 0;
 

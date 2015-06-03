@@ -6,10 +6,10 @@
 class GameView extends CView {
 
 	//Game Objects
-	private self:CMover;
+	private self:Mover;
 	private enemies:Enemy[] = new Array();
-	private enemyBullets:CMover[] = new Array();
-	private bullets:CMover[] = new Array();
+	private enemyBullets:Mover[] = new Array();
+	private bullets:Mover[] = new Array();
 	private bg:Stage;
 
 	private isKeyLock = false;

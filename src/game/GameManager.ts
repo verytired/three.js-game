@@ -6,6 +6,7 @@
 /// <reference path="../DefinitelyTyped/jquery/jquery.d.ts" />
 /// <reference path="MyShip.ts"/>
 /// <reference path="../framework/CView.ts"/>
+/// <reference path="../framework/GameApp.ts"/>
 /// <reference path="../framework/ControlManager.ts"/>
 /// <reference path="../DefinitelyTyped/stats/stats.d.ts" />
 
@@ -39,8 +40,6 @@ class GameManager {
 
 	public initialize() {
 
-		//this.app = GameApp.getInstance();
-
 		//canvas以外のdom
 		this.$viewScore = $("#score");
 		this.setScore(0);
@@ -49,13 +48,26 @@ class GameManager {
 		this.$viewDebug = $("#debug");
 		//this.$viewDebug.hide();
 
+		var app = GameApp.getInstance();
+		var scene = app.getScene();
+
+		//light
+		var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+		directionalLight.position.set(0, -300, 300);
+		directionalLight.castShadow = true;
+		scene.add(directionalLight);
+
+		var axis = new THREE.AxisHelper(1000);
+		axis.position.set(0, 0, 0);
+		scene.add(axis);
+
 		$.getJSON("data/scenedata.json", (data)=> {
 			//start point
 			this.sceneData = new SceneData(data);
 			//オブジェクト指向実装テスト
 			$("#view-top").show();
-			GameApp.getInstance().setView(new TopView());
-			GameApp.getInstance().start();
+			app.setView(new TopView());
+			app.start();
 		});
 
 		//this.setView(new TestGameView(data));

@@ -338,6 +338,153 @@ var ControlManager = (function (_super) {
     ControlManager._instance = null;
     return ControlManager;
 })(events.EventDispatcher);
+var GameApp = (function () {
+    function GameApp() {
+        this.stageWidth = 480;
+        this.stageHeight = 640;
+        this.isStop = false;
+        this.startTime = 0;
+        this.currentFrame = 0;
+        this.fps = 60.0;
+        this.frameLength = 60.0;
+        this.useControl = false;
+        if (GameApp._instance) {
+            throw new Error("must use the getInstance.");
+        }
+        GameApp._instance = this;
+        this.initialize();
+    }
+    GameApp.getInstance = function () {
+        if (GameApp._instance === null) {
+            GameApp._instance = new GameApp();
+        }
+        return GameApp._instance;
+    };
+    GameApp.prototype.initialize = function () {
+        var _this = this;
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+        this.camera.position.set(0, -300, 240);
+        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+        this.renderer = new THREE.WebGLRenderer();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setClearColor(0x000000);
+        var container = document.getElementById('container');
+        container.appendChild(this.renderer.domElement);
+        this.requestAnimationFrame = (function () {
+            return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
+                window.setTimeout(callback, 1000.0 / 60.0);
+            };
+        })();
+        var now = window.performance && (performance.now || performance.mozNow || performance.msNow || performance.oNow || performance.webkitNow);
+        this.getTime = function () {
+            return (now && now.call(performance)) || (new Date().getTime());
+        };
+        this.startTime = this.getTime();
+        window.addEventListener("keyup", function (e) {
+            var imgData, imgNode;
+            if (e.which !== 80)
+                return;
+            try {
+                imgData = _this.renderer.domElement.toDataURL();
+                console.log(imgData);
+            }
+            catch (e) {
+                console.log(e);
+                console.log("Browser does not support taking screenshot of 3d context");
+                return;
+            }
+        });
+        this.stats = new Stats();
+        this.stats.setMode(0);
+        this.stats.domElement.style.position = 'absolute';
+        this.stats.domElement.style.right = '0px';
+        this.stats.domElement.style.top = '0px';
+        document.body.appendChild(this.stats.domElement);
+        this.ua = "pc";
+        var ua = navigator.userAgent;
+        if (ua.indexOf('iPhone') > 0) {
+            this.ua = "ios";
+        }
+        else if (ua.indexOf('Android') > 0) {
+            this.ua = "android";
+        }
+        if (this.useControl == true) {
+            this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+            this.controls.addEventListener('change', function () {
+            });
+        }
+        var ctmanager = ControlManager.getInstance();
+        this.resize();
+        $(window).resize(function () {
+            _this.resize();
+            if (_this.currentView != undefined && _this.currentView != null) {
+                _this.currentView.resize();
+            }
+        });
+    };
+    GameApp.prototype.resize = function () {
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        this.renderer.setSize(w, h);
+        this.camera.aspect = w / h;
+    };
+    GameApp.prototype.update = function () {
+        if (this.useControl == true)
+            this.controls.update();
+        if (this.currentView && this.isStop == false) {
+            this.currentView.update(this.currentFrame);
+        }
+    };
+    GameApp.prototype.render = function () {
+        this.renderer.render(this.scene, this.camera);
+    };
+    GameApp.prototype.animate = function () {
+        var _this = this;
+        this.stats.begin();
+        this.update();
+        this.render();
+        this.stats.end();
+        requestAnimationFrame(function (e) {
+            _this.animate();
+        });
+        this.currentFrame++;
+    };
+    GameApp.prototype.setStartTime = function () {
+        this.startTime = this.getTime();
+        this.currentFrame = 0;
+    };
+    GameApp.prototype.setView = function (v) {
+        if (this.currentView) {
+            this.currentView.destructor();
+        }
+        this.currentView = v;
+        this.currentView.resize();
+    };
+    GameApp.prototype.getStageSize = function () {
+        return { width: this.stageWidth, height: this.stageHeight };
+    };
+    GameApp.prototype.getCurrentFrame = function () {
+        return this.currentFrame;
+    };
+    GameApp.prototype.getCurrentView = function () {
+        return this.currentView;
+    };
+    GameApp.prototype.getScene = function () {
+        return this.scene;
+    };
+    GameApp.prototype.getRenderer = function () {
+        return this.renderer;
+    };
+    GameApp.prototype.getCamera = function () {
+        return this.camera;
+    };
+    GameApp.prototype.start = function () {
+        this.animate();
+    };
+    GameApp._instance = null;
+    return GameApp;
+})();
 var GameManager = (function () {
     function GameManager() {
         this.isStop = false;
@@ -362,11 +509,20 @@ var GameManager = (function () {
         this.setScore(0);
         this.$viewScore.show();
         this.$viewDebug = $("#debug");
+        var app = GameApp.getInstance();
+        var scene = app.getScene();
+        var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+        directionalLight.position.set(0, -300, 300);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);
+        var axis = new THREE.AxisHelper(1000);
+        axis.position.set(0, 0, 0);
+        scene.add(axis);
         $.getJSON("data/scenedata.json", function (data) {
             _this.sceneData = new SceneData(data);
             $("#view-top").show();
-            GameApp.getInstance().setView(new TopView());
-            GameApp.getInstance().start();
+            app.setView(new TopView());
+            app.start();
         });
         this.resize();
     };
@@ -671,155 +827,6 @@ var SimplexNoise = (function () {
         return 32.0 * (n0 + n1 + n2 + n3);
     };
     return SimplexNoise;
-})();
-var GameApp = (function () {
-    function GameApp() {
-        this.stageWidth = 480;
-        this.stageHeight = 640;
-        this.isStop = false;
-        this.startTime = 0;
-        this.currentFrame = 0;
-        this.fps = 60.0;
-        this.frameLength = 60.0;
-        this.useControl = false;
-        if (GameApp._instance) {
-            throw new Error("must use the getInstance.");
-        }
-        GameApp._instance = this;
-        this.initialize();
-    }
-    GameApp.getInstance = function () {
-        if (GameApp._instance === null) {
-            GameApp._instance = new GameApp();
-        }
-        return GameApp._instance;
-    };
-    GameApp.prototype.initialize = function () {
-        var _this = this;
-        console.log("app initialize");
-        this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-        this.camera.position.set(0, -300, 240);
-        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
-        this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setClearColor(0x000000);
-        var container = document.getElementById('container');
-        container.appendChild(this.renderer.domElement);
-        var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
-        directionalLight.position.set(0, -300, 300);
-        directionalLight.castShadow = true;
-        this.scene.add(directionalLight);
-        this.requestAnimationFrame = (function () {
-            return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
-                window.setTimeout(callback, 1000.0 / 60.0);
-            };
-        })();
-        var now = window.performance && (performance.now || performance.mozNow || performance.msNow || performance.oNow || performance.webkitNow);
-        this.getTime = function () {
-            return (now && now.call(performance)) || (new Date().getTime());
-        };
-        this.startTime = this.getTime();
-        var axis = new THREE.AxisHelper(1000);
-        axis.position.set(0, 0, 0);
-        this.scene.add(axis);
-        window.addEventListener("keyup", function (e) {
-            var imgData, imgNode;
-            if (e.which !== 80)
-                return;
-            try {
-                imgData = _this.renderer.domElement.toDataURL();
-                console.log(imgData);
-            }
-            catch (e) {
-                console.log(e);
-                console.log("Browser does not support taking screenshot of 3d context");
-                return;
-            }
-        });
-        this.stats = new Stats();
-        this.stats.setMode(0);
-        this.stats.domElement.style.position = 'absolute';
-        this.stats.domElement.style.right = '0px';
-        this.stats.domElement.style.top = '0px';
-        document.body.appendChild(this.stats.domElement);
-        this.ua = "pc";
-        var ua = navigator.userAgent;
-        if (ua.indexOf('iPhone') > 0) {
-            this.ua = "ios";
-        }
-        else if (ua.indexOf('Android') > 0) {
-            this.ua = "android";
-        }
-        if (this.useControl == true) {
-            this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-            this.controls.addEventListener('change', function () {
-            });
-        }
-        var ctmanager = ControlManager.getInstance();
-        this.resize();
-        $(window).resize(function () {
-            _this.resize();
-            if (_this.currentView != undefined && _this.currentView != null) {
-                _this.currentView.resize();
-            }
-        });
-    };
-    GameApp.prototype.resize = function () {
-        var w = window.innerWidth;
-        var h = window.innerHeight;
-        this.renderer.setSize(w, h);
-        this.camera.aspect = w / h;
-    };
-    GameApp.prototype.update = function () {
-        if (this.useControl == true)
-            this.controls.update();
-        if (this.currentView && this.isStop == false) {
-            this.currentView.update(this.currentFrame);
-        }
-    };
-    GameApp.prototype.render = function () {
-        this.renderer.render(this.scene, this.camera);
-    };
-    GameApp.prototype.animate = function () {
-        var _this = this;
-        this.stats.begin();
-        this.update();
-        this.render();
-        this.stats.end();
-        requestAnimationFrame(function (e) {
-            _this.animate();
-        });
-        this.currentFrame++;
-    };
-    GameApp.prototype.setStartTime = function () {
-        this.startTime = this.getTime();
-        this.currentFrame = 0;
-    };
-    GameApp.prototype.getScene = function () {
-        return this.scene;
-    };
-    GameApp.prototype.setView = function (v) {
-        if (this.currentView) {
-            this.currentView.destructor();
-        }
-        this.currentView = v;
-        this.currentView.resize();
-    };
-    GameApp.prototype.getStageSize = function () {
-        return { width: this.stageWidth, height: this.stageHeight };
-    };
-    GameApp.prototype.getCurrentFrame = function () {
-        return this.currentFrame;
-    };
-    GameApp.prototype.getCurrentView = function () {
-        return this.currentView;
-    };
-    GameApp.prototype.start = function () {
-        this.animate();
-    };
-    GameApp._instance = null;
-    return GameApp;
 })();
 var Bullet = (function (_super) {
     __extends(Bullet, _super);

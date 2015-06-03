@@ -34,11 +34,23 @@ class Enemy extends Mover {
 
 	public initialize() {
 		this.vy = -6;
-		var material = new THREE.MeshBasicMaterial({
-			color: this.baseColor,
-			wireframe: true
-		});
-		this._obj.add(new THREE.Mesh(new THREE.OctahedronGeometry(20, 1), material))
+		//var material = new THREE.MeshBasicMaterial({
+		//	color: this.baseColor,
+		//	wireframe: true
+		//});
+		//this._obj.add(new THREE.Mesh(new THREE.OctahedronGeometry(20, 1), material))
+		var materials = [
+			new THREE.MeshLambertMaterial({
+				color: this.baseColor,
+			}),
+			new THREE.MeshBasicMaterial({
+				color: 0x000000,
+				wireframe: true,
+				transparent: true
+			})
+		];
+		this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.OctahedronGeometry(20, 1),materials);
+
 		this._obj.castShadow = true;
 		this.shooter = new SingleShooter();
 

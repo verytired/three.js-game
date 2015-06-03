@@ -80,6 +80,7 @@ class GameApp {
 	public initialize() {
 		console.log("app initialize");
 		this.scene = new THREE.Scene();
+
 		this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
 		this.camera.position.set(0, -300, 240);
 		this.camera.lookAt(new THREE.Vector3(0, 0, 0))
@@ -92,10 +93,12 @@ class GameApp {
 		var container = document.getElementById('container');
 		container.appendChild(this.renderer.domElement);
 
-		//var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
-		//directionalLight.position.set(0, 0, 300);
-		//directionalLight.castShadow = true;
-		//this.scene.add(directionalLight);
+		//light
+		//todo camera/renderer/lightなどはdefaultの設定は行うが別途設定可能ににする
+		var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+		directionalLight.position.set(0, -300, 300);
+		directionalLight.castShadow = true;
+		this.scene.add(directionalLight);
 
 		//タイマ管理設定
 		this.requestAnimationFrame = (function () {

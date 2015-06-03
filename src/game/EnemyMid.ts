@@ -7,11 +7,25 @@ class EnemyMid extends Enemy {
 	public initialize() {
 		this.vy = -4;
 
-		var material = new THREE.MeshBasicMaterial({
-			color: 0x00ff00,
-			wireframe: true
-		});
-		this._obj.add(new THREE.Mesh(new THREE.IcosahedronGeometry(40, 1), material));
+		//var material = new THREE.MeshBasicMaterial({
+		//	color: 0x00ff00,
+		//	wireframe: true
+		//});
+		//this._obj.add(new THREE.Mesh(new THREE.IcosahedronGeometry(40, 1), material));
+
+		this.baseColor = 0x00ff00;
+		var materials = [
+			new THREE.MeshLambertMaterial({
+				color: this.baseColor,
+			}),
+			new THREE.MeshBasicMaterial({
+				color: 0x000000,
+				wireframe: true,
+				transparent: true
+			})
+		];
+		this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.IcosahedronGeometry(40, 1),materials);
+
 		this._obj.castShadow = true;
 		this.setShooter(new SingleShooter());
 		this.setLife(30);

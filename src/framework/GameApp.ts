@@ -49,7 +49,7 @@ class GameApp {
 	private currentView:CView;
 
 	//stats用
-	public stats:Stats;
+	private stats:Stats;
 
 	//タイマー管理
 	private startTime = 0;
@@ -78,24 +78,23 @@ class GameApp {
 	}
 
 	public initialize() {
-		console.log("app initialize");
+
+		//scene default initialize
 		this.scene = new THREE.Scene();
+
+		//camera default initialize
 		this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
 		this.camera.position.set(0, -300, 240);
 		this.camera.lookAt(new THREE.Vector3(0, 0, 0))
-		this.renderer = new THREE.WebGLRenderer();
 
+		//renderer default initialize
+		this.renderer = new THREE.WebGLRenderer();
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.renderer.setClearColor(0x000000);
 		//this.renderer.shadowMapEnabled = true;
-
 		var container = document.getElementById('container');
 		container.appendChild(this.renderer.domElement);
 
-		//var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
-		//directionalLight.position.set(0, 0, 300);
-		//directionalLight.castShadow = true;
-		//this.scene.add(directionalLight);
 
 		//タイマ管理設定
 		this.requestAnimationFrame = (function () {
@@ -120,10 +119,6 @@ class GameApp {
 		}
 		this.startTime = this.getTime();
 
-		//座標軸
-		var axis = new THREE.AxisHelper(1000);
-		axis.position.set(0, 0, 0);
-		this.scene.add(axis);
 
 		/*** ADDING SCREEN SHOT ABILITY ***/
 		window.addEventListener("keyup", (e)=> {
@@ -218,10 +213,6 @@ class GameApp {
 		this.currentFrame = 0;
 	}
 
-	public getScene() {
-		return this.scene;
-	}
-
 	public setView(v:CView) {
 		if (this.currentView) {
 			this.currentView.destructor();
@@ -242,6 +233,18 @@ class GameApp {
 
 	public getCurrentView() {
 		return this.currentView;
+	}
+
+	public getScene(){
+		return this.scene;
+	}
+
+	public getRenderer(){
+		return this.renderer;
+	}
+
+	public getCamera(){
+		return this.camera;
 	}
 
 	public start() {

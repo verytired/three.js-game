@@ -1,6 +1,7 @@
 //敵クラス
+/// <reference path="Mover.ts"/>
 
-class Enemy extends CMover {
+class Enemy extends Mover {
 
 	public id = 0;
 
@@ -14,7 +15,6 @@ class Enemy extends CMover {
 	private startFrame = 0;
 	public currentFrame = 0;
 
-	private explosionObj;//爆発オブジェクト格納
 	private shooter:Shooter;//弾発射オブジェクト
 
 	public baseColor = 0xFFFFFF;
@@ -34,11 +34,23 @@ class Enemy extends CMover {
 
 	public initialize() {
 		this.vy = -6;
-		var material = new THREE.MeshBasicMaterial({
-			color: this.baseColor,
-			wireframe: true
-		});
-		this._obj = new THREE.Mesh(new THREE.OctahedronGeometry(20, 1), material);
+		//var material = new THREE.MeshBasicMaterial({
+		//	color: this.baseColor,
+		//	wireframe: true
+		//});
+		//this._obj.add(new THREE.Mesh(new THREE.OctahedronGeometry(20, 1), material))
+		var materials = [
+			new THREE.MeshLambertMaterial({
+				color: this.baseColor,
+			}),
+			new THREE.MeshBasicMaterial({
+				color: 0x000000,
+				wireframe: true,
+				transparent: true
+			})
+		];
+		this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.OctahedronGeometry(20, 1),materials);
+
 		this._obj.castShadow = true;
 		this.shooter = new SingleShooter();
 
@@ -61,14 +73,6 @@ class Enemy extends CMover {
 			this.hitArea[i].update(this.x + this.hitAreaPos[i].x, this.y + this.hitAreaPos[i].y);
 		}
 
-		if (this.explosionObj != null) {
-			this.explosionObj.update(nowFrame);
-			if (this.explosionObj.isFinished == true) {
-				var v = GameApp.getInstance().getCurrentView();
-				v.remove(this.explosionObj);
-				this.waitRemove = true;
-			}
-		}
 	}
 
 	/**
@@ -101,17 +105,19 @@ class Enemy extends CMover {
 	}
 
 	public explode() {
+		this.waitRemove = true;
+
 		var v = GameApp.getInstance().getCurrentView();
-		v.remove(this._obj)
+		//v.remove(this._obj)
 		var ex = new Explosion(this.x, this.y, 0xFFFFFFF);
-		v.add(ex.getParticles());
-		this.explosionObj = ex;
+		v.addMover(ex);
 	}
 
 	//hit
 	public hit() {
 		if (this.receiveDamage == false) return
-		var ma:any = this._obj.material
+		var msh:any = this._obj.children[0];
+		var ma = msh.material;
 		ma.color.setHex(0xFF0000);
 		setTimeout(()=> {
 			ma.color.setHex(this.baseColor);

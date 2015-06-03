@@ -1,18 +1,12 @@
 //弾クラス
+/// <reference path="Mover.ts"/>
 
-class Bullet extends CMover {
-
-	public x = 0;
-	public y = 0;
-	z = 0;
-
-	public vx = 0;
-	public vy = 0;
+class Bullet extends Mover {
 
 	private stageWidth = 0;
 	private stageHeight = 0;
 
-	constructor(vx,vy) {
+	constructor(vx, vy) {
 		super()
 
 		var s = GameApp.getInstance().getStageSize();
@@ -21,15 +15,16 @@ class Bullet extends CMover {
 
 		this.vx = vx;
 		this.vy = vy;
-		this._obj = new THREE.Mesh(
+
+		this._obj.add(new THREE.Mesh(
 			//球のジオメトリ　（半径：２００）
 			new THREE.SphereGeometry(5),
 			//マテリアル （材質）
 			new THREE.MeshBasicMaterial({
 				//色（１６進数）
 				color: 0xffffff,
-				wireframe:true
-			}));
+				wireframe: true
+			})));
 		//this._obj.position.set(0, 60, 50);
 		this._obj.castShadow = true;
 

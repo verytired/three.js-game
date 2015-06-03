@@ -16,7 +16,7 @@ class EnemyBoss extends Enemy {
 			wireframe: true
 		});
 
-		this._obj = new THREE.Mesh(new THREE.IcosahedronGeometry(120, 3), material);
+		this._obj.add(new THREE.Mesh(new THREE.IcosahedronGeometry(120, 3), material));
 		this._obj.castShadow = true;
 		this.setShooter(new SingleShooter());
 		this.setLife(10);

@@ -10,12 +10,13 @@ class CMover extends events.EventDispatcher implements IMover {
 	public vx = 0;
 	public vy = 0;
 
-	public _obj:THREE.Mesh;
+	public _obj:THREE.Object3D;
 
 	public waitRemove:boolean = false;
 
 	constructor() {
 		super()
+		this._obj = new THREE.Object3D();
 	}
 
 	public update(nowFrame) {

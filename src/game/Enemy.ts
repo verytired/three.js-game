@@ -39,7 +39,7 @@ class Enemy extends Mover {
 			color: this.baseColor,
 			wireframe: true
 		});
-		this._obj = new THREE.Mesh(new THREE.OctahedronGeometry(20, 1), material);
+		this._obj.add(new THREE.Mesh(new THREE.OctahedronGeometry(20, 1), material))
 		this._obj.castShadow = true;
 		this.shooter = new SingleShooter();
 
@@ -105,14 +105,15 @@ class Enemy extends Mover {
 		var v = GameApp.getInstance().getCurrentView();
 		v.remove(this._obj)
 		var ex = new Explosion(this.x, this.y, 0xFFFFFFF);
-		v.add(ex.getParticles());
+		v.add(ex.getObject());
 		this.explosionObj = ex;
 	}
 
 	//hit
 	public hit() {
 		if (this.receiveDamage == false) return
-		var ma:any = this._obj.material
+		var msh:any = this._obj.children[0];
+		var ma = msh.material;
 		ma.color.setHex(0xFF0000);
 		setTimeout(()=> {
 			ma.color.setHex(this.baseColor);

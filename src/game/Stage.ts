@@ -18,7 +18,7 @@ class Stage extends Mover{
 		//this._obj = new THREE.Mesh(pGeometry, pMaterial);
 		var geometry2 = new THREE.PlaneGeometry(480,1280, 48, 128);
 		var material2 = new THREE.MeshBasicMaterial({ color: 0x00FFFF, wireframe: true });
-		this._obj = new THREE.Mesh(geometry2, material2);
+		this._obj.add(new THREE.Mesh(geometry2, material2));
 
 		//var pn = new SimplexNoise();
 		//for (var i = 0; i < geometry2.vertices.length; i++) {

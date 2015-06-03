@@ -14,11 +14,8 @@ class MyShip extends Mover {
 			wireframe: true
 		});
 
-		this._obj = new THREE.Mesh(geometry, material);
+		this._obj.add(new THREE.Mesh(geometry, material));
 		this._obj.castShadow = true;
-
-		//var ma:any = this._obj.material
-		//ma.color.setHex(0x0000FF);
 
 		this.hitArea.push(new HitArea(20, 20, this.x, this.y))
 		this.hitAreaPos.push(new THREE.Vector2(0, 0));
@@ -43,7 +40,7 @@ class MyShip extends Mover {
 		var v = GameApp.getInstance().getCurrentView();
 		v.remove(this._obj)
 		var ex = new Explosion(this.x, this.y, 0xFF0000);
-		v.add(ex.getParticles());
+		v.add(ex.getObject());
 		this.explosionObj = ex;
 	}
 

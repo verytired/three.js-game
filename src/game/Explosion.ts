@@ -17,8 +17,8 @@ class Explosion extends Mover {
 	yDir = 0;
 	zDir = 0;
 
-	private _pc:THREE.PointCloud;
-	private particle;
+	private frameCount = 0;
+	private isFinished = false;
 
 	constructor(x, y, color) {
 		super();
@@ -49,7 +49,7 @@ class Explosion extends Mover {
 			transparent: true
 		});
 
-		this._pc = new THREE.PointCloud(particles, materialParticle);
+		this._obj.add(new THREE.PointCloud(particles, materialParticle));
 		this.status = true;
 		this.xDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
 		this.yDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
@@ -60,18 +60,14 @@ class Explosion extends Mover {
 
 	}
 
-	public getParticles() {
-		return this._pc;
-	}
-
-	private frameCount = 0;
-	private isFinished = false;
-
 	public update() {
+
 		if (this.status == true) {
+
+			var m:any = this._obj.children[0];
 			var pCount = this.totalObjects;
 			while (pCount--) {
-				var particle = this._pc.geometry.vertices[pCount]
+				var particle = m.geometry.vertices[pCount]
 				particle.y += this.dirs[pCount].y;
 				particle.x += this.dirs[pCount].x;
 				particle.z += this.dirs[pCount].z;
@@ -81,7 +77,7 @@ class Explosion extends Mover {
 				this.status = false;
 				this.isFinished = true;
 			}
-			this._pc.geometry.verticesNeedUpdate = true;
+			m.geometry.verticesNeedUpdate = true;
 		}
 	}
 

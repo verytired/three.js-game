@@ -1007,7 +1007,7 @@ var EnemyBoss = (function (_super) {
         this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.IcosahedronGeometry(120, 3), materials);
         this._obj.castShadow = true;
         this.setShooter(new SingleShooter());
-        this.setLife(10);
+        this.setLife(600);
         this.setLifeTime(-1);
         this.setBaseColor(0x00FF00);
         this.hitArea.push(new HitArea(120, 120, this.x, this.y));
@@ -1037,7 +1037,7 @@ var EnemyBoss = (function (_super) {
             }
             return;
         }
-        if (this.currentFrame == 90) {
+        if (this.currentFrame == 240) {
             this.vy = 0;
             this.vx = 2;
             this.isLoop = true;

@@ -33,7 +33,7 @@ class EnemyBoss extends Enemy {
 
 		this._obj.castShadow = true;
 		this.setShooter(new SingleShooter());
-		this.setLife(10);
+		this.setLife(600);
 		this.setLifeTime(-1);
 		this.setBaseColor(0x00FF00);
 
@@ -68,7 +68,7 @@ class EnemyBoss extends Enemy {
 			return
 		}
 
-		if (this.currentFrame == 90) {
+		if (this.currentFrame == 240) {
 			this.vy = 0;
 			this.vx = 2;
 			this.isLoop = true;

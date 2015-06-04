@@ -1,3 +1,5 @@
+//<reference path="NwayShooter.ts"/>
+
 class EnemyMid extends Enemy {
 
 	constructor(startframe) {
@@ -24,10 +26,11 @@ class EnemyMid extends Enemy {
 				transparent: true
 			})
 		];
-		this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.IcosahedronGeometry(40, 1),materials);
+		this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.IcosahedronGeometry(40, 1), materials);
 
 		this._obj.castShadow = true;
-		this.setShooter(new SingleShooter());
+		//this.setShooter(new NwayShooter());
+		this.shooter = new NwayShooter();
 		this.setLife(30);
 		this.setLifeTime(540);
 		this.setBaseColor(0x00FF00);
@@ -36,16 +39,25 @@ class EnemyMid extends Enemy {
 		this.hitAreaPos.push(new THREE.Vector2(0, 0));
 	}
 
+	public shot() {
+		if (this.isDead == true)return
+		this.shooter.shot(this.x, this.y, 8, 15, 3); //4way 弾丸角度間隔
+	}
+
 	public doAction() {
 		if (this.currentFrame == 70) {
 			this.vy = 0
 
-		} else if (this.currentFrame == 160) {
-			if (this.isShoted == true)return
-			this.isShoted = true;
-
+		} else if (this.currentFrame == 120) {
 			this.shot()
-		} else if (this.currentFrame == 200) {
+		} else if (this.currentFrame == 140) {
+			this.shot()
+		} else if (this.currentFrame == 160) {
+			this.shot()
+		} else if (this.currentFrame == 180) {
+			this.shot()
+		}
+		else if (this.currentFrame == 200) {
 			this.vy = 6
 		}
 

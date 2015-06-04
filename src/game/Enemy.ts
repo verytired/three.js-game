@@ -1,12 +1,10 @@
 //敵クラス
 /// <reference path="Mover.ts"/>
+/// <reference path="SingleShooter.ts"/>
 
 class Enemy extends Mover {
 
 	public id = 0;
-
-	private stageWidth = 0;
-	private stageHeight = 0;
 
 	private point = 150; //得点
 	public life = 1;//生存時間
@@ -15,20 +13,15 @@ class Enemy extends Mover {
 	private startFrame = 0;
 	public currentFrame = 0;
 
-	private shooter:Shooter;//弾発射オブジェクト
+	public shooter;//弾発射オブジェクト
 
 	public baseColor = 0xFFFFFF;
-
-	public isShoted = false;
 
 	public receiveDamage = true;
 
 	constructor(startframe) {
 		super();
 		this.startFrame = startframe;
-		var s = GameApp.getInstance().getStageSize();
-		this.stageWidth = s.width;
-		this.stageHeight = s.height;
 		this.initialize();
 	}
 
@@ -49,7 +42,7 @@ class Enemy extends Mover {
 				transparent: true
 			})
 		];
-		this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.OctahedronGeometry(20, 1),materials);
+		this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.OctahedronGeometry(20, 1), materials);
 
 		this._obj.castShadow = true;
 		this.shooter = new SingleShooter();
@@ -72,7 +65,6 @@ class Enemy extends Mover {
 		for (var i = 0; i < this.hitArea.length; i++) {
 			this.hitArea[i].update(this.x + this.hitAreaPos[i].x, this.y + this.hitAreaPos[i].y);
 		}
-
 	}
 
 	/**

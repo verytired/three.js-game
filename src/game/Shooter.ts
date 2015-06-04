@@ -1,3 +1,5 @@
+/// <reference path="Mover.ts"/>
+
 class Shooter {
 
 	private bullets:Mover[] = new Array();

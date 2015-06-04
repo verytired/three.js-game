@@ -4,20 +4,14 @@
 
 class Enemy extends Mover {
 
-	public id = 0;
-
 	private point = 150; //得点
 	public life = 1;//生存時間
 	public lifeTime = 500;//生存時間
-
-	private startFrame = 0;
-	public currentFrame = 0;
-
+	private startFrame = 0;//開始フレーム
+	public currentFrame = 0;//現在のフレーム
 	public shooter;//弾発射オブジェクト
-
-	public baseColor = 0xFFFFFF;
-
-	public receiveDamage = true;
+	public baseColor = 0xFFFFFF;//カラー
+	public receiveDamage = true;//ダメージ受付フラグ
 
 	constructor(startframe) {
 		super();
@@ -61,10 +55,6 @@ class Enemy extends Mover {
 		this.y += this.vy;
 
 		this.setPosition(this.x, this.y, this.z);
-
-		for (var i = 0; i < this.hitArea.length; i++) {
-			this.hitArea[i].update(this.x + this.hitAreaPos[i].x, this.y + this.hitAreaPos[i].y);
-		}
 	}
 
 	/**
@@ -98,10 +88,9 @@ class Enemy extends Mover {
 
 	public explode() {
 		this.waitRemove = true;
-
 		var v = GameApp.getInstance().getCurrentView();
 		//v.remove(this._obj)
-		var ex = new Explosion(this.x, this.y, 0xFFFFFFF);
+		var ex = new Explosion(this.x, this.y, this.baseColor);
 		v.addMover(ex);
 	}
 
@@ -119,6 +108,13 @@ class Enemy extends Mover {
 			this.isDead = true;
 			this.explode();
 		}
+	}
+
+	public setPosition(x, y, z) {
+		for (var i = 0; i < this.hitArea.length; i++) {
+			this.hitArea[i].update(x + this.hitAreaPos[i].x, y + this.hitAreaPos[i].y);
+		}
+		super.setPosition(x, y, z);
 	}
 
 	public getPoint() {

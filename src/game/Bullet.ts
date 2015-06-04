@@ -3,11 +3,11 @@
 
 class Bullet extends Mover {
 
-	private stageWidth = 0;
-	private stageHeight = 0;
+	private stageWidth = 0;//ステージ幅
+	private stageHeight = 0;//ステージ幅
 
 	constructor(vx, vy) {
-		super()
+		super();
 
 		var s = GameApp.getInstance().getStageSize();
 		this.stageWidth = s.width;
@@ -25,7 +25,7 @@ class Bullet extends Mover {
 				color: 0xffffff,
 				wireframe: true
 			})));
-		//this._obj.position.set(0, 60, 50);
+
 		this._obj.castShadow = true;
 
 		this.hitArea.push(new HitArea(10, 10, this.x, this.y))
@@ -35,17 +35,22 @@ class Bullet extends Mover {
 	public update() {
 		this.x += this.vx;
 		this.y += this.vy;
-		this.checkAreaTest()
-		this._obj.position.set(this.x, this.y, 50);
 
-		for (var i = 0; i < this.hitArea.length; i++) {
-			this.hitArea[i].update(this.x + this.hitAreaPos[i].x, this.y + this.hitAreaPos[i].y);
-		}
+		this.setPosition(this.x, this.y, this.z);
+		this.checkAreaTest();
 	}
 
 	public checkAreaTest() {
 		if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
 			this.isDead = true;
+			this.waitRemove = true;
 		}
+	}
+
+	public setPosition(x, y, z) {
+		for (var i = 0; i < this.hitArea.length; i++) {
+			this.hitArea[i].update(x + this.hitAreaPos[i].x, y + this.hitAreaPos[i].y);
+		}
+		super.setPosition(x, y, z);
 	}
 }

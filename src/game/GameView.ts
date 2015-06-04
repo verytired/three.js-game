@@ -156,7 +156,7 @@ class GameView extends CView {
 				this.bullets[i].waitRemove = true;
 			}
 			this.isInBossBattle = false
-			this.boss =null;
+			this.boss = null;
 			this.waitingRestart = true;
 			this.isKeyLock = true;
 			setTimeout(()=> {
@@ -174,7 +174,10 @@ class GameView extends CView {
 						this.bullets[i].isDead = true;
 						this.bullets[i].waitRemove = true;
 						this.enemies[j].hit();
-						this.gm.addScore(this.enemies[j].getPoint())
+						if (this.enemies[j].isDead == true) {
+							this.gm.addScore(this.enemies[j].getPoint());
+						}
+
 					}
 				}
 			}

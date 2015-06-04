@@ -581,16 +581,20 @@ var Bullet = (function (_super) {
     Bullet.prototype.update = function () {
         this.x += this.vx;
         this.y += this.vy;
+        this.setPosition(this.x, this.y, this.z);
         this.checkAreaTest();
-        this._obj.position.set(this.x, this.y, 50);
-        for (var i = 0; i < this.hitArea.length; i++) {
-            this.hitArea[i].update(this.x + this.hitAreaPos[i].x, this.y + this.hitAreaPos[i].y);
-        }
     };
     Bullet.prototype.checkAreaTest = function () {
         if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
             this.isDead = true;
+            this.waitRemove = true;
         }
+    };
+    Bullet.prototype.setPosition = function (x, y, z) {
+        for (var i = 0; i < this.hitArea.length; i++) {
+            this.hitArea[i].update(x + this.hitAreaPos[i].x, y + this.hitAreaPos[i].y);
+        }
+        _super.prototype.setPosition.call(this, x, y, z);
     };
     return Bullet;
 })(Mover);
@@ -627,7 +631,6 @@ var Enemy = (function (_super) {
     __extends(Enemy, _super);
     function Enemy(startframe) {
         _super.call(this);
-        this.id = 0;
         this.point = 150;
         this.life = 1;
         this.lifeTime = 500;
@@ -665,9 +668,6 @@ var Enemy = (function (_super) {
         this.x += this.vx;
         this.y += this.vy;
         this.setPosition(this.x, this.y, this.z);
-        for (var i = 0; i < this.hitArea.length; i++) {
-            this.hitArea[i].update(this.x + this.hitAreaPos[i].x, this.y + this.hitAreaPos[i].y);
-        }
     };
     Enemy.prototype.doAction = function () {
         if (this.currentFrame == 50) {
@@ -699,7 +699,7 @@ var Enemy = (function (_super) {
     Enemy.prototype.explode = function () {
         this.waitRemove = true;
         var v = GameApp.getInstance().getCurrentView();
-        var ex = new Explosion(this.x, this.y, 0xFFFFFFF);
+        var ex = new Explosion(this.x, this.y, this.baseColor);
         v.addMover(ex);
     };
     Enemy.prototype.hit = function () {
@@ -717,6 +717,12 @@ var Enemy = (function (_super) {
             this.isDead = true;
             this.explode();
         }
+    };
+    Enemy.prototype.setPosition = function (x, y, z) {
+        for (var i = 0; i < this.hitArea.length; i++) {
+            this.hitArea[i].update(x + this.hitAreaPos[i].x, y + this.hitAreaPos[i].y);
+        }
+        _super.prototype.setPosition.call(this, x, y, z);
     };
     Enemy.prototype.getPoint = function () {
         return this.point;
@@ -1386,7 +1392,9 @@ var GameView = (function (_super) {
                         this.bullets[i].isDead = true;
                         this.bullets[i].waitRemove = true;
                         this.enemies[j].hit();
-                        this.gm.addScore(this.enemies[j].getPoint());
+                        if (this.enemies[j].isDead == true) {
+                            this.gm.addScore(this.enemies[j].getPoint());
+                        }
                     }
                 }
             }
@@ -1481,12 +1489,17 @@ var GameView = (function (_super) {
 })(CView);
 var HitArea = (function () {
     function HitArea(w, h, x, y) {
+        this.positions = new Array();
         this.center = new THREE.Vector2(x, y);
         this.width = w;
         this.height = h;
     }
     HitArea.prototype.update = function (x, y) {
         this.center.set(x, y);
+        this.positions[0] = new THREE.Vector2(this.center.x - this.width / 2, this.center.y - this.height / 2);
+        this.positions[1] = new THREE.Vector2(this.center.x + this.width / 2, this.center.y - this.height / 2);
+        this.positions[2] = new THREE.Vector2(this.center.x - this.width / 2, this.center.y + this.height / 2);
+        this.positions[3] = new THREE.Vector2(this.center.x + this.width / 2, this.center.y + this.height / 2);
     };
     HitArea.prototype.hitTest = function (area) {
         var pos = area.getPositions();
@@ -1499,12 +1512,7 @@ var HitArea = (function () {
         return false;
     };
     HitArea.prototype.getPositions = function () {
-        var positions = new Array();
-        positions.push(new THREE.Vector2(this.center.x - this.width / 2, this.center.y - this.height / 2));
-        positions.push(new THREE.Vector2(this.center.x + this.width / 2, this.center.y - this.height / 2));
-        positions.push(new THREE.Vector2(this.center.x - this.width / 2, this.center.y + this.height / 2));
-        positions.push(new THREE.Vector2(this.center.x + this.width / 2, this.center.y + this.height / 2));
-        return positions;
+        return this.positions;
     };
     return HitArea;
 })();
@@ -1570,10 +1578,3 @@ var TopView = (function (_super) {
     };
     return TopView;
 })(CView);
-var TwoWayShooter = (function (_super) {
-    __extends(TwoWayShooter, _super);
-    function TwoWayShooter() {
-        _super.call(this);
-    }
-    return TwoWayShooter;
-})(Shooter);

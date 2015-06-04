@@ -36,9 +36,6 @@ class MyShip extends Mover {
 
 	public update(nowFrame) {
 		this.setPosition(this.x, this.y, this.z);
-		for (var i = 0; i < this.hitArea.length; i++) {
-			this.hitArea[i].update(this.x + this.hitAreaPos[i].x, this.y + this.hitAreaPos[i].y);
-		}
 	}
 
 	public explode() {
@@ -50,6 +47,12 @@ class MyShip extends Mover {
 		v.addMover(ex);
 	}
 
+	public setPosition(x, y, z) {
+		for (var i = 0; i < this.hitArea.length; i++) {
+			this.hitArea[i].update(x + this.hitAreaPos[i].x, y + this.hitAreaPos[i].y);
+		}
+		super.setPosition(x, y, z);
+	}
 }
 
 

@@ -1,6 +1,6 @@
 /// <reference path="../framework/GameApp.ts"/>
 
-class NwayShooter extends Shooter {
+class ShooterNway extends Shooter {
 
 	constructor() {
 		super();
@@ -13,12 +13,12 @@ class NwayShooter extends Shooter {
 		var startRad = baseForward - totalRad / 2;
 		var v = GameApp.getInstance().getCurrentView();
 
+		var z = GameManager.getInstance().zPosition;
 		for (var i = 0; i < nway; i++) {
 			var vx = Math.cos((startRad + durationRad * i) * (Math.PI / 180)) * speed;
 			var vy = Math.sin((startRad + durationRad * i) * (Math.PI / 180)) * speed;
-			var b = new Bullet(vx, vy);
-			b.x = x;
-			b.y = y;
+			var b = new BulletEnemy(vx, vy);
+			b.setPosition(x, y, z)
 			v.addMover(b);
 			this.getBullets().push(b);
 		}

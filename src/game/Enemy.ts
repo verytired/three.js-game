@@ -1,6 +1,6 @@
 //敵クラス
 /// <reference path="Mover.ts"/>
-/// <reference path="SingleShooter.ts"/>
+/// <reference path="ShooterSingle.ts"/>
 
 class Enemy extends Mover {
 

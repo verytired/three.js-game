@@ -1,4 +1,4 @@
-//<reference path="NwayShooter.ts"/>
+//<reference path="ShooterNway.ts"/>
 
 class EnemyMid extends Enemy {
 
@@ -29,8 +29,8 @@ class EnemyMid extends Enemy {
 		this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.IcosahedronGeometry(40, 1), materials);
 
 		this._obj.castShadow = true;
-		//this.setShooter(new NwayShooter());
-		this.shooter = new NwayShooter();
+		//this.setShooter(new ShooterNway());
+		this.shooter = new ShooterNway();
 		this.setLife(30);
 		this.setLifeTime(540);
 		this.setBaseColor(0x00FF00);

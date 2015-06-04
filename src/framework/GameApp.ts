@@ -88,7 +88,9 @@ class GameApp {
 		this.camera.lookAt(new THREE.Vector3(0, 0, 0))
 
 		//renderer default initialize
-		this.renderer = new THREE.WebGLRenderer();
+		this.renderer = new THREE.WebGLRenderer({
+			antialias : true
+		});
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.renderer.setClearColor(0x000000);
 		//this.renderer.shadowMapEnabled = true;

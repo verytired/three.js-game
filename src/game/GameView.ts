@@ -25,7 +25,7 @@ class GameView extends CView {
 	private boss;
 	private gm:GameManager;
 
-	private zPosition = 50;
+	private zPosition;
 
 	constructor() {
 		super();
@@ -43,6 +43,7 @@ class GameView extends CView {
 
 		this.gm = GameManager.getInstance();
 		this.sceneData = this.gm.getSceneData(0);
+		this.zPosition = this.gm.zPosition;
 
 		this.startGame();
 	}
@@ -268,7 +269,7 @@ class GameView extends CView {
 		this.addMover(this.bg);
 
 		this.self = new MyShip();
-		this.self.y = -150;
+		this.self.setPosition(0,300,0)
 		this.addMover(this.self);
 		this.gm.setSelfCharacter(this.self);
 		this.app.setStartTime();

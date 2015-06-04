@@ -11,7 +11,6 @@ class CView {
 	private cm:ControlManager;
 
 	constructor() {
-		this.getScene();
 		this.init();
 	}
 
@@ -22,6 +21,7 @@ class CView {
 
 	public init() {
 		this.app = GameApp.getInstance();
+		this.scene = this.app.getScene();
 		this.cm = ControlManager.getInstance();
 		this._keyEvent = (e)=> {
 			this.keyEvent(e);
@@ -75,11 +75,6 @@ class CView {
 		this.objs.splice(index, 1);
 		this.scene.remove(chara.getObject());
 		chara.remove();
-	}
-
-	private getScene() {
-		var app = GameApp.getInstance();
-		this.scene = app.getScene();
 	}
 
 	public removeAll() {

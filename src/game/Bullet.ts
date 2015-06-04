@@ -16,16 +16,29 @@ class Bullet extends Mover {
 		this.vx = vx;
 		this.vy = vy;
 
-		this._obj.add(new THREE.Mesh(
-			//球のジオメトリ　（半径：２００）
-			new THREE.SphereGeometry(5),
-			//マテリアル （材質）
-			new THREE.MeshBasicMaterial({
-				//色（１６進数）
-				color: 0xffffff,
-				wireframe: true
-			})));
+		//this._obj.add(new THREE.Mesh(
+		//	//球のジオメトリ　（半径：２００）
+		//	new THREE.SphereGeometry(5),
+		//	//マテリアル （材質）
+		//	new THREE.MeshBasicMaterial({
+		//		//色（１６進数）
+		//		color: 0xffffff,
+		//		wireframe: true
+		//	})));
 
+		var texture = new THREE.Texture(this.generateSprite())
+		texture.needsUpdate = true;
+		//Texture is not power of two. Texture.minFilter should be set to THREE.NearestFilter or THREE.LinearFilter.
+		texture.minFilter = THREE.LinearFilter;
+
+		var material = new THREE.SpriteMaterial({
+				map: texture,
+				blending: THREE.AdditiveBlending
+			}
+		)
+		var sp = new THREE.Sprite(material)
+		sp.scale.x = sp.scale.y = 64;
+		this._obj.add(sp)
 		this._obj.castShadow = true;
 
 		this.hitArea.push(new HitArea(10, 10, this.x, this.y))
@@ -53,4 +66,21 @@ class Bullet extends Mover {
 		}
 		super.setPosition(x, y, z);
 	}
+
+	public generateSprite() {
+		var canvas = document.createElement("canvas");
+		canvas.width = 100;
+		canvas.height = 100;
+		var context = canvas.getContext("2d");
+		var gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2,
+			canvas.width / 2);
+		gradient.addColorStop(0, "rgba(255,255,255,1)");
+		gradient.addColorStop(0.2, "rgba(0,255,255,1)");
+		gradient.addColorStop(0.4, "rgba(0,0,64,1)");
+		gradient.addColorStop(1, "rgba(0,0,0,1)");
+		context.fillStyle = gradient;
+		context.fillRect(0, 0, canvas.width, canvas.height);
+		return canvas
+	}
+
 }

@@ -16,6 +16,8 @@ class GameManager {
 
 	public isStop:boolean = false;
 	private score = 0;
+	public zPosition = 50;
+
 	private app:GameApp;
 	//dom
 	private $viewScore = null;
@@ -71,7 +73,6 @@ class GameManager {
 			app.start();
 		});
 
-		//this.setView(new TestGameView(data));
 		this.resize();
 	}
 

@@ -203,12 +203,12 @@ var MyShip = (function (_super) {
 var CView = (function () {
     function CView() {
         this.objs = new Array();
-        this.getScene();
         this.init();
     }
     CView.prototype.init = function () {
         var _this = this;
         this.app = GameApp.getInstance();
+        this.scene = this.app.getScene();
         this.cm = ControlManager.getInstance();
         this._keyEvent = function (e) {
             _this.keyEvent(e);
@@ -256,10 +256,6 @@ var CView = (function () {
         this.objs.splice(index, 1);
         this.scene.remove(chara.getObject());
         chara.remove();
-    };
-    CView.prototype.getScene = function () {
-        var app = GameApp.getInstance();
-        this.scene = app.getScene();
     };
     CView.prototype.removeAll = function () {
         for (var i = 0; i < this.objs.length; i++) {
@@ -369,7 +365,9 @@ var GameApp = (function () {
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
         this.camera.position.set(0, -300, 240);
         this.camera.lookAt(new THREE.Vector3(0, 0, 0));
-        this.renderer = new THREE.WebGLRenderer();
+        this.renderer = new THREE.WebGLRenderer({
+            antialias: true
+        });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setClearColor(0x000000);
         var container = document.getElementById('container');
@@ -492,6 +490,7 @@ var GameManager = (function () {
     function GameManager() {
         this.isStop = false;
         this.score = 0;
+        this.zPosition = 50;
         this.$viewScore = null;
         this.$viewDebug = null;
         this.overlay = ["#view-top", "#view-gameover", "#view-stageclear"];
@@ -843,10 +842,16 @@ var Bullet = (function (_super) {
         this.stageHeight = s.height;
         this.vx = vx;
         this.vy = vy;
-        this._obj.add(new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            wireframe: true
-        })));
+        var texture = new THREE.Texture(this.generateSprite());
+        texture.needsUpdate = true;
+        texture.minFilter = THREE.LinearFilter;
+        var material = new THREE.SpriteMaterial({
+            map: texture,
+            blending: THREE.AdditiveBlending
+        });
+        var sp = new THREE.Sprite(material);
+        sp.scale.x = sp.scale.y = 64;
+        this._obj.add(sp);
         this._obj.castShadow = true;
         this.hitArea.push(new HitArea(10, 10, this.x, this.y));
         this.hitAreaPos.push(new THREE.Vector2(0, 0));
@@ -869,8 +874,43 @@ var Bullet = (function (_super) {
         }
         _super.prototype.setPosition.call(this, x, y, z);
     };
+    Bullet.prototype.generateSprite = function () {
+        var canvas = document.createElement("canvas");
+        canvas.width = 100;
+        canvas.height = 100;
+        var context = canvas.getContext("2d");
+        var gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
+        gradient.addColorStop(0, "rgba(255,255,255,1)");
+        gradient.addColorStop(0.2, "rgba(0,255,255,1)");
+        gradient.addColorStop(0.4, "rgba(0,0,64,1)");
+        gradient.addColorStop(1, "rgba(0,0,0,1)");
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        return canvas;
+    };
     return Bullet;
 })(Mover);
+var BulletEnemy = (function (_super) {
+    __extends(BulletEnemy, _super);
+    function BulletEnemy(vx, vy) {
+        _super.call(this, vx, vy);
+    }
+    BulletEnemy.prototype.generateSprite = function () {
+        var canvas = document.createElement("canvas");
+        canvas.width = 100;
+        canvas.height = 100;
+        var context = canvas.getContext("2d");
+        var gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
+        gradient.addColorStop(0, "rgba(255,255,255,1)");
+        gradient.addColorStop(0.2, "rgba(255,0,255,1)");
+        gradient.addColorStop(0.4, "rgba(64,0,0,1)");
+        gradient.addColorStop(1, "rgba(0,0,0,1)");
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        return canvas;
+    };
+    return BulletEnemy;
+})(Bullet);
 var Shooter = (function () {
     function Shooter() {
         this.bullets = new Array();
@@ -881,10 +921,10 @@ var Shooter = (function () {
         }
     };
     Shooter.prototype.shot = function (x, y, vx, vy) {
-        var b = new Bullet(vx, vy);
-        b.x = x;
-        b.y = y;
+        var b = new BulletEnemy(vx, vy);
         var v = GameApp.getInstance().getCurrentView();
+        var z = GameManager.getInstance().zPosition;
+        b.setPosition(x, y, z);
         v.addMover(b);
         this.bullets.push(b);
     };
@@ -1098,7 +1138,7 @@ var EnemyMid = (function (_super) {
         ];
         this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.IcosahedronGeometry(40, 1), materials);
         this._obj.castShadow = true;
-        this.shooter = new NwayShooter();
+        this.shooter = new ShooterNway();
         this.setLife(30);
         this.setLifeTime(540);
         this.setBaseColor(0x00FF00);
@@ -1270,7 +1310,6 @@ var GameView = (function (_super) {
         this.nextActionFrame = 0;
         this.nextActionNum = 0;
         this.isInBossBattle = false;
-        this.zPosition = 50;
     }
     GameView.prototype.init = function () {
         _super.prototype.init.call(this);
@@ -1280,6 +1319,7 @@ var GameView = (function (_super) {
         this.nextActionNum = 0;
         this.gm = GameManager.getInstance();
         this.sceneData = this.gm.getSceneData(0);
+        this.zPosition = this.gm.zPosition;
         this.startGame();
     };
     GameView.prototype.keyEvent = function (e) {
@@ -1470,7 +1510,7 @@ var GameView = (function (_super) {
         this.bg.init();
         this.addMover(this.bg);
         this.self = new MyShip();
-        this.self.y = -150;
+        this.self.setPosition(0, 300, 0);
         this.addMover(this.self);
         this.gm.setSelfCharacter(this.self);
         this.app.setStartTime();
@@ -1519,31 +1559,6 @@ var HitArea = (function () {
     };
     return HitArea;
 })();
-var NwayShooter = (function (_super) {
-    __extends(NwayShooter, _super);
-    function NwayShooter() {
-        _super.call(this);
-    }
-    NwayShooter.prototype.shot = function (x, y, nway, durationRad, speed) {
-        if (speed === void 0) { speed = 5; }
-        if (nway <= 1)
-            return;
-        var baseForward = 270;
-        var totalRad = durationRad * (nway - 1);
-        var startRad = baseForward - totalRad / 2;
-        var v = GameApp.getInstance().getCurrentView();
-        for (var i = 0; i < nway; i++) {
-            var vx = Math.cos((startRad + durationRad * i) * (Math.PI / 180)) * speed;
-            var vy = Math.sin((startRad + durationRad * i) * (Math.PI / 180)) * speed;
-            var b = new Bullet(vx, vy);
-            b.x = x;
-            b.y = y;
-            v.addMover(b);
-            this.getBullets().push(b);
-        }
-    };
-    return NwayShooter;
-})(Shooter);
 var SceneData = (function () {
     function SceneData(data) {
         this._data = data;
@@ -1553,6 +1568,31 @@ var SceneData = (function () {
     };
     return SceneData;
 })();
+var ShooterNway = (function (_super) {
+    __extends(ShooterNway, _super);
+    function ShooterNway() {
+        _super.call(this);
+    }
+    ShooterNway.prototype.shot = function (x, y, nway, durationRad, speed) {
+        if (speed === void 0) { speed = 5; }
+        if (nway <= 1)
+            return;
+        var baseForward = 270;
+        var totalRad = durationRad * (nway - 1);
+        var startRad = baseForward - totalRad / 2;
+        var v = GameApp.getInstance().getCurrentView();
+        var z = GameManager.getInstance().zPosition;
+        for (var i = 0; i < nway; i++) {
+            var vx = Math.cos((startRad + durationRad * i) * (Math.PI / 180)) * speed;
+            var vy = Math.sin((startRad + durationRad * i) * (Math.PI / 180)) * speed;
+            var b = new BulletEnemy(vx, vy);
+            b.setPosition(x, y, z);
+            v.addMover(b);
+            this.getBullets().push(b);
+        }
+    };
+    return ShooterNway;
+})(Shooter);
 var TopView = (function (_super) {
     __extends(TopView, _super);
     function TopView() {

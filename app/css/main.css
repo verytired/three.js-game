@@ -42,4 +42,15 @@ body {
 	position:absolute;
 	left:0px;
 	bottom:0px;
+	font-size:36px;
+	color:#ffffff;
+}
+
+#overlay{
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:100%;
+	height:100%;
+	background-color:rgba(0,0,0,0.4);
 }

@@ -58,7 +58,7 @@ class CView {
 		}
 	}
 
-	public add(obj) {
+	public add(obj:THREE.Object3D) {
 		this.scene.add(obj);
 	}
 

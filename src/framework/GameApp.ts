@@ -60,7 +60,7 @@ class GameApp {
 	private frameLength = 60.0;
 
 	public ua;
-	private useControl = false;
+	private useControl = true;
 
 	constructor() {
 		if (GameApp._instance) {
@@ -83,7 +83,9 @@ class GameApp {
 		this.scene = new THREE.Scene();
 
 		//camera default initialize
-		this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+		//this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+		this.camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+
 		this.camera.position.set(0, -300, 240);
 		this.camera.lookAt(new THREE.Vector3(0, 0, 0))
 
@@ -92,7 +94,8 @@ class GameApp {
 			antialias : true
 		});
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		this.renderer.setClearColor(0x000000);
+		this.renderer.setPixelRatio( window.devicePixelRatio );
+		//this.renderer.setClearColor(0x000000);
 		//this.renderer.shadowMapEnabled = true;
 		var container = document.getElementById('container');
 		container.appendChild(this.renderer.domElement);

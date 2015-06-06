@@ -45,6 +45,27 @@ class GameView extends CView {
 		this.sceneData = this.gm.getSceneData(0);
 		this.zPosition = this.gm.zPosition;
 
+		//todo skybox
+		var path = "image/skybox/";
+		var format = '.jpg';
+		var urls = [
+			path + 'px' + format, path + 'nx' + format,
+			path + 'py' + format, path + 'ny' + format,
+			path + 'pz' + format, path + 'nz' + format
+		];
+		var textureCube = THREE.ImageUtils.loadTextureCube(urls, THREE.CubeRefractionMapping);
+		var shader = THREE.ShaderLib["cube"];
+		shader.uniforms["tCube"].value = textureCube;
+		var material = new THREE.ShaderMaterial({
+			fragmentShader: shader.fragmentShader,
+			vertexShader: shader.vertexShader,
+			uniforms: shader.uniforms,
+			depthWrite: false,
+			side: THREE.BackSide
+		})
+		var mesh = new THREE.Mesh(new THREE.BoxGeometry(10000,10000,10000), material);
+		this.add(mesh);
+
 		this.startGame();
 	}
 
@@ -269,7 +290,7 @@ class GameView extends CView {
 		this.addMover(this.bg);
 
 		this.self = new MyShip();
-		this.self.setPosition(0,300,0)
+		this.self.setPosition(0, 300, 0)
 		this.addMover(this.self);
 		this.gm.setSelfCharacter(this.self);
 		this.app.setStartTime();

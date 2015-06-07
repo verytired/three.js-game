@@ -11,9 +11,9 @@ class GameView extends CView {
 	private enemyBullets:Mover[] = new Array();
 	private bullets:Mover[] = new Array();
 	private bg:Stage;
+    private skybox;
 
 	private isKeyLock = false;
-
 	private waitingRestart = false;
 	private timerId = 0;
 
@@ -34,37 +34,32 @@ class GameView extends CView {
 	public init() {
 		super.init();
 
-		//create background
-		this.bg = new Stage();
-		this.bg.init();
-		this.addMover(this.bg);
+        //skybox
+        var path = "image/skybox/";
+        var format = '.jpg';
+        var urls = [
+            path + 'px' + format, path + 'nx' + format,
+            path + 'py' + format, path + 'ny' + format,
+            path + 'pz' + format, path + 'nz' + format
+        ];
+        var textureCube = THREE.ImageUtils.loadTextureCube(urls, THREE.CubeRefractionMapping);
+        var shader = THREE.ShaderLib["cube"];
+        shader.uniforms["tCube"].value = textureCube;
+        var material = new THREE.ShaderMaterial({
+            fragmentShader: shader.fragmentShader,
+            vertexShader: shader.vertexShader,
+            uniforms: shader.uniforms,
+            depthWrite: false,
+            side: THREE.BackSide
+        })
+        this.skybox = new THREE.Mesh(new THREE.BoxGeometry(10000,10000,10000), material);
+        this.add(this.skybox);
 
 		this.nextActionNum = 0;
 
 		this.gm = GameManager.getInstance();
 		this.sceneData = this.gm.getSceneData(0);
 		this.zPosition = this.gm.zPosition;
-
-		//todo skybox
-		var path = "image/skybox/";
-		var format = '.jpg';
-		var urls = [
-			path + 'px' + format, path + 'nx' + format,
-			path + 'py' + format, path + 'ny' + format,
-			path + 'pz' + format, path + 'nz' + format
-		];
-		var textureCube = THREE.ImageUtils.loadTextureCube(urls, THREE.CubeRefractionMapping);
-		var shader = THREE.ShaderLib["cube"];
-		shader.uniforms["tCube"].value = textureCube;
-		var material = new THREE.ShaderMaterial({
-			fragmentShader: shader.fragmentShader,
-			vertexShader: shader.vertexShader,
-			uniforms: shader.uniforms,
-			depthWrite: false,
-			side: THREE.BackSide
-		})
-		var mesh = new THREE.Mesh(new THREE.BoxGeometry(10000,10000,10000), material);
-		this.add(mesh);
 
 		this.startGame();
 	}
@@ -163,9 +158,13 @@ class GameView extends CView {
 			}
 			this.nextActionNum++;
 		}
+
 		this.hitTest();
 		this.checkLiveTest();
-		super.update(this.app.getCurrentFrame());
+		super.update(currentFrame);
+
+        if(this.skybox)this.skybox.rotation.y +=0.01;
+
 	}
 
 	/**
@@ -285,12 +284,13 @@ class GameView extends CView {
 		$("#view-gameover").hide();
 		$("#view-stageclear").hide();
 		$("#overlay").hide();
+
 		this.bg = new Stage();
 		this.bg.init();
 		this.addMover(this.bg);
 
 		this.self = new MyShip();
-		this.self.setPosition(0, 300, 0)
+		this.self.setPosition(0, -300, 0)
 		this.addMover(this.self);
 		this.gm.setSelfCharacter(this.self);
 		this.app.setStartTime();

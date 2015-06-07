@@ -94,9 +94,11 @@ class GameApp {
 			antialias : true
 		});
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		this.renderer.setPixelRatio( window.devicePixelRatio );
+		//setPixelRatioを設定すると重くなる
+		//this.renderer.setPixelRatio( window.devicePixelRatio );
 		//this.renderer.setClearColor(0x000000);
 		//this.renderer.shadowMapEnabled = true;
+
 		var container = document.getElementById('container');
 		container.appendChild(this.renderer.domElement);
 

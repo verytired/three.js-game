@@ -369,7 +369,6 @@ var GameApp = (function () {
             antialias: true
         });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(window.devicePixelRatio);
         var container = document.getElementById('container');
         container.appendChild(this.renderer.domElement);
         this.requestAnimationFrame = (function () {
@@ -1312,13 +1311,6 @@ var GameView = (function (_super) {
     }
     GameView.prototype.init = function () {
         _super.prototype.init.call(this);
-        this.bg = new Stage();
-        this.bg.init();
-        this.addMover(this.bg);
-        this.nextActionNum = 0;
-        this.gm = GameManager.getInstance();
-        this.sceneData = this.gm.getSceneData(0);
-        this.zPosition = this.gm.zPosition;
         var path = "image/skybox/";
         var format = '.jpg';
         var urls = [
@@ -1339,8 +1331,12 @@ var GameView = (function (_super) {
             depthWrite: false,
             side: THREE.BackSide
         });
-        var mesh = new THREE.Mesh(new THREE.BoxGeometry(10000, 10000, 10000), material);
-        this.add(mesh);
+        this.skybox = new THREE.Mesh(new THREE.BoxGeometry(10000, 10000, 10000), material);
+        this.add(this.skybox);
+        this.nextActionNum = 0;
+        this.gm = GameManager.getInstance();
+        this.sceneData = this.gm.getSceneData(0);
+        this.zPosition = this.gm.zPosition;
         this.startGame();
     };
     GameView.prototype.keyEvent = function (e) {
@@ -1431,7 +1427,9 @@ var GameView = (function (_super) {
         }
         this.hitTest();
         this.checkLiveTest();
-        _super.prototype.update.call(this, this.app.getCurrentFrame());
+        _super.prototype.update.call(this, currentFrame);
+        if (this.skybox)
+            this.skybox.rotation.y += 0.01;
     };
     GameView.prototype.hitTest = function () {
         var _this = this;
@@ -1531,7 +1529,7 @@ var GameView = (function (_super) {
         this.bg.init();
         this.addMover(this.bg);
         this.self = new MyShip();
-        this.self.setPosition(0, 300, 0);
+        this.self.setPosition(0, -300, 0);
         this.addMover(this.self);
         this.gm.setSelfCharacter(this.self);
         this.app.setStartTime();

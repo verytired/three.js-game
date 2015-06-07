@@ -20,8 +20,8 @@ class GameManager {
 
 	private app:GameApp;
 	//dom
-	private $viewScore = null;
-	private $viewDebug = null;
+	private $viewScore:any = null;
+	private $viewDebug:any = null;
 
 	private sceneData:SceneData;
 	private overlay:String[] = ["#view-top", "#view-gameover", "#view-stageclear"];

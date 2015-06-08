@@ -6,7 +6,7 @@ class TopView extends CView {
 		//this.resize();
 
 		//todo test 2d
-		THREE.ImageUtils.loadTexture("image/ui/title.png", {},  (texture)=> {
+		THREE.ImageUtils.loadTexture("image/ui/title.png", undefined,  (texture)=> {
 			texture.minFilter = THREE.NearestFilter;
 			var material = new THREE.SpriteMaterial({map: texture, color: 0xFFFFFF});
 			var w = texture.image.width, h = texture.image.height;
@@ -17,7 +17,7 @@ class TopView extends CView {
 			sprite.scale.y = h
 			this.add2d(sprite);
 		})
-		THREE.ImageUtils.loadTexture("image/ui/press_space.png", {},  (texture)=> {
+		THREE.ImageUtils.loadTexture("image/ui/press_space.png", undefined,  (texture)=> {
 			texture.minFilter = THREE.NearestFilter;
 			var material = new THREE.SpriteMaterial({map: texture, color: 0xFFFFFF});
 			var w = texture.image.width, h = texture.image.height;

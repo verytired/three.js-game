@@ -10,16 +10,12 @@ class CView {
 	public app:GameApp;
 	private cm:ControlManager;
 
-	constructor() {
-		this.init();
-	}
-
 	private _keyEvent:Function;
 	private _onMouseDown:Function;
 	private _onMouseMove:Function;
 	private _onMouseUp:Function;
 
-	public init() {
+	constructor() {
 		this.app = GameApp.getInstance();
 		this.scene = this.app.getScene();
 		this.cm = ControlManager.getInstance();
@@ -86,15 +82,11 @@ class CView {
 
 	public resize(){}
 
-	public keyEvent(e:any) {
-	}
+	public keyEvent(e:any) {}
 
-	public onMouseDown(e:any) {
-	}
+	public onMouseDown(e:any) {}
 
-	public onMouseMove(e:any) {
-	}
+	public onMouseMove(e:any) {}
 
-	public onMouseUp(e:any) {
-	}
+	public onMouseUp(e:any) {}
 }

@@ -1,7 +1,3 @@
-//GameManager
-//theee.jsのカメラやレンダリングなどを管理する
-
-//定義ファイル
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
 /// <reference path="../DefinitelyTyped/jquery/jquery.d.ts" />
 /// <reference path="MyShip.ts"/>

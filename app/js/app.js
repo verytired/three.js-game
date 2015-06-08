@@ -202,11 +202,8 @@ var MyShip = (function (_super) {
 })(Mover);
 var CView = (function () {
     function CView() {
-        this.objs = new Array();
-        this.init();
-    }
-    CView.prototype.init = function () {
         var _this = this;
+        this.objs = new Array();
         this.app = GameApp.getInstance();
         this.scene = this.app.getScene();
         this.cm = ControlManager.getInstance();
@@ -226,7 +223,7 @@ var CView = (function () {
         this.cm.addEventListener("onMouseDown", this._onMouseDown);
         this.cm.addEventListener("onMouseMove", this._onMouseMove);
         this.cm.addEventListener("onMouseUp", this._onMouseUp);
-    };
+    }
     CView.prototype.destructor = function () {
         this.removeAll();
         this.cm.removeEventListener("onKeyPress", this._keyEvent);
@@ -1309,40 +1306,13 @@ var GameView = (function (_super) {
         this.nextActionFrame = 0;
         this.nextActionNum = 0;
         this.isInBossBattle = false;
-    }
-    GameView.prototype.init = function () {
-        _super.prototype.init.call(this);
-        this.bg = new Stage();
-        this.bg.init();
-        this.addMover(this.bg);
+        this.hitTestObjects = new Array();
         this.nextActionNum = 0;
         this.gm = GameManager.getInstance();
         this.sceneData = this.gm.getSceneData(0);
         this.zPosition = this.gm.zPosition;
-        var path = "image/skybox/";
-        var format = '.jpg';
-        var urls = [
-            path + 'px' + format,
-            path + 'nx' + format,
-            path + 'py' + format,
-            path + 'ny' + format,
-            path + 'pz' + format,
-            path + 'nz' + format
-        ];
-        var textureCube = THREE.ImageUtils.loadTextureCube(urls, THREE.CubeRefractionMapping);
-        var shader = THREE.ShaderLib["cube"];
-        shader.uniforms["tCube"].value = textureCube;
-        var material = new THREE.ShaderMaterial({
-            fragmentShader: shader.fragmentShader,
-            vertexShader: shader.vertexShader,
-            uniforms: shader.uniforms,
-            depthWrite: false,
-            side: THREE.BackSide
-        });
-        var mesh = new THREE.Mesh(new THREE.BoxGeometry(10000, 10000, 10000), material);
-        this.add(mesh);
         this.startGame();
-    };
+    }
     GameView.prototype.keyEvent = function (e) {
         if (this.isKeyLock == true) {
             return;
@@ -1375,15 +1345,14 @@ var GameView = (function (_super) {
     GameView.prototype.onMouseDown = function (e) {
     };
     GameView.prototype.onMouseMove = function (e) {
-        var nowX = e.data.x;
-        var nowY = e.data.y;
-        if (this.app.ua != "pc") {
-            nowX = e.data.touches[0].clientX;
-            nowY = e.data.touches[0].clientY;
+        var mouse = new THREE.Vector2();
+        mouse.set((e.data.x / window.innerWidth) * 2 - 1, -(e.data.y / window.innerHeight) * 2 + 1);
+        this.raycaster.setFromCamera(mouse, this.app.getCamera());
+        var intersects = this.raycaster.intersectObjects(this.hitTestObjects);
+        if (intersects.length > 0) {
+            var intersect = intersects[0];
+            this.self.setPosition(intersect.point.x, intersect.point.y, this.zPosition);
         }
-        var w = window.innerWidth;
-        var h = window.innerHeight;
-        this.self.setPosition(-240 + 480 * nowX / w, 320 - 640 * nowY / h, this.zPosition);
     };
     GameView.prototype.onMouseUp = function (e) {
         if (this.isKeyLock == true) {
@@ -1535,6 +1504,35 @@ var GameView = (function (_super) {
         this.addMover(this.self);
         this.gm.setSelfCharacter(this.self);
         this.app.setStartTime();
+        var path = "image/skybox/";
+        var format = '.jpg';
+        var urls = [
+            path + 'px' + format,
+            path + 'nx' + format,
+            path + 'py' + format,
+            path + 'ny' + format,
+            path + 'pz' + format,
+            path + 'nz' + format
+        ];
+        var textureCube = THREE.ImageUtils.loadTextureCube(urls, THREE.CubeRefractionMapping);
+        var shader = THREE.ShaderLib["cube"];
+        shader.uniforms["tCube"].value = textureCube;
+        var material = new THREE.ShaderMaterial({
+            fragmentShader: shader.fragmentShader,
+            vertexShader: shader.vertexShader,
+            uniforms: shader.uniforms,
+            depthWrite: false,
+            side: THREE.BackSide
+        });
+        var mesh = new THREE.Mesh(new THREE.BoxGeometry(10000, 10000, 10000), material);
+        this.add(mesh);
+        this.raycaster = new THREE.Raycaster();
+        var geometry = new THREE.PlaneBufferGeometry(480, 640);
+        var material2 = new THREE.MeshBasicMaterial({ color: 0xFF0000, wireframe: false });
+        var plane = new THREE.Mesh(geometry, material2);
+        plane.visible = false;
+        this.add(plane);
+        this.hitTestObjects.push(plane);
     };
     GameView.prototype.restart = function () {
         this.waitingRestart = false;

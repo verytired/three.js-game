@@ -2,12 +2,7 @@ class TopView extends CView {
 
 	constructor() {
 		super();
-	}
-
-	public init() {
-		super.init();
 		$("#view-top").show();
-
 		this.resize();
 	}
 

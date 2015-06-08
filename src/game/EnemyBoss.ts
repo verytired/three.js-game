@@ -68,7 +68,7 @@ class EnemyBoss extends Enemy {
 			return
 		}
 
-		if (this.currentFrame == 240) {
+		if (this.currentFrame => 240) {
 			this.vy = 0;
 			this.vx = 2;
 			this.isLoop = true;

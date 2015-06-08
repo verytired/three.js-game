@@ -6,7 +6,7 @@
 //theee.jsのカメラやレンダリングなどを管理する
 
 //定義ファイル
-/// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
+/// <reference p    ath="../DefinitelyTyped/threejs/three.d.ts" />
 /// <reference path="../DefinitelyTyped/jquery/jquery.d.ts" />
 /// <reference path="../framework/CView.ts"/>
 /// <reference path="ControlManager.ts"/>
@@ -24,7 +24,7 @@ interface Window {
 
 }
 
-interface Performance {
+interface performance {
 	mozNow: any;
 	msNow: any;
 	oNow: any;

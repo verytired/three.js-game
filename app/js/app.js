@@ -206,6 +206,7 @@ var CView = (function () {
         this.objs = new Array();
         this.app = GameApp.getInstance();
         this.scene = this.app.getScene();
+        this.scene2d = this.app.getScene2d();
         this.cm = ControlManager.getInstance();
         this._keyEvent = function (e) {
             _this.keyEvent(e);
@@ -242,8 +243,14 @@ var CView = (function () {
     CView.prototype.add = function (obj) {
         this.scene.add(obj);
     };
+    CView.prototype.add2d = function (obj) {
+        this.scene2d.add(obj);
+    };
     CView.prototype.remove = function (obj) {
         this.scene.remove(obj);
+    };
+    CView.prototype.remove2d = function (obj) {
+        this.scene2d.remove(obj);
     };
     CView.prototype.addMover = function (chara) {
         this.objs.push(chara);
@@ -258,6 +265,11 @@ var CView = (function () {
         for (var i = 0; i < this.objs.length; i++) {
             this.scene.remove(this.objs[i].getObject());
             this.objs[i].remove();
+        }
+        if (this.scene2d.children.length > 0) {
+            while (this.scene2d.children.length > 0) {
+                this.scene2d.remove(this.scene2d.children[this.scene2d.children.length - 1]);
+            }
         }
     };
     CView.prototype.resize = function () {
@@ -336,6 +348,7 @@ var ControlManager = (function (_super) {
 })(events.EventDispatcher);
 var GameApp = (function () {
     function GameApp() {
+        this.use2d = true;
         this.stageWidth = 480;
         this.stageHeight = 640;
         this.isStop = false;
@@ -367,6 +380,7 @@ var GameApp = (function () {
         });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.autoClear = false;
         var container = document.getElementById('container');
         container.appendChild(this.renderer.domElement);
         this.requestAnimationFrame = (function () {
@@ -420,6 +434,13 @@ var GameApp = (function () {
                 _this.currentView.resize();
             }
         });
+        if (this.use2d == true)
+            this.init2d();
+    };
+    GameApp.prototype.init2d = function () {
+        console.info("using 2d");
+        this.camera2d = new THREE.OrthographicCamera(0, window.innerWidth, 0, window.innerHeight);
+        this.scene2d = new THREE.Scene();
     };
     GameApp.prototype.resize = function () {
         var w = window.innerWidth;
@@ -435,6 +456,8 @@ var GameApp = (function () {
         }
     };
     GameApp.prototype.render = function () {
+        this.renderer.clear();
+        this.renderer.render(this.scene2d, this.camera2d);
         this.renderer.render(this.scene, this.camera);
     };
     GameApp.prototype.animate = function () {
@@ -470,6 +493,9 @@ var GameApp = (function () {
     };
     GameApp.prototype.getScene = function () {
         return this.scene;
+    };
+    GameApp.prototype.getScene2d = function () {
+        return this.scene2d;
     };
     GameApp.prototype.getRenderer = function () {
         return this.renderer;
@@ -519,7 +545,6 @@ var GameManager = (function () {
         scene.add(axis);
         $.getJSON("data/scenedata.json", function (data) {
             _this.sceneData = new SceneData(data);
-            $("#view-top").show();
             app.setView(new TopView());
             app.start();
         });
@@ -1615,9 +1640,30 @@ var ShooterNway = (function (_super) {
 var TopView = (function (_super) {
     __extends(TopView, _super);
     function TopView() {
+        var _this = this;
         _super.call(this);
-        $("#view-top").show();
-        this.resize();
+        THREE.ImageUtils.loadTexture("image/ui/title.png", {}, function (texture) {
+            texture.minFilter = THREE.NearestFilter;
+            var material = new THREE.SpriteMaterial({ map: texture, color: 0xFFFFFF });
+            var w = texture.image.width, h = texture.image.height;
+            texture.flipY = false;
+            var sprite = new THREE.Sprite(material);
+            sprite.position.set(window.innerWidth * 0.5, window.innerHeight * 0.5 - 100, -1);
+            sprite.scale.set(w, h, 1);
+            sprite.scale.y = h;
+            _this.add2d(sprite);
+        });
+        THREE.ImageUtils.loadTexture("image/ui/press_space.png", {}, function (texture) {
+            texture.minFilter = THREE.NearestFilter;
+            var material = new THREE.SpriteMaterial({ map: texture, color: 0xFFFFFF });
+            var w = texture.image.width, h = texture.image.height;
+            texture.flipY = false;
+            var sprite = new THREE.Sprite(material);
+            sprite.position.set(window.innerWidth * 0.5, window.innerHeight * 0.5 + 100, -3);
+            sprite.scale.set(w, h, 1);
+            sprite.scale.y = h;
+            _this.add2d(sprite);
+        });
     }
     TopView.prototype.keyEvent = function (e) {
         switch (e.data.keyCode) {

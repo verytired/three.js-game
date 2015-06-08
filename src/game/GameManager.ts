@@ -63,8 +63,8 @@ class GameManager {
 		$.getJSON("data/scenedata.json", (data)=> {
 			//start point
 			this.sceneData = new SceneData(data);
-			//オブジェクト指向実装テスト
-			$("#view-top").show();
+
+			//$("#view-top").show();
 			app.setView(new TopView());
 			app.start();
 		});

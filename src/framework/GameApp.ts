@@ -21,7 +21,6 @@ interface Window {
 	webkitRequestAnimationFrame: any;
 	mozRequestAnimationFrame: any;
 	oRequestAnimationFrame: any;
-
 }
 
 interface Performance {
@@ -39,6 +38,11 @@ class GameApp {
 	private camera:THREE.PerspectiveCamera;
 	private renderer;
 	private controls;
+
+	//2d
+	private camera2d:THREE.OrthographicCamera;
+	private scene2d:THREE.Scene;
+	private use2d = true;
 
 	private stageWidth = 480;
 	private stageHeight = 640;
@@ -84,22 +88,23 @@ class GameApp {
 
 		//camera default initialize
 		//this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-		this.camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+		this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 100000);
 
 		this.camera.position.set(0, -300, 240);
 		this.camera.lookAt(new THREE.Vector3(0, 0, 0))
 
 		//renderer default initialize
 		this.renderer = new THREE.WebGLRenderer({
-			antialias : true
+			antialias: true
 		});
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		this.renderer.setPixelRatio( window.devicePixelRatio );
+		this.renderer.setPixelRatio(window.devicePixelRatio);
+		this.renderer.autoClear = false;
+
 		//this.renderer.setClearColor(0x000000);
 		//this.renderer.shadowMapEnabled = true;
 		var container = document.getElementById('container');
 		container.appendChild(this.renderer.domElement);
-
 
 		//タイマ管理設定
 		this.requestAnimationFrame = (function () {
@@ -123,7 +128,6 @@ class GameApp {
 			return ( now && now.call(performance) ) || ( new Date().getTime() );
 		}
 		this.startTime = this.getTime();
-
 
 		/*** ADDING SCREEN SHOT ABILITY ***/
 		window.addEventListener("keyup", (e)=> {
@@ -176,6 +180,16 @@ class GameApp {
 			}
 		});
 
+		if (this.use2d == true)this.init2d();
+	}
+
+	/**
+	 * 2d描画初期化
+	 */
+	private init2d() {
+		console.info("using 2d")
+		this.camera2d = new THREE.OrthographicCamera(0, window.innerWidth, 0, window.innerHeight);
+		this.scene2d = new THREE.Scene();
 	}
 
 	public resize() {
@@ -193,6 +207,8 @@ class GameApp {
 	}
 
 	public render() {
+		this.renderer.clear();
+		this.renderer.render(this.scene2d, this.camera2d);
 		this.renderer.render(this.scene, this.camera);
 	}
 
@@ -240,15 +256,19 @@ class GameApp {
 		return this.currentView;
 	}
 
-	public getScene(){
+	public getScene() {
 		return this.scene;
 	}
 
-	public getRenderer(){
+	public getScene2d() {
+		return this.scene2d;
+	}
+
+	public getRenderer() {
 		return this.renderer;
 	}
 
-	public getCamera(){
+	public getCamera() {
 		return this.camera;
 	}
 

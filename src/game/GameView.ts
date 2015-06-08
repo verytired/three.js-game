@@ -315,6 +315,7 @@ class GameView extends CView {
 		this.add(plane);
 		this.hitTestObjects.push(plane);
 
+
 		//dummy enemy generate
 		//var func = ()=> {
 		//	this.timerId = setTimeout(()=> {

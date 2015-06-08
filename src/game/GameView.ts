@@ -11,9 +11,9 @@ class GameView extends CView {
 	private enemyBullets:Mover[] = new Array();
 	private bullets:Mover[] = new Array();
 	private bg:Stage;
+    private skybox;
 
 	private isKeyLock = false;
-
 	private waitingRestart = false;
 	private timerId = 0;
 
@@ -151,9 +151,13 @@ class GameView extends CView {
 			}
 			this.nextActionNum++;
 		}
+
 		this.hitTest();
 		this.checkLiveTest();
-		super.update(this.app.getCurrentFrame());
+		super.update(currentFrame);
+
+        if(this.skybox)this.skybox.rotation.y +=0.01;
+
 	}
 
 	/**
@@ -279,7 +283,7 @@ class GameView extends CView {
 		this.addMover(this.bg);
 
 		this.self = new MyShip();
-		this.self.setPosition(0, 300, 0)
+		this.self.setPosition(0, -300, 0)
 		this.addMover(this.self);
 		this.gm.setSelfCharacter(this.self);
 		this.app.setStartTime();

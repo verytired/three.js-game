@@ -202,11 +202,13 @@ var MyShip = (function (_super) {
 })(Mover);
 var CView = (function () {
     function CView() {
-        var _this = this;
         this.objs = new Array();
+        this.init();
+    }
+    CView.prototype.init = function () {
+        var _this = this;
         this.app = GameApp.getInstance();
         this.scene = this.app.getScene();
-        this.scene2d = this.app.getScene2d();
         this.cm = ControlManager.getInstance();
         this._keyEvent = function (e) {
             _this.keyEvent(e);
@@ -224,7 +226,7 @@ var CView = (function () {
         this.cm.addEventListener("onMouseDown", this._onMouseDown);
         this.cm.addEventListener("onMouseMove", this._onMouseMove);
         this.cm.addEventListener("onMouseUp", this._onMouseUp);
-    }
+    };
     CView.prototype.destructor = function () {
         this.removeAll();
         this.cm.removeEventListener("onKeyPress", this._keyEvent);
@@ -243,14 +245,8 @@ var CView = (function () {
     CView.prototype.add = function (obj) {
         this.scene.add(obj);
     };
-    CView.prototype.add2d = function (obj) {
-        this.scene2d.add(obj);
-    };
     CView.prototype.remove = function (obj) {
         this.scene.remove(obj);
-    };
-    CView.prototype.remove2d = function (obj) {
-        this.scene2d.remove(obj);
     };
     CView.prototype.addMover = function (chara) {
         this.objs.push(chara);
@@ -265,11 +261,6 @@ var CView = (function () {
         for (var i = 0; i < this.objs.length; i++) {
             this.scene.remove(this.objs[i].getObject());
             this.objs[i].remove();
-        }
-        if (this.scene2d.children.length > 0) {
-            while (this.scene2d.children.length > 0) {
-                this.scene2d.remove(this.scene2d.children[this.scene2d.children.length - 1]);
-            }
         }
     };
     CView.prototype.resize = function () {
@@ -348,7 +339,6 @@ var ControlManager = (function (_super) {
 })(events.EventDispatcher);
 var GameApp = (function () {
     function GameApp() {
-        this.use2d = true;
         this.stageWidth = 480;
         this.stageHeight = 640;
         this.isStop = false;
@@ -379,8 +369,6 @@ var GameApp = (function () {
             antialias: true
         });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.autoClear = false;
         var container = document.getElementById('container');
         container.appendChild(this.renderer.domElement);
         this.requestAnimationFrame = (function () {
@@ -434,13 +422,6 @@ var GameApp = (function () {
                 _this.currentView.resize();
             }
         });
-        if (this.use2d == true)
-            this.init2d();
-    };
-    GameApp.prototype.init2d = function () {
-        console.info("using 2d");
-        this.camera2d = new THREE.OrthographicCamera(0, window.innerWidth, 0, window.innerHeight);
-        this.scene2d = new THREE.Scene();
     };
     GameApp.prototype.resize = function () {
         var w = window.innerWidth;
@@ -456,8 +437,6 @@ var GameApp = (function () {
         }
     };
     GameApp.prototype.render = function () {
-        this.renderer.clear();
-        this.renderer.render(this.scene2d, this.camera2d);
         this.renderer.render(this.scene, this.camera);
     };
     GameApp.prototype.animate = function () {
@@ -493,9 +472,6 @@ var GameApp = (function () {
     };
     GameApp.prototype.getScene = function () {
         return this.scene;
-    };
-    GameApp.prototype.getScene2d = function () {
-        return this.scene2d;
     };
     GameApp.prototype.getRenderer = function () {
         return this.renderer;
@@ -545,6 +521,7 @@ var GameManager = (function () {
         scene.add(axis);
         $.getJSON("data/scenedata.json", function (data) {
             _this.sceneData = new SceneData(data);
+            $("#view-top").show();
             app.setView(new TopView());
             app.start();
         });
@@ -582,6 +559,276 @@ var GameManager = (function () {
     return GameManager;
 })();
 GameManager.getInstance().initialize();
+var SimplexNoise = (function () {
+    function SimplexNoise(r) {
+        if (r === void 0) { r = undefined; }
+        if (r == undefined)
+            r = Math;
+        this.grad3 = [
+            [1, 1, 0],
+            [-1, 1, 0],
+            [1, -1, 0],
+            [-1, -1, 0],
+            [1, 0, 1],
+            [-1, 0, 1],
+            [1, 0, -1],
+            [-1, 0, -1],
+            [0, 1, 1],
+            [0, -1, 1],
+            [0, 1, -1],
+            [0, -1, -1]
+        ];
+        this.p = [];
+        for (var i = 0; i < 256; i++) {
+            this.p[i] = Math.floor(r.random() * 256);
+        }
+        this.perm = [];
+        for (var i = 0; i < 512; i++) {
+            this.perm[i] = this.p[i & 255];
+        }
+        this.simplex = [
+            [0, 1, 2, 3],
+            [0, 1, 3, 2],
+            [0, 0, 0, 0],
+            [0, 2, 3, 1],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [1, 2, 3, 0],
+            [0, 2, 1, 3],
+            [0, 0, 0, 0],
+            [0, 3, 1, 2],
+            [0, 3, 2, 1],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [1, 3, 2, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [1, 2, 0, 3],
+            [0, 0, 0, 0],
+            [1, 3, 0, 2],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [2, 3, 0, 1],
+            [2, 3, 1, 0],
+            [1, 0, 2, 3],
+            [1, 0, 3, 2],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [2, 0, 3, 1],
+            [0, 0, 0, 0],
+            [2, 1, 3, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [2, 0, 1, 3],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [3, 0, 1, 2],
+            [3, 0, 2, 1],
+            [0, 0, 0, 0],
+            [3, 1, 2, 0],
+            [2, 1, 0, 3],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [3, 1, 0, 2],
+            [0, 0, 0, 0],
+            [3, 2, 0, 1],
+            [3, 2, 1, 0]
+        ];
+    }
+    SimplexNoise.prototype.dot = function (g, x, y) {
+        return g[0] * x + g[1] * y;
+    };
+    SimplexNoise.prototype.dot3d = function (g, x, y, z) {
+        return g[0] * x + g[1] * y + g[2] * z;
+    };
+    SimplexNoise.prototype.noise = function (xin, yin) {
+        var n0, n1, n2;
+        var F2 = 0.5 * (Math.sqrt(3.0) - 1.0);
+        var s = (xin + yin) * F2;
+        var i = Math.floor(xin + s);
+        var j = Math.floor(yin + s);
+        var G2 = (3.0 - Math.sqrt(3.0)) / 6.0;
+        var t = (i + j) * G2;
+        var X0 = i - t;
+        var Y0 = j - t;
+        var x0 = xin - X0;
+        var y0 = yin - Y0;
+        var i1, j1;
+        if (x0 > y0) {
+            i1 = 1;
+            j1 = 0;
+        }
+        else {
+            i1 = 0;
+            j1 = 1;
+        }
+        var x1 = x0 - i1 + G2;
+        var y1 = y0 - j1 + G2;
+        var x2 = x0 - 1.0 + 2.0 * G2;
+        var y2 = y0 - 1.0 + 2.0 * G2;
+        var ii = i & 255;
+        var jj = j & 255;
+        var gi0 = this.perm[ii + this.perm[jj]] % 12;
+        var gi1 = this.perm[ii + i1 + this.perm[jj + j1]] % 12;
+        var gi2 = this.perm[ii + 1 + this.perm[jj + 1]] % 12;
+        var t0 = 0.5 - x0 * x0 - y0 * y0;
+        if (t0 < 0)
+            n0 = 0.0;
+        else {
+            t0 *= t0;
+            n0 = t0 * t0 * this.dot(this.grad3[gi0], x0, y0);
+        }
+        var t1 = 0.5 - x1 * x1 - y1 * y1;
+        if (t1 < 0)
+            n1 = 0.0;
+        else {
+            t1 *= t1;
+            n1 = t1 * t1 * this.dot(this.grad3[gi1], x1, y1);
+        }
+        var t2 = 0.5 - x2 * x2 - y2 * y2;
+        if (t2 < 0)
+            n2 = 0.0;
+        else {
+            t2 *= t2;
+            n2 = t2 * t2 * this.dot(this.grad3[gi2], x2, y2);
+        }
+        return 70.0 * (n0 + n1 + n2);
+    };
+    SimplexNoise.prototype.noise3d = function (xin, yin, zin) {
+        var n0, n1, n2, n3;
+        var F3 = 1.0 / 3.0;
+        var s = (xin + yin + zin) * F3;
+        var i = Math.floor(xin + s);
+        var j = Math.floor(yin + s);
+        var k = Math.floor(zin + s);
+        var G3 = 1.0 / 6.0;
+        var t = (i + j + k) * G3;
+        var X0 = i - t;
+        var Y0 = j - t;
+        var Z0 = k - t;
+        var x0 = xin - X0;
+        var y0 = yin - Y0;
+        var z0 = zin - Z0;
+        var i1, j1, k1;
+        var i2, j2, k2;
+        if (x0 >= y0) {
+            if (y0 >= z0) {
+                i1 = 1;
+                j1 = 0;
+                k1 = 0;
+                i2 = 1;
+                j2 = 1;
+                k2 = 0;
+            }
+            else if (x0 >= z0) {
+                i1 = 1;
+                j1 = 0;
+                k1 = 0;
+                i2 = 1;
+                j2 = 0;
+                k2 = 1;
+            }
+            else {
+                i1 = 0;
+                j1 = 0;
+                k1 = 1;
+                i2 = 1;
+                j2 = 0;
+                k2 = 1;
+            }
+        }
+        else {
+            if (y0 < z0) {
+                i1 = 0;
+                j1 = 0;
+                k1 = 1;
+                i2 = 0;
+                j2 = 1;
+                k2 = 1;
+            }
+            else if (x0 < z0) {
+                i1 = 0;
+                j1 = 1;
+                k1 = 0;
+                i2 = 0;
+                j2 = 1;
+                k2 = 1;
+            }
+            else {
+                i1 = 0;
+                j1 = 1;
+                k1 = 0;
+                i2 = 1;
+                j2 = 1;
+                k2 = 0;
+            }
+        }
+        var x1 = x0 - i1 + G3;
+        var y1 = y0 - j1 + G3;
+        var z1 = z0 - k1 + G3;
+        var x2 = x0 - i2 + 2.0 * G3;
+        var y2 = y0 - j2 + 2.0 * G3;
+        var z2 = z0 - k2 + 2.0 * G3;
+        var x3 = x0 - 1.0 + 3.0 * G3;
+        var y3 = y0 - 1.0 + 3.0 * G3;
+        var z3 = z0 - 1.0 + 3.0 * G3;
+        var ii = i & 255;
+        var jj = j & 255;
+        var kk = k & 255;
+        var gi0 = this.perm[ii + this.perm[jj + this.perm[kk]]] % 12;
+        var gi1 = this.perm[ii + i1 + this.perm[jj + j1 + this.perm[kk + k1]]] % 12;
+        var gi2 = this.perm[ii + i2 + this.perm[jj + j2 + this.perm[kk + k2]]] % 12;
+        var gi3 = this.perm[ii + 1 + this.perm[jj + 1 + this.perm[kk + 1]]] % 12;
+        var t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0;
+        if (t0 < 0)
+            n0 = 0.0;
+        else {
+            t0 *= t0;
+            n0 = t0 * t0 * this.dot3d(this.grad3[gi0], x0, y0, z0);
+        }
+        var t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1;
+        if (t1 < 0)
+            n1 = 0.0;
+        else {
+            t1 *= t1;
+            n1 = t1 * t1 * this.dot3d(this.grad3[gi1], x1, y1, z1);
+        }
+        var t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2;
+        if (t2 < 0)
+            n2 = 0.0;
+        else {
+            t2 *= t2;
+            n2 = t2 * t2 * this.dot3d(this.grad3[gi2], x2, y2, z2);
+        }
+        var t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3;
+        if (t3 < 0)
+            n3 = 0.0;
+        else {
+            t3 *= t3;
+            n3 = t3 * t3 * this.dot3d(this.grad3[gi3], x3, y3, z3);
+        }
+        return 32.0 * (n0 + n1 + n2 + n3);
+    };
+    return SimplexNoise;
+})();
 var Bullet = (function (_super) {
     __extends(Bullet, _super);
     function Bullet(vx, vy) {
@@ -860,7 +1107,7 @@ var EnemyBoss = (function (_super) {
             }
             return;
         }
-        if (this.currentFrame >= 240) {
+        if (this.currentFrame == 240) {
             this.vy = 0;
             this.vx = 2;
             this.isLoop = true;
@@ -1025,276 +1272,6 @@ var Explosion = (function (_super) {
     };
     return Explosion;
 })(Mover);
-var SimplexNoise = (function () {
-    function SimplexNoise(r) {
-        if (r === void 0) { r = undefined; }
-        if (r == undefined)
-            r = Math;
-        this.grad3 = [
-            [1, 1, 0],
-            [-1, 1, 0],
-            [1, -1, 0],
-            [-1, -1, 0],
-            [1, 0, 1],
-            [-1, 0, 1],
-            [1, 0, -1],
-            [-1, 0, -1],
-            [0, 1, 1],
-            [0, -1, 1],
-            [0, 1, -1],
-            [0, -1, -1]
-        ];
-        this.p = [];
-        for (var i = 0; i < 256; i++) {
-            this.p[i] = Math.floor(r.random() * 256);
-        }
-        this.perm = [];
-        for (var i = 0; i < 512; i++) {
-            this.perm[i] = this.p[i & 255];
-        }
-        this.simplex = [
-            [0, 1, 2, 3],
-            [0, 1, 3, 2],
-            [0, 0, 0, 0],
-            [0, 2, 3, 1],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [1, 2, 3, 0],
-            [0, 2, 1, 3],
-            [0, 0, 0, 0],
-            [0, 3, 1, 2],
-            [0, 3, 2, 1],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [1, 3, 2, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [1, 2, 0, 3],
-            [0, 0, 0, 0],
-            [1, 3, 0, 2],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [2, 3, 0, 1],
-            [2, 3, 1, 0],
-            [1, 0, 2, 3],
-            [1, 0, 3, 2],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [2, 0, 3, 1],
-            [0, 0, 0, 0],
-            [2, 1, 3, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [2, 0, 1, 3],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [3, 0, 1, 2],
-            [3, 0, 2, 1],
-            [0, 0, 0, 0],
-            [3, 1, 2, 0],
-            [2, 1, 0, 3],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [3, 1, 0, 2],
-            [0, 0, 0, 0],
-            [3, 2, 0, 1],
-            [3, 2, 1, 0]
-        ];
-    }
-    SimplexNoise.prototype.dot = function (g, x, y) {
-        return g[0] * x + g[1] * y;
-    };
-    SimplexNoise.prototype.dot3d = function (g, x, y, z) {
-        return g[0] * x + g[1] * y + g[2] * z;
-    };
-    SimplexNoise.prototype.noise = function (xin, yin) {
-        var n0, n1, n2;
-        var F2 = 0.5 * (Math.sqrt(3.0) - 1.0);
-        var s = (xin + yin) * F2;
-        var i = Math.floor(xin + s);
-        var j = Math.floor(yin + s);
-        var G2 = (3.0 - Math.sqrt(3.0)) / 6.0;
-        var t = (i + j) * G2;
-        var X0 = i - t;
-        var Y0 = j - t;
-        var x0 = xin - X0;
-        var y0 = yin - Y0;
-        var i1, j1;
-        if (x0 > y0) {
-            i1 = 1;
-            j1 = 0;
-        }
-        else {
-            i1 = 0;
-            j1 = 1;
-        }
-        var x1 = x0 - i1 + G2;
-        var y1 = y0 - j1 + G2;
-        var x2 = x0 - 1.0 + 2.0 * G2;
-        var y2 = y0 - 1.0 + 2.0 * G2;
-        var ii = i & 255;
-        var jj = j & 255;
-        var gi0 = this.perm[ii + this.perm[jj]] % 12;
-        var gi1 = this.perm[ii + i1 + this.perm[jj + j1]] % 12;
-        var gi2 = this.perm[ii + 1 + this.perm[jj + 1]] % 12;
-        var t0 = 0.5 - x0 * x0 - y0 * y0;
-        if (t0 < 0)
-            n0 = 0.0;
-        else {
-            t0 *= t0;
-            n0 = t0 * t0 * this.dot(this.grad3[gi0], x0, y0);
-        }
-        var t1 = 0.5 - x1 * x1 - y1 * y1;
-        if (t1 < 0)
-            n1 = 0.0;
-        else {
-            t1 *= t1;
-            n1 = t1 * t1 * this.dot(this.grad3[gi1], x1, y1);
-        }
-        var t2 = 0.5 - x2 * x2 - y2 * y2;
-        if (t2 < 0)
-            n2 = 0.0;
-        else {
-            t2 *= t2;
-            n2 = t2 * t2 * this.dot(this.grad3[gi2], x2, y2);
-        }
-        return 70.0 * (n0 + n1 + n2);
-    };
-    SimplexNoise.prototype.noise3d = function (xin, yin, zin) {
-        var n0, n1, n2, n3;
-        var F3 = 1.0 / 3.0;
-        var s = (xin + yin + zin) * F3;
-        var i = Math.floor(xin + s);
-        var j = Math.floor(yin + s);
-        var k = Math.floor(zin + s);
-        var G3 = 1.0 / 6.0;
-        var t = (i + j + k) * G3;
-        var X0 = i - t;
-        var Y0 = j - t;
-        var Z0 = k - t;
-        var x0 = xin - X0;
-        var y0 = yin - Y0;
-        var z0 = zin - Z0;
-        var i1, j1, k1;
-        var i2, j2, k2;
-        if (x0 >= y0) {
-            if (y0 >= z0) {
-                i1 = 1;
-                j1 = 0;
-                k1 = 0;
-                i2 = 1;
-                j2 = 1;
-                k2 = 0;
-            }
-            else if (x0 >= z0) {
-                i1 = 1;
-                j1 = 0;
-                k1 = 0;
-                i2 = 1;
-                j2 = 0;
-                k2 = 1;
-            }
-            else {
-                i1 = 0;
-                j1 = 0;
-                k1 = 1;
-                i2 = 1;
-                j2 = 0;
-                k2 = 1;
-            }
-        }
-        else {
-            if (y0 < z0) {
-                i1 = 0;
-                j1 = 0;
-                k1 = 1;
-                i2 = 0;
-                j2 = 1;
-                k2 = 1;
-            }
-            else if (x0 < z0) {
-                i1 = 0;
-                j1 = 1;
-                k1 = 0;
-                i2 = 0;
-                j2 = 1;
-                k2 = 1;
-            }
-            else {
-                i1 = 0;
-                j1 = 1;
-                k1 = 0;
-                i2 = 1;
-                j2 = 1;
-                k2 = 0;
-            }
-        }
-        var x1 = x0 - i1 + G3;
-        var y1 = y0 - j1 + G3;
-        var z1 = z0 - k1 + G3;
-        var x2 = x0 - i2 + 2.0 * G3;
-        var y2 = y0 - j2 + 2.0 * G3;
-        var z2 = z0 - k2 + 2.0 * G3;
-        var x3 = x0 - 1.0 + 3.0 * G3;
-        var y3 = y0 - 1.0 + 3.0 * G3;
-        var z3 = z0 - 1.0 + 3.0 * G3;
-        var ii = i & 255;
-        var jj = j & 255;
-        var kk = k & 255;
-        var gi0 = this.perm[ii + this.perm[jj + this.perm[kk]]] % 12;
-        var gi1 = this.perm[ii + i1 + this.perm[jj + j1 + this.perm[kk + k1]]] % 12;
-        var gi2 = this.perm[ii + i2 + this.perm[jj + j2 + this.perm[kk + k2]]] % 12;
-        var gi3 = this.perm[ii + 1 + this.perm[jj + 1 + this.perm[kk + 1]]] % 12;
-        var t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0;
-        if (t0 < 0)
-            n0 = 0.0;
-        else {
-            t0 *= t0;
-            n0 = t0 * t0 * this.dot3d(this.grad3[gi0], x0, y0, z0);
-        }
-        var t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1;
-        if (t1 < 0)
-            n1 = 0.0;
-        else {
-            t1 *= t1;
-            n1 = t1 * t1 * this.dot3d(this.grad3[gi1], x1, y1, z1);
-        }
-        var t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2;
-        if (t2 < 0)
-            n2 = 0.0;
-        else {
-            t2 *= t2;
-            n2 = t2 * t2 * this.dot3d(this.grad3[gi2], x2, y2, z2);
-        }
-        var t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3;
-        if (t3 < 0)
-            n3 = 0.0;
-        else {
-            t3 *= t3;
-            n3 = t3 * t3 * this.dot3d(this.grad3[gi3], x3, y3, z3);
-        }
-        return 32.0 * (n0 + n1 + n2 + n3);
-    };
-    return SimplexNoise;
-})();
 var Stage = (function (_super) {
     __extends(Stage, _super);
     function Stage() {
@@ -1331,13 +1308,37 @@ var GameView = (function (_super) {
         this.nextActionFrame = 0;
         this.nextActionNum = 0;
         this.isInBossBattle = false;
-        this.hitTestObjects = new Array();
+    }
+    GameView.prototype.init = function () {
+        _super.prototype.init.call(this);
+        var path = "image/skybox/";
+        var format = '.jpg';
+        var urls = [
+            path + 'px' + format,
+            path + 'nx' + format,
+            path + 'py' + format,
+            path + 'ny' + format,
+            path + 'pz' + format,
+            path + 'nz' + format
+        ];
+        var textureCube = THREE.ImageUtils.loadTextureCube(urls, THREE.CubeRefractionMapping);
+        var shader = THREE.ShaderLib["cube"];
+        shader.uniforms["tCube"].value = textureCube;
+        var material = new THREE.ShaderMaterial({
+            fragmentShader: shader.fragmentShader,
+            vertexShader: shader.vertexShader,
+            uniforms: shader.uniforms,
+            depthWrite: false,
+            side: THREE.BackSide
+        });
+        this.skybox = new THREE.Mesh(new THREE.BoxGeometry(10000, 10000, 10000), material);
+        this.add(this.skybox);
         this.nextActionNum = 0;
         this.gm = GameManager.getInstance();
         this.sceneData = this.gm.getSceneData(0);
         this.zPosition = this.gm.zPosition;
         this.startGame();
-    }
+    };
     GameView.prototype.keyEvent = function (e) {
         if (this.isKeyLock == true) {
             return;
@@ -1370,14 +1371,15 @@ var GameView = (function (_super) {
     GameView.prototype.onMouseDown = function (e) {
     };
     GameView.prototype.onMouseMove = function (e) {
-        var mouse = new THREE.Vector2();
-        mouse.set((e.data.x / window.innerWidth) * 2 - 1, -(e.data.y / window.innerHeight) * 2 + 1);
-        this.raycaster.setFromCamera(mouse, this.app.getCamera());
-        var intersects = this.raycaster.intersectObjects(this.hitTestObjects);
-        if (intersects.length > 0) {
-            var intersect = intersects[0];
-            this.self.setPosition(intersect.point.x, intersect.point.y, this.zPosition);
+        var nowX = e.data.x;
+        var nowY = e.data.y;
+        if (this.app.ua != "pc") {
+            nowX = e.data.touches[0].clientX;
+            nowY = e.data.touches[0].clientY;
         }
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        this.self.setPosition(-240 + 480 * nowX / w, 320 - 640 * nowY / h, this.zPosition);
     };
     GameView.prototype.onMouseUp = function (e) {
         if (this.isKeyLock == true) {
@@ -1425,7 +1427,9 @@ var GameView = (function (_super) {
         }
         this.hitTest();
         this.checkLiveTest();
-        _super.prototype.update.call(this, this.app.getCurrentFrame());
+        _super.prototype.update.call(this, currentFrame);
+        if (this.skybox)
+            this.skybox.rotation.y += 0.01;
     };
     GameView.prototype.hitTest = function () {
         var _this = this;
@@ -1525,39 +1529,10 @@ var GameView = (function (_super) {
         this.bg.init();
         this.addMover(this.bg);
         this.self = new MyShip();
-        this.self.setPosition(0, 300, 0);
+        this.self.setPosition(0, -300, 0);
         this.addMover(this.self);
         this.gm.setSelfCharacter(this.self);
         this.app.setStartTime();
-        var path = "image/skybox/";
-        var format = '.jpg';
-        var urls = [
-            path + 'px' + format,
-            path + 'nx' + format,
-            path + 'py' + format,
-            path + 'ny' + format,
-            path + 'pz' + format,
-            path + 'nz' + format
-        ];
-        var textureCube = THREE.ImageUtils.loadTextureCube(urls, THREE.CubeRefractionMapping);
-        var shader = THREE.ShaderLib["cube"];
-        shader.uniforms["tCube"].value = textureCube;
-        var material = new THREE.ShaderMaterial({
-            fragmentShader: shader.fragmentShader,
-            vertexShader: shader.vertexShader,
-            uniforms: shader.uniforms,
-            depthWrite: false,
-            side: THREE.BackSide
-        });
-        var mesh = new THREE.Mesh(new THREE.BoxGeometry(10000, 10000, 10000), material);
-        this.add(mesh);
-        this.raycaster = new THREE.Raycaster();
-        var geometry = new THREE.PlaneBufferGeometry(480, 640);
-        var material2 = new THREE.MeshBasicMaterial({ color: 0xFF0000, wireframe: false });
-        var plane = new THREE.Mesh(geometry, material2);
-        plane.visible = false;
-        this.add(plane);
-        this.hitTestObjects.push(plane);
     };
     GameView.prototype.restart = function () {
         this.waitingRestart = false;
@@ -1612,6 +1587,36 @@ var SceneData = (function () {
     };
     return SceneData;
 })();
+var Score = (function () {
+    function Score() {
+        this.score = 0;
+        this.$viewScore = null;
+        if (Score._instance) {
+            throw new Error("must use the getInstance.");
+        }
+        Score._instance = this;
+    }
+    Score.getInstance = function () {
+        if (Score._instance === null) {
+            Score._instance = new Score();
+            Score._instance.initialize();
+        }
+        return Score._instance;
+    };
+    Score.prototype.initialize = function () {
+        this.$viewScore = $("#score");
+    };
+    Score.prototype.addScore = function (p) {
+        this.score += p;
+        this.$viewScore.html("Score:" + this.score);
+    };
+    Score.prototype.setScore = function (p) {
+        this.score = p;
+        this.$viewScore.html("Score:" + this.score);
+    };
+    Score._instance = null;
+    return Score;
+})();
 var ShooterNway = (function (_super) {
     __extends(ShooterNway, _super);
     function ShooterNway() {
@@ -1640,31 +1645,13 @@ var ShooterNway = (function (_super) {
 var TopView = (function (_super) {
     __extends(TopView, _super);
     function TopView() {
-        var _this = this;
         _super.call(this);
-        THREE.ImageUtils.loadTexture("image/ui/title.png", undefined, function (texture) {
-            texture.minFilter = THREE.NearestFilter;
-            var material = new THREE.SpriteMaterial({ map: texture, color: 0xFFFFFF });
-            var w = texture.image.width, h = texture.image.height;
-            texture.flipY = false;
-            var sprite = new THREE.Sprite(material);
-            sprite.position.set(window.innerWidth * 0.5, window.innerHeight * 0.5 - 100, -1);
-            sprite.scale.set(w, h, 1);
-            sprite.scale.y = h;
-            _this.add2d(sprite);
-        });
-        THREE.ImageUtils.loadTexture("image/ui/press_space.png", undefined, function (texture) {
-            texture.minFilter = THREE.NearestFilter;
-            var material = new THREE.SpriteMaterial({ map: texture, color: 0xFFFFFF });
-            var w = texture.image.width, h = texture.image.height;
-            texture.flipY = false;
-            var sprite = new THREE.Sprite(material);
-            sprite.position.set(window.innerWidth * 0.5, window.innerHeight * 0.5 + 100, -3);
-            sprite.scale.set(w, h, 1);
-            sprite.scale.y = h;
-            _this.add2d(sprite);
-        });
     }
+    TopView.prototype.init = function () {
+        _super.prototype.init.call(this);
+        $("#view-top").show();
+        this.resize();
+    };
     TopView.prototype.keyEvent = function (e) {
         switch (e.data.keyCode) {
             case 32:

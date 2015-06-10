@@ -1,6 +1,6 @@
 # three.js-game
 
-three.jsを使ったシューティングゲーム開発
+Shooting Game Development using three.js
 
 [http://verytired.github.io/three.js-game/app/index.html](http://verytired.github.io/three.js-game/app/index.html)
 
@@ -9,6 +9,6 @@ three.jsを使ったシューティングゲーム開発
 ```
 bower install
 
-cd src/typescript
+cd src
 git clone https://github.com/borisyankov/DefinitelyTyped.git
 ```

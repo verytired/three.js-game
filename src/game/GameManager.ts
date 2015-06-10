@@ -1,7 +1,3 @@
-//GameManager
-//theee.jsのカメラやレンダリングなどを管理する
-
-//定義ファイル
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
 /// <reference path="../DefinitelyTyped/jquery/jquery.d.ts" />
 /// <reference path="MyShip.ts"/>
@@ -16,10 +12,12 @@ class GameManager {
 
 	public isStop:boolean = false;
 	private score = 0;
+	public zPosition = 50;
+
 	private app:GameApp;
 	//dom
-	private $viewScore = null;
-	private $viewDebug = null;
+	private $viewScore:any = null;
+	private $viewDebug:any = null;
 
 	private sceneData:SceneData;
 	private overlay:String[] = ["#view-top", "#view-gameover", "#view-stageclear"];
@@ -56,7 +54,7 @@ class GameManager {
 		directionalLight.position.set(0, -300, 300);
 		directionalLight.castShadow = true;
 		scene.add(directionalLight);
-			scene.fog = new THREE.Fog(0x000000, 480,640);
+		//scene.fog = new THREE.Fog(0x000000, 480,640);
 
 		var axis = new THREE.AxisHelper(1000);
 		axis.position.set(0, 0, 0);
@@ -65,13 +63,12 @@ class GameManager {
 		$.getJSON("data/scenedata.json", (data)=> {
 			//start point
 			this.sceneData = new SceneData(data);
-			//オブジェクト指向実装テスト
-			$("#view-top").show();
+
+			//$("#view-top").show();
 			app.setView(new TopView());
 			app.start();
 		});
 
-		//this.setView(new TestGameView(data));
 		this.resize();
 	}
 

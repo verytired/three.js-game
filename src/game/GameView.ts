@@ -11,9 +11,9 @@ class GameView extends CView {
 	private enemyBullets:Mover[] = new Array();
 	private bullets:Mover[] = new Array();
 	private bg:Stage;
+    private skybox;
 
 	private isKeyLock = false;
-
 	private waitingRestart = false;
 	private timerId = 0;
 
@@ -25,26 +25,24 @@ class GameView extends CView {
 	private boss;
 	private gm:GameManager;
 
-	private zPosition = 50;
+	private zPosition;
+
+	//todo raycaster test
+	private raycaster;
+	private hitTestObjects = new Array();
 
 	constructor() {
 		super();
-	}
-
-	public init() {
-		super.init();
-
-		//create background
-		this.bg = new Stage();
-		this.bg.init();
-		this.addMover(this.bg);
 
 		this.nextActionNum = 0;
 
 		this.gm = GameManager.getInstance();
 		this.sceneData = this.gm.getSceneData(0);
+		this.zPosition = this.gm.zPosition;
 
+		//gamestart
 		this.startGame();
+
 	}
 
 	public keyEvent(e:any) {
@@ -84,18 +82,30 @@ class GameView extends CView {
 
 	public onMouseMove(e:any) {
 
-		var nowX = e.data.x
-		var nowY = e.data.y
+		//var nowX = e.data.x
+		//var nowY = e.data.y
+		//
+		//if (this.app.ua != "pc") {
+		//	nowX = e.data.touches[0].clientX;
+		//	nowY = e.data.touches[0].clientY;
+		//}
+		//
+		//var w = window.innerWidth;
+		//var h = window.innerHeight;
+		//
+		//this.self.setPosition(-240 + 480 * nowX / w, 320 - 640 * nowY / h, this.zPosition)
 
-		if (this.app.ua != "pc") {
-			nowX = e.data.touches[0].clientX;
-			nowY = e.data.touches[0].clientY;
+		var mouse = new THREE.Vector2();
+		mouse.set( ( e.data.x / window.innerWidth ) * 2 - 1, - ( e.data.y / window.innerHeight ) * 2 + 1 );
+
+		this.raycaster.setFromCamera( mouse, this.app.getCamera());
+
+		var intersects = this.raycaster.intersectObjects( this.hitTestObjects );
+
+		if ( intersects.length > 0 ) {
+			var intersect = intersects[ 0 ];
+			this.self.setPosition(intersect.point.x,intersect.point.y, this.zPosition)
 		}
-
-		var w = window.innerWidth;
-		var h = window.innerHeight;
-
-		this.self.setPosition(-240 + 480 * nowX / w, 320 - 640 * nowY / h, this.zPosition)
 	}
 
 	public onMouseUp(e:any) {
@@ -141,9 +151,13 @@ class GameView extends CView {
 			}
 			this.nextActionNum++;
 		}
+
 		this.hitTest();
 		this.checkLiveTest();
-		super.update(this.app.getCurrentFrame());
+		super.update(currentFrame);
+
+        if(this.skybox)this.skybox.rotation.y +=0.01;
+
 	}
 
 	/**
@@ -156,7 +170,7 @@ class GameView extends CView {
 				this.bullets[i].waitRemove = true;
 			}
 			this.isInBossBattle = false
-			this.boss =null;
+			this.boss = null;
 			this.waitingRestart = true;
 			this.isKeyLock = true;
 			setTimeout(()=> {
@@ -174,7 +188,10 @@ class GameView extends CView {
 						this.bullets[i].isDead = true;
 						this.bullets[i].waitRemove = true;
 						this.enemies[j].hit();
-						this.gm.addScore(this.enemies[j].getPoint())
+						if (this.enemies[j].isDead == true) {
+							this.gm.addScore(this.enemies[j].getPoint());
+						}
+
 					}
 				}
 			}
@@ -260,15 +277,48 @@ class GameView extends CView {
 		$("#view-gameover").hide();
 		$("#view-stageclear").hide();
 		$("#overlay").hide();
+
 		this.bg = new Stage();
 		this.bg.init();
 		this.addMover(this.bg);
 
 		this.self = new MyShip();
-		this.self.y = -150;
+		this.self.setPosition(0, -300, 0)
 		this.addMover(this.self);
 		this.gm.setSelfCharacter(this.self);
 		this.app.setStartTime();
+
+
+		//todo skybox
+		var path = "image/skybox/";
+		var format = '.jpg';
+		var urls = [
+			path + 'px' + format, path + 'nx' + format,
+			path + 'py' + format, path + 'ny' + format,
+			path + 'pz' + format, path + 'nz' + format
+		];
+		var textureCube = THREE.ImageUtils.loadTextureCube(urls, THREE.CubeRefractionMapping);
+		var shader = THREE.ShaderLib["cube"];
+		shader.uniforms["tCube"].value = textureCube;
+		var material = new THREE.ShaderMaterial({
+			fragmentShader: shader.fragmentShader,
+			vertexShader: shader.vertexShader,
+			uniforms: shader.uniforms,
+			depthWrite: false,
+			side: THREE.BackSide
+		})
+		var mesh = new THREE.Mesh(new THREE.BoxGeometry(10000, 10000, 10000), material);
+		this.add(mesh);
+
+		//todo test raycaster
+		this.raycaster = new THREE.Raycaster();
+		var geometry = new THREE.PlaneBufferGeometry(480, 640);
+		var material2 = new THREE.MeshBasicMaterial({color: 0xFF0000, wireframe: false});
+		var plane = new THREE.Mesh(geometry, material2);
+		plane.visible = false;
+		this.add(plane);
+		this.hitTestObjects.push(plane);
+
 
 		//dummy enemy generate
 		//var func = ()=> {

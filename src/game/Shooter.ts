@@ -1,3 +1,5 @@
+/// <reference path="Mover.ts"/>
+
 class Shooter {
 
 	private bullets:Mover[] = new Array();
@@ -11,10 +13,10 @@ class Shooter {
 	}
 
 	public shot(x, y, vx, vy) {
-		var b = new Bullet(vx, vy);
-		b.x = x;
-		b.y = y;
+		var b = new BulletEnemy(vx, vy);
 		var v = GameApp.getInstance().getCurrentView();
+		var z = GameManager.getInstance().zPosition;
+		b.setPosition(x, y, z)
 		v.addMover(b);
 		this.bullets.push(b);
 	}

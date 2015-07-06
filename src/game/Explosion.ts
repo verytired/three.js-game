@@ -1,12 +1,6 @@
 /// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
-/// <reference path="../framework/CMover.ts"/>
-
-class Explosion extends CMover {
-	public x = 0;
-	public y = 0;
-	z = 0;
-	public vx = 0;
-	public vy = 0;
+/// <reference path="Mover.ts"/>
+class Explosion extends Mover {
 
 	movementSpeed = 80;
 	totalObjects = 500;
@@ -23,8 +17,8 @@ class Explosion extends CMover {
 	yDir = 0;
 	zDir = 0;
 
-	private _pc:THREE.PointCloud;
-	private particle;
+	private frameCount = 0;
+	//private isFinished = false;
 
 	constructor(x, y, color) {
 		super();
@@ -55,7 +49,7 @@ class Explosion extends CMover {
 			transparent: true
 		});
 
-		this._pc = new THREE.PointCloud(particles, materialParticle);
+		this._obj.add(new THREE.PointCloud(particles, materialParticle));
 		this.status = true;
 		this.xDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
 		this.yDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
@@ -66,18 +60,14 @@ class Explosion extends CMover {
 
 	}
 
-	public getParticles() {
-		return this._pc;
-	}
-
-	private frameCount = 0;
-	private isFinished = false;
-
 	public update() {
+
 		if (this.status == true) {
+
+			var m:any = this._obj.children[0];
 			var pCount = this.totalObjects;
 			while (pCount--) {
-				var particle = this._pc.geometry.vertices[pCount]
+				var particle = m.geometry.vertices[pCount]
 				particle.y += this.dirs[pCount].y;
 				particle.x += this.dirs[pCount].x;
 				particle.z += this.dirs[pCount].z;
@@ -85,9 +75,9 @@ class Explosion extends CMover {
 			this.frameCount++;
 			if (this.frameCount > 300) {
 				this.status = false;
-				this.isFinished = true;
+				this.waitRemove = true;
 			}
-			this._pc.geometry.verticesNeedUpdate = true;
+			m.geometry.verticesNeedUpdate = true;
 		}
 	}
 

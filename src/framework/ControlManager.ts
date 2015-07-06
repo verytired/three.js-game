@@ -25,7 +25,7 @@ class ControlManager extends events.EventDispatcher {
 			this.dispatchEvent(et);
 		});
 
-		var type = GameManager.getInstance().ua;
+		var type = GameApp.getInstance().ua;
 		if(type == "pc"){
 			document.addEventListener("mousedown", (e)=> {
 				var et = new events.Event("onMouseDown");

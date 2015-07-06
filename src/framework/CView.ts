@@ -6,22 +6,20 @@ class CView {
 
 	private objs:CMover[] = new Array()
 	private scene:THREE.Scene;
+	private scene2d:THREE.Scene;
 
-	public gm:GameManager;
+	public app:GameApp;
 	private cm:ControlManager;
-
-	constructor() {
-		this.getScene();
-		this.init();
-	}
 
 	private _keyEvent:Function;
 	private _onMouseDown:Function;
 	private _onMouseMove:Function;
 	private _onMouseUp:Function;
 
-	public init() {
-		this.gm = GameManager.getInstance();
+	constructor() {
+		this.app = GameApp.getInstance();
+		this.scene = this.app.getScene();
+		this.scene2d = this.app.getScene2d();
 		this.cm = ControlManager.getInstance();
 		this._keyEvent = (e)=> {
 			this.keyEvent(e);
@@ -58,12 +56,20 @@ class CView {
 		}
 	}
 
-	public add(obj) {
+	public add(obj:THREE.Object3D) {
 		this.scene.add(obj);
+	}
+
+	public add2d(obj:THREE.Object3D) {
+		this.scene2d.add(obj);
 	}
 
 	public remove(obj) {
 		this.scene.remove(obj);
+	}
+
+	public remove2d(obj) {
+		this.scene2d.remove(obj);
 	}
 
 	public addMover(chara:CMover) {
@@ -77,16 +83,20 @@ class CView {
 		chara.remove();
 	}
 
-	private getScene() {
-		var gm = GameManager.getInstance();
-		this.scene = gm.getScene();
-	}
-
 	public removeAll() {
 		for (var i = 0; i < this.objs.length; i++) {
 			this.scene.remove(this.objs[i].getObject());
 			this.objs[i].remove();
 		}
+
+		if (this.scene2d.children.length > 0) {
+			while (this.scene2d.children.length > 0) {
+				this.scene2d.remove(this.scene2d.children[this.scene2d.children.length - 1]);
+			}
+		}
+	}
+
+	public resize() {
 	}
 
 	public keyEvent(e:any) {

@@ -1,6 +1,3 @@
-/**
- * Created by yutaka.sano on 2015/06/02.
- */
 
 class HitArea {
 
@@ -37,5 +34,4 @@ class HitArea {
 	public getPositions() {
 		return this.positions;
 	}
-
 }

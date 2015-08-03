@@ -1,7 +1,3 @@
-/**
- * Created by yutaka.sano on 2015/06/01.
- */
-
 //GameApp
 //theee.jsのカメラやレンダリングなどを管理する
 
@@ -11,11 +7,6 @@
 /// <reference path="../framework/CView.ts"/>
 /// <reference path="ControlManager.ts"/>
 /// <reference path="../DefinitelyTyped/stats/stats.d.ts" />
-
-declare module THREE {
-	export var OrbitControls;
-	export var TrackballControls;
-}
 
 interface Window {
 	webkitRequestAnimationFrame: any;

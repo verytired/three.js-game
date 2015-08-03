@@ -23,7 +23,8 @@ gulp.task 'coffee', ->
 	.pipe $.coffee()
 	.pipe gulp.dest parentDir + 'js'
 
-#typescript compile
+#typescript compile by gulp-ts
+###
 gulp.task 'tsc', () ->
 	gulp
 	.src ['src/*.ts','src/*/*.ts']
@@ -32,6 +33,7 @@ gulp.task 'tsc', () ->
 	.pipe $.plumber()
 	.pipe $.tsc()
 	.pipe gulp.dest parentDir + 'js'
+###
 
 #typescript compile using gulp-typescript
 gulp.task 'typescript', () ->
@@ -39,8 +41,8 @@ gulp.task 'typescript', () ->
 		.src ['src/*.ts','src/*/*.ts']
 		.pipe $.plumber()
 		.pipe $.typescript {
-			module:"amd"
-			target: 'ES6'
+			# module:"amd"
+			# target: 'ES6'
 			removeComments: true
 			sortOutput: false
 			sourcemap: false

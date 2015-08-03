@@ -2,8 +2,8 @@
 
 class SingleShooter extends Shooter {
 
-	constructor() {
-		super();
-	}
+    constructor() {
+        super();
+    }
 
 }

@@ -104,7 +104,9 @@ var events;
     })();
     events.Event = Event;
 })(events || (events = {}));
-var __extends = this.__extends || function (d, b) {
+/// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
+/// <reference path="CEventDispatcher.ts"/>
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -137,6 +139,7 @@ var CMover = (function (_super) {
     };
     return CMover;
 })(events.EventDispatcher);
+/// <reference path="../framework/CMover.ts"/>
 var Mover = (function (_super) {
     __extends(Mover, _super);
     function Mover() {
@@ -162,6 +165,8 @@ var Mover = (function (_super) {
     };
     return Mover;
 })(CMover);
+/// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
+/// <reference path="Mover.ts"/>
 var MyShip = (function (_super) {
     __extends(MyShip, _super);
     function MyShip() {
@@ -170,7 +175,7 @@ var MyShip = (function (_super) {
         var geometry = new THREE.BoxGeometry(20, 20, 20);
         var materials = [
             new THREE.MeshLambertMaterial({
-                color: 0xff0000,
+                color: 0xff0000
             }),
             new THREE.MeshBasicMaterial({
                 color: 0x000000,
@@ -200,6 +205,9 @@ var MyShip = (function (_super) {
     };
     return MyShip;
 })(Mover);
+/// <reference path="CMover.ts"/>
+/// <reference path="../game/GameManager.ts"/>
+/// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
 var CView = (function () {
     function CView() {
         var _this = this;
@@ -346,6 +354,13 @@ var ControlManager = (function (_super) {
     ControlManager._instance = null;
     return ControlManager;
 })(events.EventDispatcher);
+//GameApp
+//theee.jsのカメラやレンダリングなどを管理する
+/// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
+/// <reference path="../DefinitelyTyped/jquery/jquery.d.ts" />
+/// <reference path="../framework/CView.ts"/>
+/// <reference path="ControlManager.ts"/>
+/// <reference path="../DefinitelyTyped/stats/stats.d.ts" />
 var GameApp = (function () {
     function GameApp() {
         this.use2d = true;
@@ -382,11 +397,20 @@ var GameApp = (function () {
         var container = document.getElementById('container');
         container.appendChild(this.renderer.domElement);
         this.requestAnimationFrame = (function () {
-            return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
-                window.setTimeout(callback, 1000.0 / 60.0);
-            };
+            return window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                window.oRequestAnimationFrame ||
+                window.msRequestAnimationFrame ||
+                function (callback) {
+                    window.setTimeout(callback, 1000.0 / 60.0);
+                };
         })();
-        var now = window.performance && (performance.now || performance.mozNow || performance.msNow || performance.oNow || performance.webkitNow);
+        var now = window.performance && (performance.now ||
+            performance.mozNow ||
+            performance.msNow ||
+            performance.oNow ||
+            performance.webkitNow);
         this.getTime = function () {
             return (now && now.call(performance)) || (new Date().getTime());
         };
@@ -507,6 +531,13 @@ var GameApp = (function () {
     GameApp._instance = null;
     return GameApp;
 })();
+/// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
+/// <reference path="../DefinitelyTyped/jquery/jquery.d.ts" />
+/// <reference path="MyShip.ts"/>
+/// <reference path="../framework/CView.ts"/>
+/// <reference path="../framework/GameApp.ts"/>
+/// <reference path="../framework/ControlManager.ts"/>
+/// <reference path="../DefinitelyTyped/stats/stats.d.ts" />
 var GameManager = (function () {
     function GameManager() {
         this.isStop = false;
@@ -579,7 +610,472 @@ var GameManager = (function () {
     GameManager._instance = null;
     return GameManager;
 })();
+/// <reference path="game/GameManager.ts"/>
 GameManager.getInstance().initialize();
+//弾クラス
+/// <reference path="Mover.ts"/>
+var Bullet = (function (_super) {
+    __extends(Bullet, _super);
+    function Bullet(vx, vy) {
+        _super.call(this);
+        this.stageWidth = 0;
+        this.stageHeight = 0;
+        var s = GameApp.getInstance().getStageSize();
+        this.stageWidth = s.width;
+        this.stageHeight = s.height;
+        this.vx = vx;
+        this.vy = vy;
+        var texture = new THREE.Texture(this.generateSprite());
+        texture.needsUpdate = true;
+        texture.minFilter = THREE.LinearFilter;
+        var material = new THREE.SpriteMaterial({
+            map: texture,
+            blending: THREE.AdditiveBlending
+        });
+        var sp = new THREE.Sprite(material);
+        sp.scale.x = sp.scale.y = 64;
+        this._obj.add(sp);
+        this._obj.castShadow = true;
+        this.hitArea.push(new HitArea(10, 10, this.x, this.y));
+        this.hitAreaPos.push(new THREE.Vector2(0, 0));
+    }
+    Bullet.prototype.update = function () {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.setPosition(this.x, this.y, this.z);
+        this.checkAreaTest();
+    };
+    Bullet.prototype.checkAreaTest = function () {
+        if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
+            this.isDead = true;
+            this.waitRemove = true;
+        }
+    };
+    Bullet.prototype.setPosition = function (x, y, z) {
+        for (var i = 0; i < this.hitArea.length; i++) {
+            this.hitArea[i].update(x + this.hitAreaPos[i].x, y + this.hitAreaPos[i].y);
+        }
+        _super.prototype.setPosition.call(this, x, y, z);
+    };
+    Bullet.prototype.generateSprite = function () {
+        var canvas = document.createElement("canvas");
+        canvas.width = 100;
+        canvas.height = 100;
+        var context = canvas.getContext("2d");
+        var gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
+        gradient.addColorStop(0, "rgba(255,255,255,1)");
+        gradient.addColorStop(0.2, "rgba(0,255,255,1)");
+        gradient.addColorStop(0.4, "rgba(0,0,64,1)");
+        gradient.addColorStop(1, "rgba(0,0,0,1)");
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        return canvas;
+    };
+    return Bullet;
+})(Mover);
+//弾クラス
+/// <reference path="Mover.ts"/>
+var BulletEnemy = (function (_super) {
+    __extends(BulletEnemy, _super);
+    function BulletEnemy(vx, vy) {
+        _super.call(this, vx, vy);
+    }
+    BulletEnemy.prototype.generateSprite = function () {
+        var canvas = document.createElement("canvas");
+        canvas.width = 100;
+        canvas.height = 100;
+        var context = canvas.getContext("2d");
+        var gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
+        gradient.addColorStop(0, "rgba(255,255,255,1)");
+        gradient.addColorStop(0.2, "rgba(255,0,255,1)");
+        gradient.addColorStop(0.4, "rgba(64,0,0,1)");
+        gradient.addColorStop(1, "rgba(0,0,0,1)");
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        return canvas;
+    };
+    return BulletEnemy;
+})(Bullet);
+/// <reference path="Mover.ts"/>
+var Shooter = (function () {
+    function Shooter() {
+        this.bullets = new Array();
+    }
+    Shooter.prototype.update = function (frame) {
+        for (var i = 0; i < this.bullets.length; i++) {
+            this.bullets[i].update(frame);
+        }
+    };
+    Shooter.prototype.shot = function (x, y, vx, vy) {
+        var b = new BulletEnemy(vx, vy);
+        var v = GameApp.getInstance().getCurrentView();
+        var z = GameManager.getInstance().zPosition;
+        b.setPosition(x, y, z);
+        v.addMover(b);
+        this.bullets.push(b);
+    };
+    Shooter.prototype.getBullets = function () {
+        return this.bullets;
+    };
+    return Shooter;
+})();
+/// <reference path="Shooter.ts"/>
+var SingleShooter = (function (_super) {
+    __extends(SingleShooter, _super);
+    function SingleShooter() {
+        _super.call(this);
+    }
+    return SingleShooter;
+})(Shooter);
+//敵クラス
+/// <reference path="Mover.ts"/>
+/// <reference path="ShooterSingle.ts"/>
+var Enemy = (function (_super) {
+    __extends(Enemy, _super);
+    function Enemy(startframe) {
+        _super.call(this);
+        this.point = 150;
+        this.life = 1;
+        this.lifeTime = 500;
+        this.startFrame = 0;
+        this.currentFrame = 0;
+        this.baseColor = 0xFFFFFF;
+        this.receiveDamage = true;
+        this.startFrame = startframe;
+        this.initialize();
+    }
+    Enemy.prototype.initialize = function () {
+        this.vy = -6;
+        var materials = [
+            new THREE.MeshLambertMaterial({
+                color: this.baseColor
+            }),
+            new THREE.MeshBasicMaterial({
+                color: 0x000000,
+                wireframe: true,
+                transparent: true
+            })
+        ];
+        this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.OctahedronGeometry(20, 1), materials);
+        this._obj.castShadow = true;
+        this.shooter = new SingleShooter();
+        this.hitArea.push(new HitArea(20, 20, this.x, this.y));
+        this.hitAreaPos.push(new THREE.Vector2(0, 0));
+    };
+    Enemy.prototype.update = function (nowFrame) {
+        var frame = nowFrame - this.startFrame;
+        if (frame <= this.currentFrame)
+            return;
+        this.currentFrame = frame;
+        this.doAction();
+        this.x += this.vx;
+        this.y += this.vy;
+        this.setPosition(this.x, this.y, this.z);
+    };
+    Enemy.prototype.doAction = function () {
+        if (this.currentFrame == 50) {
+            this.vy = 0;
+        }
+        else if (this.currentFrame == 70) {
+            this.shot();
+        }
+        else if (this.currentFrame == 100) {
+            this.vy = 6;
+        }
+        if (this.lifeTime == -1)
+            return;
+        if (this.currentFrame >= this.lifeTime) {
+            this.isDead = true;
+            this.waitRemove = true;
+        }
+    };
+    Enemy.prototype.shot = function () {
+        if (this.isDead == true)
+            return;
+        var s = GameManager.getInstance().getSelfCharacter();
+        var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
+        this.shooter.shot(this.x, this.y, (s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
+    };
+    Enemy.prototype.getBullets = function () {
+        return this.shooter.getBullets();
+    };
+    Enemy.prototype.explode = function () {
+        this.waitRemove = true;
+        var v = GameApp.getInstance().getCurrentView();
+        var ex = new Explosion(this.x, this.y, this.baseColor);
+        v.addMover(ex);
+    };
+    Enemy.prototype.hit = function () {
+        var _this = this;
+        if (this.receiveDamage == false)
+            return;
+        var msh = this._obj.children[0];
+        var ma = msh.material;
+        ma.color.setHex(0xFF0000);
+        setTimeout(function () {
+            ma.color.setHex(_this.baseColor);
+        }, 200);
+        this.life--;
+        if (this.life <= 0) {
+            this.isDead = true;
+            this.explode();
+        }
+    };
+    Enemy.prototype.setPosition = function (x, y, z) {
+        for (var i = 0; i < this.hitArea.length; i++) {
+            this.hitArea[i].update(x + this.hitAreaPos[i].x, y + this.hitAreaPos[i].y);
+        }
+        _super.prototype.setPosition.call(this, x, y, z);
+    };
+    Enemy.prototype.getPoint = function () {
+        return this.point;
+    };
+    Enemy.prototype.setLifeTime = function (t) {
+        this.lifeTime = t;
+    };
+    Enemy.prototype.setLife = function (l) {
+        this.life = l;
+    };
+    Enemy.prototype.setShooter = function (s) {
+        this.shooter = s;
+    };
+    Enemy.prototype.setBaseColor = function (c) {
+        this.baseColor = c;
+    };
+    return Enemy;
+})(Mover);
+var EnemyBoss = (function (_super) {
+    __extends(EnemyBoss, _super);
+    function EnemyBoss(startframe) {
+        _super.call(this, startframe);
+        this.moveType = 0;
+        this.farmecount = 0;
+        this.isLoop = false;
+    }
+    EnemyBoss.prototype.initialize = function () {
+        this.vy = -2;
+        this.vx = 0;
+        this.baseColor = 0x00ff00;
+        var materials = [
+            new THREE.MeshLambertMaterial({
+                color: this.baseColor
+            }),
+            new THREE.MeshBasicMaterial({
+                color: 0x000000,
+                wireframe: true,
+                transparent: true
+            })
+        ];
+        this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.IcosahedronGeometry(120, 3), materials);
+        this._obj.castShadow = true;
+        this.setShooter(new SingleShooter());
+        this.setLife(600);
+        this.setLifeTime(-1);
+        this.setBaseColor(0x00FF00);
+        this.hitArea.push(new HitArea(120, 120, this.x, this.y));
+        this.hitAreaPos.push(new THREE.Vector2(0, 0));
+        this.receiveDamage = false;
+    };
+    EnemyBoss.prototype.doAction = function () {
+        var duration = 30;
+        var vx = 3;
+        if (this.life <= 300) {
+            duration = 18;
+            vx = 5;
+        }
+        if (this.isLoop) {
+            this.farmecount++;
+            console.log();
+            if (this.farmecount % duration == 0) {
+                this.shot();
+            }
+            if (this.x > 320) {
+                this.x = 320;
+                this.vx = -vx;
+            }
+            else if (this.x < -320) {
+                this.x = -320;
+                this.vx = vx;
+            }
+            return;
+        }
+        if (this.currentFrame >= 240) {
+            this.vy = 0;
+            this.vx = 2;
+            this.isLoop = true;
+            this.receiveDamage = true;
+        }
+    };
+    return EnemyBoss;
+})(Enemy);
+//<reference path="ShooterNway.ts"/>
+var EnemyMid = (function (_super) {
+    __extends(EnemyMid, _super);
+    function EnemyMid(startframe) {
+        _super.call(this, startframe);
+    }
+    EnemyMid.prototype.initialize = function () {
+        this.vy = -4;
+        this.baseColor = 0x00ff00;
+        var materials = [
+            new THREE.MeshLambertMaterial({
+                color: this.baseColor
+            }),
+            new THREE.MeshBasicMaterial({
+                color: 0x000000,
+                wireframe: true,
+                transparent: true
+            })
+        ];
+        this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.IcosahedronGeometry(40, 1), materials);
+        this._obj.castShadow = true;
+        this.shooter = new ShooterNway();
+        this.setLife(30);
+        this.setLifeTime(540);
+        this.setBaseColor(0x00FF00);
+        this.hitArea.push(new HitArea(40, 40, this.x, this.y));
+        this.hitAreaPos.push(new THREE.Vector2(0, 0));
+    };
+    EnemyMid.prototype.shot = function () {
+        if (this.isDead == true)
+            return;
+        this.shooter.shot(this.x, this.y, 8, 15, 3);
+    };
+    EnemyMid.prototype.doAction = function () {
+        if (this.currentFrame == 70) {
+            this.vy = 0;
+        }
+        else if (this.currentFrame == 120) {
+            this.shot();
+        }
+        else if (this.currentFrame == 140) {
+            this.shot();
+        }
+        else if (this.currentFrame == 160) {
+            this.shot();
+        }
+        else if (this.currentFrame == 180) {
+            this.shot();
+        }
+        else if (this.currentFrame == 200) {
+            this.vy = 6;
+        }
+        if (this.currentFrame >= this.lifeTime) {
+            this.isDead = true;
+            this.waitRemove = true;
+        }
+    };
+    return EnemyMid;
+})(Enemy);
+/**
+ * Created by yutaka.sano on 2015/06/02.
+ */
+//敵クラス
+var EnemySmall = (function (_super) {
+    __extends(EnemySmall, _super);
+    function EnemySmall(startframe) {
+        _super.call(this, startframe);
+    }
+    EnemySmall.prototype.initialize = function () {
+        this.vy = -8;
+        var materials = [
+            new THREE.MeshLambertMaterial({
+                color: this.baseColor
+            }),
+            new THREE.MeshBasicMaterial({
+                color: 0x000000,
+                wireframe: true,
+                transparent: true
+            })
+        ];
+        this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.CylinderGeometry(20, 40, 40, 16), materials);
+        this._obj.castShadow = true;
+        this._obj.rotation.x = 90;
+        this.hitArea.push(new HitArea(20, 20, this.x, this.y));
+        this.hitAreaPos.push(new THREE.Vector2(0, 0));
+        this.setShooter(new SingleShooter());
+    };
+    EnemySmall.prototype.doAction = function () {
+        if (this.currentFrame >= this.lifeTime) {
+            this.isDead = true;
+            this.waitRemove = true;
+        }
+    };
+    return EnemySmall;
+})(Enemy);
+/// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
+/// <reference path="Mover.ts"/>
+var Explosion = (function (_super) {
+    __extends(Explosion, _super);
+    function Explosion(x, y, color) {
+        _super.call(this);
+        this.movementSpeed = 80;
+        this.totalObjects = 500;
+        this.objectSize = 10;
+        this.sizeRandomness = 4000;
+        this.colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
+        this.dirs = [];
+        this.parts = [];
+        this.status = false;
+        this.xDir = 0;
+        this.yDir = 0;
+        this.zDir = 0;
+        this.frameCount = 0;
+        var color = arguments[2];
+        if (color == undefined || color == null) {
+            color = 0xFFFFFF;
+        }
+        var particles = new THREE.Geometry();
+        for (var i = 0; i < this.totalObjects; i++) {
+            var vertex = new THREE.Vector3();
+            vertex.x = x;
+            vertex.y = y;
+            vertex.z = 0;
+            particles.vertices.push(vertex);
+            this.dirs.push({
+                x: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
+                y: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
+                z: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2)
+            });
+        }
+        var materialParticle = new THREE.PointCloudMaterial({
+            color: color,
+            size: 5,
+            transparent: true
+        });
+        this._obj.add(new THREE.PointCloud(particles, materialParticle));
+        this.status = true;
+        this.xDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
+        this.yDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
+        this.zDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
+    }
+    Explosion.prototype.init = function () {
+    };
+    Explosion.prototype.update = function () {
+        if (this.status == true) {
+            var m = this._obj.children[0];
+            var pCount = this.totalObjects;
+            while (pCount--) {
+                var particle = m.geometry.vertices[pCount];
+                particle.y += this.dirs[pCount].y;
+                particle.x += this.dirs[pCount].x;
+                particle.z += this.dirs[pCount].z;
+            }
+            this.frameCount++;
+            if (this.frameCount > 300) {
+                this.status = false;
+                this.waitRemove = true;
+            }
+            m.geometry.verticesNeedUpdate = true;
+        }
+    };
+    return Explosion;
+})(Mover);
+// Ported from Stefan Gustavson's java implementation
+// http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
+// Read Stefan's excellent paper for details on how this code works.
+//
+// Sean McCullough banksean@gmail.com
 var SimplexNoise = (function () {
     function SimplexNoise(r) {
         if (r === void 0) { r = undefined; }
@@ -850,449 +1346,8 @@ var SimplexNoise = (function () {
     };
     return SimplexNoise;
 })();
-var Bullet = (function (_super) {
-    __extends(Bullet, _super);
-    function Bullet(vx, vy) {
-        _super.call(this);
-        this.stageWidth = 0;
-        this.stageHeight = 0;
-        var s = GameApp.getInstance().getStageSize();
-        this.stageWidth = s.width;
-        this.stageHeight = s.height;
-        this.vx = vx;
-        this.vy = vy;
-        var texture = new THREE.Texture(this.generateSprite());
-        texture.needsUpdate = true;
-        texture.minFilter = THREE.LinearFilter;
-        var material = new THREE.SpriteMaterial({
-            map: texture,
-            blending: THREE.AdditiveBlending
-        });
-        var sp = new THREE.Sprite(material);
-        sp.scale.x = sp.scale.y = 64;
-        this._obj.add(sp);
-        this._obj.castShadow = true;
-        this.hitArea.push(new HitArea(10, 10, this.x, this.y));
-        this.hitAreaPos.push(new THREE.Vector2(0, 0));
-    }
-    Bullet.prototype.update = function () {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.setPosition(this.x, this.y, this.z);
-        this.checkAreaTest();
-    };
-    Bullet.prototype.checkAreaTest = function () {
-        if (this.x > this.stageWidth / 2 || this.x < -this.stageWidth / 2 || this.y > this.stageHeight / 2 || this.y < -this.stageHeight / 2) {
-            this.isDead = true;
-            this.waitRemove = true;
-        }
-    };
-    Bullet.prototype.setPosition = function (x, y, z) {
-        for (var i = 0; i < this.hitArea.length; i++) {
-            this.hitArea[i].update(x + this.hitAreaPos[i].x, y + this.hitAreaPos[i].y);
-        }
-        _super.prototype.setPosition.call(this, x, y, z);
-    };
-    Bullet.prototype.generateSprite = function () {
-        var canvas = document.createElement("canvas");
-        canvas.width = 100;
-        canvas.height = 100;
-        var context = canvas.getContext("2d");
-        var gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
-        gradient.addColorStop(0, "rgba(255,255,255,1)");
-        gradient.addColorStop(0.2, "rgba(0,255,255,1)");
-        gradient.addColorStop(0.4, "rgba(0,0,64,1)");
-        gradient.addColorStop(1, "rgba(0,0,0,1)");
-        context.fillStyle = gradient;
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        return canvas;
-    };
-    return Bullet;
-})(Mover);
-var BulletEnemy = (function (_super) {
-    __extends(BulletEnemy, _super);
-    function BulletEnemy(vx, vy) {
-        _super.call(this, vx, vy);
-    }
-    BulletEnemy.prototype.generateSprite = function () {
-        var canvas = document.createElement("canvas");
-        canvas.width = 100;
-        canvas.height = 100;
-        var context = canvas.getContext("2d");
-        var gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
-        gradient.addColorStop(0, "rgba(255,255,255,1)");
-        gradient.addColorStop(0.2, "rgba(255,0,255,1)");
-        gradient.addColorStop(0.4, "rgba(64,0,0,1)");
-        gradient.addColorStop(1, "rgba(0,0,0,1)");
-        context.fillStyle = gradient;
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        return canvas;
-    };
-    return BulletEnemy;
-})(Bullet);
-var Shooter = (function () {
-    function Shooter() {
-        this.bullets = new Array();
-    }
-    Shooter.prototype.update = function (frame) {
-        for (var i = 0; i < this.bullets.length; i++) {
-            this.bullets[i].update(frame);
-        }
-    };
-    Shooter.prototype.shot = function (x, y, vx, vy) {
-        var b = new BulletEnemy(vx, vy);
-        var v = GameApp.getInstance().getCurrentView();
-        var z = GameManager.getInstance().zPosition;
-        b.setPosition(x, y, z);
-        v.addMover(b);
-        this.bullets.push(b);
-    };
-    Shooter.prototype.getBullets = function () {
-        return this.bullets;
-    };
-    return Shooter;
-})();
-var SingleShooter = (function (_super) {
-    __extends(SingleShooter, _super);
-    function SingleShooter() {
-        _super.call(this);
-    }
-    return SingleShooter;
-})(Shooter);
-var Enemy = (function (_super) {
-    __extends(Enemy, _super);
-    function Enemy(startframe) {
-        _super.call(this);
-        this.point = 150;
-        this.life = 1;
-        this.lifeTime = 500;
-        this.startFrame = 0;
-        this.currentFrame = 0;
-        this.baseColor = 0xFFFFFF;
-        this.receiveDamage = true;
-        this.startFrame = startframe;
-        this.initialize();
-    }
-    Enemy.prototype.initialize = function () {
-        this.vy = -6;
-        var materials = [
-            new THREE.MeshLambertMaterial({
-                color: this.baseColor,
-            }),
-            new THREE.MeshBasicMaterial({
-                color: 0x000000,
-                wireframe: true,
-                transparent: true
-            })
-        ];
-        this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.OctahedronGeometry(20, 1), materials);
-        this._obj.castShadow = true;
-        this.shooter = new SingleShooter();
-        this.hitArea.push(new HitArea(20, 20, this.x, this.y));
-        this.hitAreaPos.push(new THREE.Vector2(0, 0));
-    };
-    Enemy.prototype.update = function (nowFrame) {
-        var frame = nowFrame - this.startFrame;
-        if (frame <= this.currentFrame)
-            return;
-        this.currentFrame = frame;
-        this.doAction();
-        this.x += this.vx;
-        this.y += this.vy;
-        this.setPosition(this.x, this.y, this.z);
-    };
-    Enemy.prototype.doAction = function () {
-        if (this.currentFrame == 50) {
-            this.vy = 0;
-        }
-        else if (this.currentFrame == 70) {
-            this.shot();
-        }
-        else if (this.currentFrame == 100) {
-            this.vy = 6;
-        }
-        if (this.lifeTime == -1)
-            return;
-        if (this.currentFrame >= this.lifeTime) {
-            this.isDead = true;
-            this.waitRemove = true;
-        }
-    };
-    Enemy.prototype.shot = function () {
-        if (this.isDead == true)
-            return;
-        var s = GameManager.getInstance().getSelfCharacter();
-        var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
-        this.shooter.shot(this.x, this.y, (s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
-    };
-    Enemy.prototype.getBullets = function () {
-        return this.shooter.getBullets();
-    };
-    Enemy.prototype.explode = function () {
-        this.waitRemove = true;
-        var v = GameApp.getInstance().getCurrentView();
-        var ex = new Explosion(this.x, this.y, this.baseColor);
-        v.addMover(ex);
-    };
-    Enemy.prototype.hit = function () {
-        var _this = this;
-        if (this.receiveDamage == false)
-            return;
-        var msh = this._obj.children[0];
-        var ma = msh.material;
-        ma.color.setHex(0xFF0000);
-        setTimeout(function () {
-            ma.color.setHex(_this.baseColor);
-        }, 200);
-        this.life--;
-        if (this.life <= 0) {
-            this.isDead = true;
-            this.explode();
-        }
-    };
-    Enemy.prototype.setPosition = function (x, y, z) {
-        for (var i = 0; i < this.hitArea.length; i++) {
-            this.hitArea[i].update(x + this.hitAreaPos[i].x, y + this.hitAreaPos[i].y);
-        }
-        _super.prototype.setPosition.call(this, x, y, z);
-    };
-    Enemy.prototype.getPoint = function () {
-        return this.point;
-    };
-    Enemy.prototype.setLifeTime = function (t) {
-        this.lifeTime = t;
-    };
-    Enemy.prototype.setLife = function (l) {
-        this.life = l;
-    };
-    Enemy.prototype.setShooter = function (s) {
-        this.shooter = s;
-    };
-    Enemy.prototype.setBaseColor = function (c) {
-        this.baseColor = c;
-    };
-    return Enemy;
-})(Mover);
-var EnemyBoss = (function (_super) {
-    __extends(EnemyBoss, _super);
-    function EnemyBoss(startframe) {
-        _super.call(this, startframe);
-        this.moveType = 0;
-        this.farmecount = 0;
-        this.isLoop = false;
-    }
-    EnemyBoss.prototype.initialize = function () {
-        this.vy = -2;
-        this.vx = 0;
-        this.baseColor = 0x00ff00;
-        var materials = [
-            new THREE.MeshLambertMaterial({
-                color: this.baseColor,
-            }),
-            new THREE.MeshBasicMaterial({
-                color: 0x000000,
-                wireframe: true,
-                transparent: true
-            })
-        ];
-        this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.IcosahedronGeometry(120, 3), materials);
-        this._obj.castShadow = true;
-        this.setShooter(new SingleShooter());
-        this.setLife(600);
-        this.setLifeTime(-1);
-        this.setBaseColor(0x00FF00);
-        this.hitArea.push(new HitArea(120, 120, this.x, this.y));
-        this.hitAreaPos.push(new THREE.Vector2(0, 0));
-        this.receiveDamage = false;
-    };
-    EnemyBoss.prototype.doAction = function () {
-        var duration = 30;
-        var vx = 3;
-        if (this.life <= 300) {
-            duration = 18;
-            vx = 5;
-        }
-        if (this.isLoop) {
-            this.farmecount++;
-            console.log();
-            if (this.farmecount % duration == 0) {
-                this.shot();
-            }
-            if (this.x > 320) {
-                this.x = 320;
-                this.vx = -vx;
-            }
-            else if (this.x < -320) {
-                this.x = -320;
-                this.vx = vx;
-            }
-            return;
-        }
-        if (this.currentFrame >= 240) {
-            this.vy = 0;
-            this.vx = 2;
-            this.isLoop = true;
-            this.receiveDamage = true;
-        }
-    };
-    return EnemyBoss;
-})(Enemy);
-var EnemyMid = (function (_super) {
-    __extends(EnemyMid, _super);
-    function EnemyMid(startframe) {
-        _super.call(this, startframe);
-    }
-    EnemyMid.prototype.initialize = function () {
-        this.vy = -4;
-        this.baseColor = 0x00ff00;
-        var materials = [
-            new THREE.MeshLambertMaterial({
-                color: this.baseColor,
-            }),
-            new THREE.MeshBasicMaterial({
-                color: 0x000000,
-                wireframe: true,
-                transparent: true
-            })
-        ];
-        this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.IcosahedronGeometry(40, 1), materials);
-        this._obj.castShadow = true;
-        this.shooter = new ShooterNway();
-        this.setLife(30);
-        this.setLifeTime(540);
-        this.setBaseColor(0x00FF00);
-        this.hitArea.push(new HitArea(40, 40, this.x, this.y));
-        this.hitAreaPos.push(new THREE.Vector2(0, 0));
-    };
-    EnemyMid.prototype.shot = function () {
-        if (this.isDead == true)
-            return;
-        this.shooter.shot(this.x, this.y, 8, 15, 3);
-    };
-    EnemyMid.prototype.doAction = function () {
-        if (this.currentFrame == 70) {
-            this.vy = 0;
-        }
-        else if (this.currentFrame == 120) {
-            this.shot();
-        }
-        else if (this.currentFrame == 140) {
-            this.shot();
-        }
-        else if (this.currentFrame == 160) {
-            this.shot();
-        }
-        else if (this.currentFrame == 180) {
-            this.shot();
-        }
-        else if (this.currentFrame == 200) {
-            this.vy = 6;
-        }
-        if (this.currentFrame >= this.lifeTime) {
-            this.isDead = true;
-            this.waitRemove = true;
-        }
-    };
-    return EnemyMid;
-})(Enemy);
-var EnemySmall = (function (_super) {
-    __extends(EnemySmall, _super);
-    function EnemySmall(startframe) {
-        _super.call(this, startframe);
-    }
-    EnemySmall.prototype.initialize = function () {
-        this.vy = -8;
-        var materials = [
-            new THREE.MeshLambertMaterial({
-                color: this.baseColor,
-            }),
-            new THREE.MeshBasicMaterial({
-                color: 0x000000,
-                wireframe: true,
-                transparent: true
-            })
-        ];
-        this._obj = THREE.SceneUtils.createMultiMaterialObject(new THREE.CylinderGeometry(20, 40, 40, 16), materials);
-        this._obj.castShadow = true;
-        this._obj.rotation.x = 90;
-        this.hitArea.push(new HitArea(20, 20, this.x, this.y));
-        this.hitAreaPos.push(new THREE.Vector2(0, 0));
-        this.setShooter(new SingleShooter());
-    };
-    EnemySmall.prototype.doAction = function () {
-        if (this.currentFrame >= this.lifeTime) {
-            this.isDead = true;
-            this.waitRemove = true;
-        }
-    };
-    return EnemySmall;
-})(Enemy);
-var Explosion = (function (_super) {
-    __extends(Explosion, _super);
-    function Explosion(x, y, color) {
-        _super.call(this);
-        this.movementSpeed = 80;
-        this.totalObjects = 500;
-        this.objectSize = 10;
-        this.sizeRandomness = 4000;
-        this.colors = [0xFF0FFF, 0xCCFF00, 0xFF000F, 0x996600, 0xFFFFFF];
-        this.dirs = [];
-        this.parts = [];
-        this.status = false;
-        this.xDir = 0;
-        this.yDir = 0;
-        this.zDir = 0;
-        this.frameCount = 0;
-        var color = arguments[2];
-        if (color == undefined || color == null) {
-            color = 0xFFFFFF;
-        }
-        var particles = new THREE.Geometry();
-        for (var i = 0; i < this.totalObjects; i++) {
-            var vertex = new THREE.Vector3();
-            vertex.x = x;
-            vertex.y = y;
-            vertex.z = 0;
-            particles.vertices.push(vertex);
-            this.dirs.push({
-                x: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
-                y: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2),
-                z: (Math.random() * this.movementSpeed) - (this.movementSpeed / 2)
-            });
-        }
-        var materialParticle = new THREE.PointCloudMaterial({
-            color: color,
-            size: 5,
-            transparent: true
-        });
-        this._obj.add(new THREE.PointCloud(particles, materialParticle));
-        this.status = true;
-        this.xDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
-        this.yDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
-        this.zDir = (Math.random() * this.movementSpeed) - (this.movementSpeed / 2);
-    }
-    Explosion.prototype.init = function () {
-    };
-    Explosion.prototype.update = function () {
-        if (this.status == true) {
-            var m = this._obj.children[0];
-            var pCount = this.totalObjects;
-            while (pCount--) {
-                var particle = m.geometry.vertices[pCount];
-                particle.y += this.dirs[pCount].y;
-                particle.x += this.dirs[pCount].x;
-                particle.z += this.dirs[pCount].z;
-            }
-            this.frameCount++;
-            if (this.frameCount > 300) {
-                this.status = false;
-                this.waitRemove = true;
-            }
-            m.geometry.verticesNeedUpdate = true;
-        }
-    };
-    return Explosion;
-})(Mover);
+/// <reference path="../utils/SimplexNoise.ts"/>
+/// <reference path="Mover.ts"/>
 var Stage = (function (_super) {
     __extends(Stage, _super);
     function Stage() {
@@ -1316,6 +1371,10 @@ var Stage = (function (_super) {
     };
     return Stage;
 })(Mover);
+/// <reference path="../DefinitelyTyped/threejs/three.d.ts" />
+/// <reference path="../framework/CView.ts"/>
+/// <reference path="Stage.ts"/>
+/// <reference path="Enemy.ts"/>
 var GameView = (function (_super) {
     __extends(GameView, _super);
     function GameView() {
@@ -1368,6 +1427,18 @@ var GameView = (function (_super) {
     GameView.prototype.onMouseDown = function (e) {
     };
     GameView.prototype.onMouseMove = function (e) {
+        //var nowX = e.data.x
+        //var nowY = e.data.y
+        //
+        //if (this.app.ua != "pc") {
+        //	nowX = e.data.touches[0].clientX;
+        //	nowY = e.data.touches[0].clientY;
+        //}
+        //
+        //var w = window.innerWidth;
+        //var h = window.innerHeight;
+        //
+        //this.self.setPosition(-240 + 480 * nowX / w, 320 - 640 * nowY / h, this.zPosition)
         var mouse = new THREE.Vector2();
         mouse.set((e.data.x / window.innerWidth) * 2 - 1, -(e.data.y / window.innerHeight) * 2 + 1);
         this.raycaster.setFromCamera(mouse, this.app.getCamera());
@@ -1532,12 +1603,9 @@ var GameView = (function (_super) {
         var path = "image/skybox/";
         var format = '.jpg';
         var urls = [
-            path + 'px' + format,
-            path + 'nx' + format,
-            path + 'py' + format,
-            path + 'ny' + format,
-            path + 'pz' + format,
-            path + 'nz' + format
+            path + 'px' + format, path + 'nx' + format,
+            path + 'py' + format, path + 'ny' + format,
+            path + 'pz' + format, path + 'nz' + format
         ];
         var textureCube = THREE.ImageUtils.loadTextureCube(urls, THREE.CubeRefractionMapping);
         var shader = THREE.ShaderLib["cube"];
@@ -1642,6 +1710,7 @@ var Score = (function () {
     Score._instance = null;
     return Score;
 })();
+/// <reference path="../framework/GameApp.ts"/>
 var ShooterNway = (function (_super) {
     __extends(ShooterNway, _super);
     function ShooterNway() {

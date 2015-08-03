@@ -23,7 +23,7 @@ gulp.task 'coffee', ->
 	.pipe $.coffee()
 	.pipe gulp.dest parentDir + 'js'
 
-#typescript compile by gulp-tsc
+#typescript compile by gulp-ts
 ###
 gulp.task 'tsc', () ->
 	gulp

@@ -15,11 +15,12 @@ class CMover extends events.EventDispatcher implements IMover {
     public waitRemove: boolean = false;
 
     constructor() {
-        super()
+        super();
         this._obj = new THREE.Object3D();
     }
 
     public update(nowFrame) {
+        //todo
     }
 
     public getObject() {
@@ -27,7 +28,7 @@ class CMover extends events.EventDispatcher implements IMover {
     }
 
     public remove() {
-
+        //todo implemation
     }
 
     public setPosition(x, y, z) {

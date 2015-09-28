@@ -8,10 +8,11 @@ class Mover extends CMover {
     public hitAreaPos: THREE.Vector2[] = new Array();
 
     constructor() {
-        super()
+        super();
     }
 
     public explode() {
+        //todo implemation
     }
 
     public hitTest(hitAreaArray) {

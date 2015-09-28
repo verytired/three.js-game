@@ -47,32 +47,32 @@ class GameView extends CView {
 
     public keyEvent(e: any) {
         if (this.isKeyLock == true) {
-            return
+            return;
         }
         switch (e.data.keyCode) {
             case 32:
                 if (this.waitingRestart == true) {
                     this.restart();
-                    return
+                    return;
                 }
                 //shot bullets
                 var b = new Bullet(0, 12);
                 b.setPosition(this.self.x, this.self.y, this.zPosition);
                 this.addMover(b);
                 this.bullets.push(b);
-                break
+                break;
             case 65:
                 this.self.x -= 10;
-                break
+                break;
             case 87:
                 this.self.y += 10;
-                break
+                break;
             case 68:
                 this.self.x += 10;
-                break
+                break;
             case 83:
                 this.self.y -= 10;
-                break
+                break;
         }
     }
 
@@ -104,17 +104,17 @@ class GameView extends CView {
 
         if (intersects.length > 0) {
             var intersect = intersects[0];
-            this.self.setPosition(intersect.point.x, intersect.point.y, this.zPosition)
+            this.self.setPosition(intersect.point.x, intersect.point.y, this.zPosition);
         }
     }
 
     public onMouseUp(e: any) {
         if (this.isKeyLock == true) {
-            return
+            return;
         }
         if (this.waitingRestart == true) {
             this.restart();
-            return
+            return;
         }
     }
 
@@ -126,22 +126,22 @@ class GameView extends CView {
             for (var i = 0; i < enemies.length; i++) {
                 if (enemies[i].type == 1) {
                     var e = new Enemy(this.app.getCurrentFrame());
-                    e.setPosition(enemies[i].x, enemies[i].y, this.zPosition)
+                    e.setPosition(enemies[i].x, enemies[i].y, this.zPosition);
                     this.addMover(e);
                     this.enemies.push(e);
                 } else if (enemies[i].type == 2) {
                     var e = new EnemyMid(this.app.getCurrentFrame());
-                    e.setPosition(enemies[i].x, enemies[i].y, this.zPosition)
+                    e.setPosition(enemies[i].x, enemies[i].y, this.zPosition);
                     this.addMover(e);
                     this.enemies.push(e);
                 } else if (enemies[i].type == 3) {
                     var b = new EnemySmall(this.app.getCurrentFrame());
-                    b.setPosition(enemies[i].x, enemies[i].y, this.zPosition)
+                    b.setPosition(enemies[i].x, enemies[i].y, this.zPosition);
                     this.addMover(b);
                     this.enemies.push(b);
                 } else if (enemies[i].type == 4) {
                     var boss = new EnemyBoss(this.app.getCurrentFrame());
-                    boss.setPosition(enemies[i].x, enemies[i].y, this.zPosition)
+                    boss.setPosition(enemies[i].x, enemies[i].y, this.zPosition);
                     this.addMover(boss);
                     this.enemies.push(boss);
                     //todo boss
@@ -156,7 +156,7 @@ class GameView extends CView {
         this.checkLiveTest();
         super.update(currentFrame);
 
-        if (this.skybox) this.skybox.rotation.y += 0.01;
+        if (this.skybox) {this.skybox.rotation.y += 0.01;}
 
     }
 
@@ -169,15 +169,15 @@ class GameView extends CView {
                 this.bullets[i].isDead = true;
                 this.bullets[i].waitRemove = true;
             }
-            this.isInBossBattle = false
+            this.isInBossBattle = false;
             this.boss = null;
             this.waitingRestart = true;
             this.isKeyLock = true;
             setTimeout(() => {
                 this.setClear();
-            }, 3000)
+            }, 3000);
 
-            return
+            return;
         }
 
         for (var i = 0; i < this.bullets.length; i++) {
@@ -201,7 +201,7 @@ class GameView extends CView {
         for (var j = 0; j < this.enemies.length; j++) {
             var bulletArray = this.enemies[j].getBullets();
             for (var k = 0; k < bulletArray.length; k++) {
-                var b = bulletArray[k]
+                var b = bulletArray[k];
                 if (this.self.hitTest(b.hitArea) == true) {
                     if (!this.self.isDead) {
                         this.self.isDead = true;
@@ -233,13 +233,13 @@ class GameView extends CView {
             this.isKeyLock = true;
             setTimeout(() => {
                 this.setGameOver();
-            }, 3000)
-            return
+            }, 3000);
+            return;
         }
         var n = 0;
         for (var i = 0; i < this.bullets.length; i++) {
             if (this.bullets[n].isDead == true) {
-                this.bullets.splice(n, 1)
+                this.bullets.splice(n, 1);
             } else {
                 n++;
             }
@@ -247,7 +247,7 @@ class GameView extends CView {
         n = 0;
         for (var i = 0; i < this.enemies.length; i++) {
             if (this.enemies[n].waitRemove == true) {
-                this.enemies.splice(n, 1)
+                this.enemies.splice(n, 1);
             } else {
                 n++;
             }
@@ -283,7 +283,7 @@ class GameView extends CView {
         this.addMover(this.bg);
 
         this.self = new MyShip();
-        this.self.setPosition(0, -300, 0)
+        this.self.setPosition(0, -300, 0);
         this.addMover(this.self);
         this.gm.setSelfCharacter(this.self);
         this.app.setStartTime();
@@ -291,11 +291,11 @@ class GameView extends CView {
 
         //todo skybox
         var path = "image/skybox/";
-        var format = '.jpg';
+        var format = ".jpg";
         var urls = [
-            path + 'px' + format, path + 'nx' + format,
-            path + 'py' + format, path + 'ny' + format,
-            path + 'pz' + format, path + 'nz' + format
+            path + "px" + format, path + "nx" + format,
+            path + "py" + format, path + "ny" + format,
+            path + "pz" + format, path + "nz" + format
         ];
         var textureCube = THREE.ImageUtils.loadTextureCube(urls, THREE.CubeRefractionMapping);
         var shader = THREE.ShaderLib["cube"];
@@ -306,7 +306,7 @@ class GameView extends CView {
             uniforms: shader.uniforms,
             depthWrite: false,
             side: THREE.BackSide
-        })
+        });
         var mesh = new THREE.Mesh(new THREE.BoxGeometry(10000, 10000, 10000), material);
         this.add(mesh);
 

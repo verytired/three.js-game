@@ -82,7 +82,7 @@ class GameApp {
         this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 100000);
 
         this.camera.position.set(0, -300, 240);
-        this.camera.lookAt(new THREE.Vector3(0, 0, 0))
+        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
 
         //renderer default initialize
         this.renderer = new THREE.WebGLRenderer({
@@ -94,7 +94,7 @@ class GameApp {
         //this.renderer.setClearColor(0x000000);
         //this.renderer.shadowMapEnabled = true;
 
-        var container = document.getElementById('container');
+        var container = document.getElementById("container");
         container.appendChild(this.renderer.domElement);
 
 
@@ -118,7 +118,7 @@ class GameApp {
 
         this.getTime = function() {
             return (now && now.call(performance)) || (new Date().getTime());
-        }
+        };
         this.startTime = this.getTime();
 
 
@@ -126,13 +126,13 @@ class GameApp {
         window.addEventListener("keyup", (e) => {
             var imgData, imgNode;
             //Listen to 'P' key
-            if (e.which !== 80) return;
+            if (e.which !== 80) {return;}
             try {
                 imgData = this.renderer.domElement.toDataURL();
                 console.log(imgData);
             }
             catch (e) {
-                console.log(e)
+                console.log(e);
                 console.log("Browser does not support taking screenshot of 3d context");
                 return;
             }
@@ -141,23 +141,23 @@ class GameApp {
         //stats
         this.stats = new Stats();
         this.stats.setMode(0); // 0: fps, 1: ms
-        this.stats.domElement.style.position = 'absolute';
-        this.stats.domElement.style.right = '0px';
-        this.stats.domElement.style.top = '0px';
+        this.stats.domElement.style.position = "absolute";
+        this.stats.domElement.style.right = "0px";
+        this.stats.domElement.style.top = "0px";
         document.body.appendChild(this.stats.domElement);
 
         this.ua = "pc";
         var ua = navigator.userAgent;
-        if (ua.indexOf('iPhone') > 0) {
+        if (ua.indexOf("iPhone") > 0) {
             this.ua = "ios";
-        } else if (ua.indexOf('Android') > 0) {
-            this.ua = "android"
+        } else if (ua.indexOf("Android") > 0) {
+            this.ua = "android";
         }
 
         //orbitcontrol
         if (this.useControl == true) {
             this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-            this.controls.addEventListener('change', () => {
+            this.controls.addEventListener("change", () => {
                 //console.log(this.camera)
             });
         }
@@ -173,14 +173,14 @@ class GameApp {
             }
         });
 
-        if (this.use2d == true) this.init2d();
+        if (this.use2d == true) {this.init2d();};
     }
 
 	/**
 	 * 2d描画初期化
 	 */
     private init2d() {
-        console.info("using 2d")
+        console.info("using 2d");
         this.camera2d = new THREE.OrthographicCamera(0, window.innerWidth, 0, window.innerHeight);
         this.scene2d = new THREE.Scene();
     }
@@ -193,7 +193,7 @@ class GameApp {
     }
 
     public update() {
-        if (this.useControl == true) this.controls.update();
+        if (this.useControl == true) {this.controls.update();}
         if (this.currentView && this.isStop == false) {
             this.currentView.update(this.currentFrame);
         }
@@ -237,7 +237,7 @@ class GameApp {
 
     //stageサイズ返却
     public getStageSize() {
-        return { width: this.stageWidth, height: this.stageHeight }
+        return { width: this.stageWidth, height: this.stageHeight };
     }
 
     //viewへの参照

@@ -57,12 +57,12 @@ module events {
         }
 
         containEventListener(type: string): boolean {
-            if (this.listeners[type] == null) return false;
+            if (this.listeners[type] == null) {return false;}
             return this.listeners[type].length > 0;
         }
 
         hasEventListener(type: string, callback: Function): boolean {
-            if (this.listeners[type] == null) return false;
+            if (this.listeners[type] == null) {return false;}
             for (var i: number = 0; i < this.listeners[type].length; i++) {
                 var listener: EventListener = this.listeners[type][i];
                 if (listener.equalCurrentListener(type, callback)) {

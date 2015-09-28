@@ -4,7 +4,9 @@ class Shooter {
 
     private bullets: Mover[] = new Array();
 
-    constructor() { }
+    constructor() {
+        //todo implemation
+    }
 
     public update(frame) {
         for (var i = 0; i < this.bullets.length; i++) {
@@ -16,7 +18,7 @@ class Shooter {
         var b = new BulletEnemy(vx, vy);
         var v = GameApp.getInstance().getCurrentView();
         var z = GameManager.getInstance().zPosition;
-        b.setPosition(x, y, z)
+        b.setPosition(x, y, z);
         v.addMover(b);
         this.bullets.push(b);
     }

@@ -20,7 +20,7 @@ class BulletEnemy extends Bullet {
         gradient.addColorStop(1, "rgba(0,0,0,1)");
         context.fillStyle = gradient;
         context.fillRect(0, 0, canvas.width, canvas.height);
-        return canvas
+        return canvas;
     }
 
 }

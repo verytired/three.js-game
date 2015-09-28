@@ -26,7 +26,7 @@ class Bullet extends Mover {
         //		wireframe: true
         //	})));
 
-        var texture = new THREE.Texture(this.generateSprite())
+        var texture = new THREE.Texture(this.generateSprite());
         texture.needsUpdate = true;
         //Texture is not power of two. Texture.minFilter should be set to THREE.NearestFilter or THREE.LinearFilter.
         texture.minFilter = THREE.LinearFilter;
@@ -35,13 +35,13 @@ class Bullet extends Mover {
             map: texture,
             blending: THREE.AdditiveBlending
         }
-            )
-        var sp = new THREE.Sprite(material)
+    );
+        var sp = new THREE.Sprite(material);
         sp.scale.x = sp.scale.y = 64;
-        this._obj.add(sp)
+        this._obj.add(sp);
         this._obj.castShadow = true;
 
-        this.hitArea.push(new HitArea(10, 10, this.x, this.y))
+        this.hitArea.push(new HitArea(10, 10, this.x, this.y));
         this.hitAreaPos.push(new THREE.Vector2(0, 0));
     }
 
@@ -80,7 +80,7 @@ class Bullet extends Mover {
         gradient.addColorStop(1, "rgba(0,0,0,1)");
         context.fillStyle = gradient;
         context.fillRect(0, 0, canvas.width, canvas.height);
-        return canvas
+        return canvas;
     }
 
 }

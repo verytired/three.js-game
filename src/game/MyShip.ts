@@ -30,7 +30,7 @@ class MyShip extends Mover {
 
         this._obj.castShadow = true;
 
-        this.hitArea.push(new HitArea(20, 20, this.x, this.y))
+        this.hitArea.push(new HitArea(20, 20, this.x, this.y));
         this.hitAreaPos.push(new THREE.Vector2(0, 0));
     }
 

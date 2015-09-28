@@ -22,9 +22,9 @@ class Explosion extends Mover {
 
     constructor(x, y, color) {
         super();
-        var color = arguments[2];
+        // var color = arguments[2];
         if (color == undefined || color == null) {
-            color = 0xFFFFFF
+            color = 0xFFFFFF;
         }
         var particles = new THREE.Geometry();
         for (var i = 0; i < this.totalObjects; i++) {
@@ -57,7 +57,7 @@ class Explosion extends Mover {
     }
 
     public init() {
-
+        //todo implementation
     }
 
     public update() {
@@ -67,7 +67,7 @@ class Explosion extends Mover {
             var m: any = this._obj.children[0];
             var pCount = this.totalObjects;
             while (pCount--) {
-                var particle = m.geometry.vertices[pCount]
+                var particle = m.geometry.vertices[pCount];
                 particle.y += this.dirs[pCount].y;
                 particle.x += this.dirs[pCount].x;
                 particle.z += this.dirs[pCount].z;

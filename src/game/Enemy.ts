@@ -41,13 +41,13 @@ class Enemy extends Mover {
         this._obj.castShadow = true;
         this.shooter = new SingleShooter();
 
-        this.hitArea.push(new HitArea(20, 20, this.x, this.y))
+        this.hitArea.push(new HitArea(20, 20, this.x, this.y));
         this.hitAreaPos.push(new THREE.Vector2(0, 0));
     }
 
     public update(nowFrame) {
         var frame = nowFrame - this.startFrame;
-        if (frame <= this.currentFrame) return
+        if (frame <= this.currentFrame) {return;}
         this.currentFrame = frame;
         this.doAction();
 
@@ -62,13 +62,13 @@ class Enemy extends Mover {
 	 */
     public doAction() {
         if (this.currentFrame == 50) {
-            this.vy = 0
+            this.vy = 0;
         } else if (this.currentFrame == 70) {
-            this.shot()
+            this.shot();
         } else if (this.currentFrame == 100) {
-            this.vy = 6
+            this.vy = 6;
         }
-        if (this.lifeTime == -1) return;
+        if (this.lifeTime == -1) {return;}
         if (this.currentFrame >= this.lifeTime) {
             this.isDead = true;
             this.waitRemove = true;
@@ -76,7 +76,7 @@ class Enemy extends Mover {
     }
 
     public shot() {
-        if (this.isDead == true) return
+        if (this.isDead == true) {return;}
         var s = GameManager.getInstance().getSelfCharacter();
         var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
         this.shooter.shot(this.x, this.y, (s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
@@ -96,13 +96,15 @@ class Enemy extends Mover {
 
     //hit
     public hit() {
-        if (this.receiveDamage == false) return
+        if (this.receiveDamage == false) {
+            return;
+        }
         var msh: any = this._obj.children[0];
         var ma = msh.material;
         ma.color.setHex(0xFF0000);
         setTimeout(() => {
             ma.color.setHex(this.baseColor);
-        }, 200)
+        }, 200);
         this.life--;
         if (this.life <= 0) {
             this.isDead = true;
@@ -134,6 +136,6 @@ class Enemy extends Mover {
     }
 
     public setBaseColor(c) {
-        this.baseColor = c
+        this.baseColor = c;
     }
 }

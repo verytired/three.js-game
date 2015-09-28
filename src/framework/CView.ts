@@ -4,7 +4,7 @@
 
 class CView {
 
-    private objs: CMover[] = new Array()
+    private objs: CMover[] = new Array();
     private scene: THREE.Scene;
     private scene2d: THREE.Scene;
 
@@ -23,16 +23,16 @@ class CView {
         this.cm = ControlManager.getInstance();
         this._keyEvent = (e) => {
             this.keyEvent(e);
-        }
+        };
         this._onMouseDown = (e) => {
             this.onMouseDown(e);
-        }
+        };
         this._onMouseMove = (e) => {
             this.onMouseMove(e);
-        }
+        };
         this._onMouseUp = (e) => {
             this.onMouseUp(e);
-        }
+        };
         this.cm.addEventListener("onKeyPress", this._keyEvent);
         this.cm.addEventListener("onMouseDown", this._onMouseDown);
         this.cm.addEventListener("onMouseMove", this._onMouseMove);
@@ -51,7 +51,7 @@ class CView {
         for (var i = 0; i < this.objs.length; i++) {
             this.objs[i].update(nowFrame);
             if (this.objs[i].waitRemove == true) {
-                this.removeMover(this.objs[i], i)
+                this.removeMover(this.objs[i], i);
             }
         }
     }
@@ -73,7 +73,7 @@ class CView {
     }
 
     public addMover(chara: CMover) {
-        this.objs.push(chara)
+        this.objs.push(chara);
         this.scene.add(chara.getObject());
     }
 
@@ -97,17 +97,22 @@ class CView {
     }
 
     public resize() {
+        //
     }
 
     public keyEvent(e: any) {
+        //
     }
 
     public onMouseDown(e: any) {
+        //
     }
 
     public onMouseMove(e: any) {
+        //
     }
 
     public onMouseUp(e: any) {
+        //
     }
 }

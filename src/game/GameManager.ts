@@ -76,8 +76,8 @@ class GameManager {
         var w = window.innerWidth;
         var h = window.innerHeight;
         for (var i = 0; i < this.overlay.length; i++) {
-            $(this.overlay[i]).css({ top: h / 2 - $(this.overlay[i]).height() / 2 })
-            $(this.overlay[i]).hide()
+            $(this.overlay[i]).css({ top: h / 2 - $(this.overlay[i]).height() / 2 });
+            $(this.overlay[i]).hide();
         }
     }
 
@@ -104,7 +104,7 @@ class GameManager {
     }
 
     public getSelfCharacter() {
-        return this.myChara
+        return this.myChara;
     }
 
     //シーン情報取得

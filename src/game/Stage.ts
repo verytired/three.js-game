@@ -33,13 +33,13 @@ class Stage extends Mover {
     }
 
     public destructor() {
-
+        //todo implemation
     }
 
     public update() {
-        this.y += this.vy
+        this.y += this.vy;
         if (this.y <= -320) {
-            this.y = 0
+            this.y = 0;
         }
         this._obj.position.set(this.x, this.y, 0);
     }

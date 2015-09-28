@@ -8,6 +8,6 @@ interface IMover{
 
 
     //内部情報更新
-    update(nowFrame):void
+    update(nowFrame):void;
 
 }

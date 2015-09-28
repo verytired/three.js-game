@@ -35,7 +35,7 @@ class TopView extends CView {
             case 32:
                 this.moveNextScene();
                 $("#view-top").hide();
-                break
+                break;
         }
     }
 
@@ -46,7 +46,7 @@ class TopView extends CView {
 
     public moveNextScene() {
         $("#overlay").hide();
-        this.app.setView(new GameView())
+        this.app.setView(new GameView());
     }
 
 }

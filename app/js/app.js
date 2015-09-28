@@ -109,8 +109,7 @@ var events;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var CMover = (function (_super) {
     __extends(CMover, _super);
@@ -764,8 +763,9 @@ var Enemy = (function (_super) {
     };
     Enemy.prototype.update = function (nowFrame) {
         var frame = nowFrame - this.startFrame;
-        if (frame <= this.currentFrame)
+        if (frame <= this.currentFrame) {
             return;
+        }
         this.currentFrame = frame;
         this.doAction();
         this.x += this.vx;
@@ -782,16 +782,18 @@ var Enemy = (function (_super) {
         else if (this.currentFrame == 100) {
             this.vy = 6;
         }
-        if (this.lifeTime == -1)
+        if (this.lifeTime == -1) {
             return;
+        }
         if (this.currentFrame >= this.lifeTime) {
             this.isDead = true;
             this.waitRemove = true;
         }
     };
     Enemy.prototype.shot = function () {
-        if (this.isDead == true)
+        if (this.isDead == true) {
             return;
+        }
         var s = GameManager.getInstance().getSelfCharacter();
         var dist = Math.sqrt(Math.pow((s.x - this.x), 2) + Math.pow((s.y - this.y), 2));
         this.shooter.shot(this.x, this.y, (s.x - this.x) / dist * 3, (s.y - this.y) / dist * 3);
@@ -807,8 +809,9 @@ var Enemy = (function (_super) {
     };
     Enemy.prototype.hit = function () {
         var _this = this;
-        if (this.receiveDamage == false)
+        if (this.receiveDamage == false) {
             return;
+        }
         var msh = this._obj.children[0];
         var ma = msh.material;
         ma.color.setHex(0xFF0000);
@@ -885,7 +888,6 @@ var EnemyBoss = (function (_super) {
         }
         if (this.isLoop) {
             this.farmecount++;
-            console.log();
             if (this.farmecount % duration == 0) {
                 this.shot();
             }
@@ -937,8 +939,9 @@ var EnemyMid = (function (_super) {
         this.hitAreaPos.push(new THREE.Vector2(0, 0));
     };
     EnemyMid.prototype.shot = function () {
-        if (this.isDead == true)
+        if (this.isDead == true) {
             return;
+        }
         this.shooter.shot(this.x, this.y, 8, 15, 3);
     };
     EnemyMid.prototype.doAction = function () {
@@ -1021,7 +1024,6 @@ var Explosion = (function (_super) {
         this.yDir = 0;
         this.zDir = 0;
         this.frameCount = 0;
-        var color = arguments[2];
         if (color == undefined || color == null) {
             color = 0xFFFFFF;
         }
@@ -1495,8 +1497,9 @@ var GameView = (function (_super) {
         this.hitTest();
         this.checkLiveTest();
         _super.prototype.update.call(this, currentFrame);
-        if (this.skybox)
+        if (this.skybox) {
             this.skybox.rotation.y += 0.01;
+        }
     };
     GameView.prototype.hitTest = function () {
         var _this = this;
@@ -1601,11 +1604,11 @@ var GameView = (function (_super) {
         this.gm.setSelfCharacter(this.self);
         this.app.setStartTime();
         var path = "image/skybox/";
-        var format = '.jpg';
+        var format = ".jpg";
         var urls = [
-            path + 'px' + format, path + 'nx' + format,
-            path + 'py' + format, path + 'ny' + format,
-            path + 'pz' + format, path + 'nz' + format
+            path + "px" + format, path + "nx" + format,
+            path + "py" + format, path + "ny" + format,
+            path + "pz" + format, path + "nz" + format
         ];
         var textureCube = THREE.ImageUtils.loadTextureCube(urls, THREE.CubeRefractionMapping);
         var shader = THREE.ShaderLib["cube"];
@@ -1718,8 +1721,9 @@ var ShooterNway = (function (_super) {
     }
     ShooterNway.prototype.shot = function (x, y, nway, durationRad, speed) {
         if (speed === void 0) { speed = 5; }
-        if (nway <= 1)
+        if (nway <= 1) {
             return;
+        }
         var baseForward = 270;
         var totalRad = durationRad * (nway - 1);
         var startRad = baseForward - totalRad / 2;

@@ -23,18 +23,6 @@ gulp.task 'coffee', ->
 	.pipe $.coffee()
 	.pipe gulp.dest parentDir + 'js'
 
-#typescript compile by gulp-ts
-###
-gulp.task 'tsc', () ->
-	gulp
-	.src ['src/*.ts','src/*/*.ts']
-#	 --outオプションでひとまとめにコンパイル
-	.pipe $.typescript({ target: "ES5", removeComments: true, out: "main.js" })
-	.pipe $.plumber()
-	.pipe $.tsc()
-	.pipe gulp.dest parentDir + 'js'
-###
-
 #typescript compile using gulp-typescript
 gulp.task 'typescript', () ->
 	gulp

@@ -4,11 +4,19 @@ Shooting Game Development using three.js
 
 [http://verytired.github.io/three.js-game/app/index.html](http://verytired.github.io/three.js-game/app/index.html)
 
-#build setting
+## build setting
 
 ```
+npm install
+
 bower install
 
-cd src
-git clone https://github.com/borisyankov/DefinitelyTyped.git
+tsd install
+
+```
+
+## start
+
+```
+npm start
 ```
